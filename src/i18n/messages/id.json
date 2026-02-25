@@ -1,0 +1,131 @@
+{
+  "app": {
+    "name": "AutoClipper"
+  },
+  "nav": {
+    "dashboard": "Dasbor",
+    "projects": "Proyek",
+    "history": "Riwayat Klip",
+    "settings": "Pengaturan",
+    "onboarding": "Panduan Setup"
+  },
+  "dashboard": {
+    "title": "Proyek Saya",
+    "description": "Kelola dan buat klip video viral dari konten Anda.",
+    "newProject": "Proyek Baru",
+    "noProjects": "Belum ada proyek. Klik 'Proyek Baru' untuk mulai.",
+    "loadingProjects": "Memuat proyek...",
+    "dialog": {
+      "title": "Buat Proyek Baru",
+      "description": "Masukkan nama proyek dan pilih file video sumber.",
+      "projectName": "Nama Proyek",
+      "projectNamePlaceholder": "Contoh: Podcast Ep. 42",
+      "videoSource": "File Video Sumber",
+      "videoSourcePlaceholder": "Klik Pilih File atau tempel path...",
+      "browse": "Pilih File",
+      "cancel": "Batal",
+      "create": "Buat Proyek",
+      "creating": "Membuat..."
+    },
+    "project": {
+      "open": "Buka Studio",
+      "duration": "Durasi",
+      "status": "Status"
+    }
+  },
+  "studio": {
+    "title": "Studio Proyek",
+    "autoCut": "Potong Otomatis",
+    "videoPreview": "Pratinjau Video",
+    "aiClips": "Klip AI",
+    "noClips": "Belum ada klip. Klik Potong Otomatis untuk mulai.",
+    "bgMusic": "Musik Latar (.mp3)",
+    "bgMusicPlaceholder": "Opsional — pilih file musik",
+    "clipScore": "Skor",
+    "clipBroll": "B-Roll",
+    "editSubs": "Edit Teks",
+    "render": "Render 9:16",
+    "openFile": "Buka File",
+    "schedulePost": "Jadwalkan",
+    "rendering": "Merender...",
+    "statusReady": "Siap. Klik 'Potong Otomatis' untuk memulai pipeline AI.",
+    "statusTranscribing": "Mengekstrak audio & transkripsi dengan",
+    "statusSegmenting": "Memotong transkrip menjadi kandidat klip...",
+    "statusScoring": "Menilai kandidat dengan LLM...",
+    "statusEnriching": "Menyisipkan emoji & tag B-Roll...",
+    "statusDone": "Selesai! {count} klip siap.",
+    "statusMockLoaded": "Data contoh dimuat (tambahkan API key di Pengaturan untuk proses nyata).",
+    "statusNoKey": "API Key belum dikonfigurasi. Menggunakan data contoh...",
+    "statusNoClips": "Tidak ada kandidat klip ditemukan. Coba video yang lebih panjang.",
+    "subtitleEditor": {
+      "title": "Edit Teks & Gaya",
+      "description": "Sesuaikan font, warna, posisi, dan waktu teks.",
+      "font": "Font",
+      "karaokeColor": "Warna Karaoke",
+      "outline": "Garis Tepi",
+      "alignment": "Perataan",
+      "marginY": "Margin Y",
+      "bottom": "Bawah",
+      "top": "Atas",
+      "middle": "Tengah",
+      "save": "Simpan Perubahan",
+      "cancel": "Batal"
+    }
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "description": "Kelola provider AI, model, dan API key.",
+    "aiScoring": {
+      "title": "Model AI Penskoran",
+      "description": "Pilih provider & model LLM untuk menilai klip.",
+      "provider": "Provider",
+      "model": "Model",
+      "localModelName": "Nama Model Lokal",
+      "localModelPlaceholder": "llama3.2, gemma3, mistral...",
+      "localType": "Tipe AI Lokal",
+      "localUrl": "URL AI Lokal"
+    },
+    "asr": {
+      "title": "Transkripsi (ASR)",
+      "description": "Pilih provider & model pengenalan suara.",
+      "provider": "Provider ASR",
+      "model": "Model ASR"
+    },
+    "apiKeys": {
+      "title": "API Key",
+      "description": "Disimpan aman di OS Keychain. Tidak pernah ditulis ke disk.",
+      "save": "Simpan Semua Pengaturan",
+      "saving": "Menyimpan..."
+    },
+    "oauth": {
+      "title": "OAuth Media Sosial",
+      "description": "Hubungkan akun untuk posting terjadwal. Membutuhkan Client ID di file .env.",
+      "connectYoutube": "Hubungkan YouTube",
+      "connectTiktok": "Hubungkan TikTok",
+      "connectFacebook": "Hubungkan Facebook"
+    },
+    "advanced": {
+      "title": "Fitur Lanjutan",
+      "description": "Aktifkan atau nonaktifkan fitur opsional.",
+      "faceTracking": "Face Tracking",
+      "autoUpdate": "Cek Update Otomatis",
+      "errorLogging": "Log Error",
+      "checkNow": "Cek Sekarang",
+      "clearLogs": "Hapus Log"
+    },
+    "pexels": {
+      "apiKey": "Pexels API Key",
+      "hint": "Gratis di pexels.com/api — untuk download B-Roll video"
+    }
+  },
+  "common": {
+    "loading": "Memuat...",
+    "error": "Error",
+    "success": "Berhasil",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "browse": "Pilih File",
+    "open": "Buka",
+    "close": "Tutup"
+  }
+}

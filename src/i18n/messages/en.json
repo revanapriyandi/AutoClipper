@@ -1,0 +1,130 @@
+{
+  "app": { "name": "AutoClipper" },
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "history": "Clip History",
+    "settings": "Settings",
+    "onboarding": "Setup Guide"
+  },
+  "dashboard": {
+    "title": "My Projects",
+    "description": "Manage and create viral video clips from your content.",
+    "newProject": "New Project",
+    "noProjects": "No projects yet. Click 'New Project' to get started.",
+    "loadingProjects": "Loading projects...",
+    "dialog": {
+      "title": "Create New Project",
+      "description": "Enter a project name and select a source video file.",
+      "projectName": "Project Name",
+      "projectNamePlaceholder": "e.g. Podcast Ep. 42",
+      "videoSource": "Source Video File",
+      "videoSourcePlaceholder": "Click Browse or paste a path...",
+      "browse": "Browse",
+      "cancel": "Cancel",
+      "create": "Create Project",
+      "creating": "Creating..."
+    },
+    "project": {
+      "open": "Open Studio",
+      "duration": "Duration",
+      "status": "Status"
+    }
+  },
+  "studio": {
+    "title": "Project Studio",
+    "autoCut": "Auto-Cut Clips",
+    "videoPreview": "Video Preview",
+    "aiClips": "AI Generated Clips",
+    "noClips": "No clips generated yet. Click Auto-Cut to begin.",
+    "bgMusic": "Background Music (.mp3)",
+    "bgMusicPlaceholder": "Optional — select music file",
+    "clipScore": "Score",
+    "clipBroll": "B-Roll",
+    "editSubs": "Edit Subs",
+    "render": "Render 9:16",
+    "openFile": "Open File",
+    "schedulePost": "Schedule Post",
+    "rendering": "Rendering...",
+    "statusReady": "Ready. Click 'Auto-Cut Clips' to start the AI pipeline.",
+    "statusTranscribing": "Extracting audio & transcribing with",
+    "statusSegmenting": "Segmenting transcript into viral clip candidates...",
+    "statusScoring": "Scoring candidates with LLM...",
+    "statusEnriching": "Injecting emojis & B-Roll keywords...",
+    "statusDone": "Done! {count} clip(s) ready.",
+    "statusMockLoaded": "Mock data loaded (add API key in Settings for real processing).",
+    "statusNoKey": "API Key not configured. Loading mock data...",
+    "statusNoClips": "No clip candidates found. Try a longer video.",
+    "subtitleEditor": {
+      "title": "Edit Subtitles & Style",
+      "description": "Customize font, colors, positions, and subtitle timings.",
+      "font": "Font",
+      "karaokeColor": "Karaoke Color",
+      "outline": "Outline",
+      "alignment": "Alignment",
+      "marginY": "Margin Y",
+      "bottom": "Bottom",
+      "top": "Top",
+      "middle": "Middle",
+      "save": "Save Changes",
+      "cancel": "Cancel"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage AI providers, models, and API keys.",
+    "aiScoring": {
+      "title": "AI Scoring Model",
+      "description": "Select LLM provider & model for clip scoring.",
+      "provider": "Provider",
+      "model": "Model",
+      "localModelName": "Local Model Name",
+      "localModelPlaceholder": "llama3.2, gemma3, mistral...",
+      "localType": "Local AI Type",
+      "localUrl": "Local AI URL"
+    },
+    "asr": {
+      "title": "Transcription (ASR)",
+      "description": "Select speech recognition provider & model.",
+      "provider": "ASR Provider",
+      "model": "ASR Model"
+    },
+    "apiKeys": {
+      "title": "API Keys",
+      "description": "Stored securely in the OS Keychain. Never written to disk.",
+      "save": "Save All Settings",
+      "saving": "Saving..."
+    },
+    "oauth": {
+      "title": "Social Media OAuth",
+      "description": "Connect accounts for scheduled posting. Requires Client IDs in .env file.",
+      "connectYoutube": "Connect YouTube",
+      "connectTiktok": "Connect TikTok",
+      "connectFacebook": "Connect Facebook"
+    },
+    "advanced": {
+      "title": "Advanced Features",
+      "description": "Enable or disable optional features.",
+      "faceTracking": "Face Tracking",
+      "autoUpdate": "Auto-Update Check",
+      "errorLogging": "Error Logging",
+      "checkNow": "Check Now",
+      "clearLogs": "Clear Logs"
+    },
+    "pexels": {
+      "apiKey": "Pexels API Key",
+      "hint": "Free at pexels.com/api — for downloading B-Roll videos"
+    }
+  },
+
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "browse": "Browse",
+    "open": "Open",
+    "close": "Close"
+  }
+}

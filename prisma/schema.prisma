@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  sourcePath  String
+  durationMs  Int?
+  status      String   @default("DRAFT") // DRAFT, TRANSCRIBING, GENERATING, READY
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  transcripts Transcript[]
+  candidates  ClipCandidate[]
+  clips       Clip[]
+}
+
+model ClipProfile {
+  id          String   @id @default(uuid())
+  name        String
+  configJson  String   // Storing full dynamic JSON configuration
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Transcript {
+  id           String   @id @default(uuid())
+  projectId    String
+  provider     String   // e.g. "openai", "deepgram", "ollama-whisper"
+  segmentsJson String   // Storing actual SRT/words json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ClipCandidate {
+  id         String   @id @default(uuid())
+  projectId  String
+  startMs    Int
+  endMs      Int
+  statsJson  String   // Contains heuristics (words count, energy)
+  createdAt  DateTime @default(now())
+  
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Clip {
+  id         String   @id @default(uuid())
+  projectId  String
+  startMs    Int
+  endMs      Int
+  scores     String   // JSON containing { text, audio, visual, total }
+  caption    String?  // Generated Caption/Hooks
+  status     String   @default("PENDING") // PENDING, RENDERING, COMPLETED, POSTED
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assets     Asset[]
+}
+
+model Asset {
+  id          String   @id @default(uuid())
+  clipId      String
+  kind        String   // "video", "thumbnail", "subtitle"
+  storagePath String
+  createdAt   DateTime @default(now())
+
+  clip        Clip     @relation(fields: [clipId], references: [id], onDelete: Cascade)
+}
+
+model Job {
+  id           String    @id @default(uuid())
+  type         String    // "RENDER", "POST"
+  payloadJson  String
+  status       String    @default("QUEUED") // QUEUED, PROCESSING, RETRY_PENDING, FAILED, COMPLETED
+  attempts     Int       @default(0)
+  error        String?
+  nextRetryAt  DateTime?  // Set when status = RETRY_PENDING
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Settings {
+  id    String @id @default("GLOBAL")
+  key   String @unique
+  value String
+}

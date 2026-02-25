@@ -1,36 +1,47 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ==== Secrets & Environment ====
+.env
+.env.local
+.env.production
+.env*.local
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
+# ==== Next.js ====
+.next/
+out/
+next-env.d.ts
 
-# testing
-/coverage
+# ==== Electron Build Output ====
+dist/
+dist-electron/
+release/
 
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
+# ==== Node / npm ====
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnp
+.pnp.js
 
-# local env files
-.env*.local
+# ==== Database (SQLite local dev db) ====
+prisma/*.db
+prisma/*.db-journal
+*.sqlite
+*.sqlite-journal
 
-# vercel
-.vercel
+# ==== OS Generated ====
+.DS_Store
+Thumbs.db
+Desktop.ini
 
-# typescript
+# ==== IDE / Editor ====
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ==== Build artifacts ====
 *.tsbuildinfo
-next-env.d.ts
+
+# ==== Test Coverage ====
+coverage/
+.nyc_output/

@@ -1,0 +1,48 @@
+name: AutoClipper Release Build
+
+on:
+  push:
+    tags:
+      - "v*" # Trigger build hanya saat push tag seperti v1.0.0
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client (Per OS)
+        run: npx prisma generate
+
+      - name: Create Production .env
+        run: |
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "TIKTOK_CLIENT_KEY=${{ secrets.TIKTOK_CLIENT_KEY }}" >> .env
+          echo "FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }}" >> .env
+          echo "PEXELS_API_KEY=${{ secrets.PEXELS_API_KEY }}" >> .env
+          echo "OAUTH_REDIRECT_URI=http://localhost:3000/oauth/callback" >> .env
+          echo "DATABASE_URL=file:./dev.db" >> .env
+        shell: bash
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Build & Publish Electron Apps
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --publish always
