@@ -32,6 +32,12 @@ export default function SettingsPage() {
   const [deepgramKey,   setDeepgramKey]   = useState("");
   const [assemblyaiKey, setAssemblyaiKey] = useState("");
 
+  // ---- OAuth App Credentials (user registers their own apps) ----
+  const [googleClientId,  setGoogleClientId]  = useState("");
+  const [tiktokClientKey, setTiktokClientKey] = useState("");
+  const [facebookAppId,   setFacebookAppId]   = useState("");
+  const [pexelsApiKey,    setPexelsApiKey]    = useState("");
+
   // ---- AI Selection ----
   const [llmProvider,   setLlmProvider]   = useState("openai");
   const [llmModel,      setLlmModel]      = useState("gpt-5-mini");
@@ -93,6 +99,11 @@ export default function SettingsPage() {
       setLocalAiType(  await load("local_ai_type")       || "ollama");
       setLocalAiUrl(   await load("local_ai_url")        || "http://localhost:11434");
       setLocalModel(   await load("local_model_name")    || "llama3.2");
+      // OAuth App Credentials
+      setGoogleClientId(  await load("oauth_google_client_id"));
+      setTiktokClientKey( await load("oauth_tiktok_client_key"));
+      setFacebookAppId(   await load("oauth_facebook_app_id"));
+      setPexelsApiKey(    await load("pexels_api_key"));
     };
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,6 +129,11 @@ export default function SettingsPage() {
         ["local_ai_type",       localAiType],
         ["local_ai_url",        localAiUrl],
         ["local_model_name",    localModel],
+        // OAuth App Credentials
+        ["oauth_google_client_id",  googleClientId],
+        ["oauth_tiktok_client_key", tiktokClientKey],
+        ["oauth_facebook_app_id",   facebookAppId],
+        ["pexels_api_key",          pexelsApiKey],
       ];
       for (const [key, val] of pairs) {
         if (val) await api.setKey(key, val);
@@ -297,10 +313,46 @@ export default function SettingsPage() {
       </Card>
 
       {/* ── OAuth ──────────────────────────── */}
+      {/* ── OAuth App Credentials ──────────────────────────── */}
+      <Card>
+        <CardHeader>
+          <CardTitle>🔐 OAuth App Credentials</CardTitle>
+          <CardDescription>
+            Daftarkan OAuth App Anda sendiri di developer portal masing-masing platform.
+            Credentials ini disimpan aman di OS Keychain — tidak pernah boleh dibagikan.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Google Client ID</Label>
+              <p className="text-[10px] text-muted-foreground">Dari <a href="https://console.cloud.google.com" target="_blank" className="underline text-blue-400">Google Cloud Console</a> → YouTube Data API v3</p>
+              <Input value={googleClientId} onChange={e => setGoogleClientId(e.target.value)} placeholder="123456-abc.apps.googleusercontent.com" className="h-8 text-xs" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">TikTok Client Key</Label>
+              <p className="text-[10px] text-muted-foreground">Dari <a href="https://developers.tiktok.com" target="_blank" className="underline text-blue-400">TikTok for Developers</a> → Manage Apps</p>
+              <Input value={tiktokClientKey} onChange={e => setTiktokClientKey(e.target.value)} placeholder="aw..." className="h-8 text-xs" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Facebook / Meta App ID</Label>
+              <p className="text-[10px] text-muted-foreground">Dari <a href="https://developers.facebook.com" target="_blank" className="underline text-blue-400">Meta for Developers</a> → My Apps → Basic Settings</p>
+              <Input value={facebookAppId} onChange={e => setFacebookAppId(e.target.value)} placeholder="123456789..." className="h-8 text-xs" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Pexels API Key (B-Roll)</Label>
+              <p className="text-[10px] text-muted-foreground">Dari <a href="https://www.pexels.com/api" target="_blank" className="underline text-blue-400">Pexels.com/api</a> → gratis</p>
+              <Input value={pexelsApiKey} onChange={e => setPexelsApiKey(e.target.value)} placeholder="pexels-..." className="h-8 text-xs" />
+            </div>
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-1 italic">Klik &quot;Save All Settings&quot; di atas untuk menyimpan ke OS Keychain.</p>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>📱 Social Media OAuth</CardTitle>
-          <CardDescription>Connect accounts for scheduled posting. Requires Client IDs in .env file.</CardDescription>
+          <CardDescription>Hubungkan akun untuk auto-posting. Pastikan OAuth App Credentials di atas sudah terisi dulu.</CardDescription>
         </CardHeader>
         <CardContent className="flex gap-3 flex-wrap">
           <Button variant="outline" onClick={() => handleAuth("youtube")}>Connect YouTube</Button>

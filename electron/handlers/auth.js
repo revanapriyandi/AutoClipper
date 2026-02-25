@@ -26,12 +26,12 @@ function generatePKCE() {
 
 // ── Token exchange helpers ──────────────────────────────────────
 
-async function exchangeYouTubeToken(code, redirectUri, verifier) {
+async function exchangeYouTubeToken(code, redirectUri, verifier, clientId) {
   const res = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
-      client_id:     process.env.GOOGLE_CLIENT_ID,
+      client_id:     clientId,
       redirect_uri:  redirectUri,
       grant_type:    'authorization_code',
       code,
@@ -43,12 +43,12 @@ async function exchangeYouTubeToken(code, redirectUri, verifier) {
   return { accessToken: data.access_token, refreshToken: data.refresh_token, expiresIn: data.expires_in };
 }
 
-async function exchangeTikTokToken(code, redirectUri, verifier) {
+async function exchangeTikTokToken(code, redirectUri, verifier, clientKey) {
   const res = await fetch('https://open.tiktokapis.com/v2/oauth/token/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
-      client_key:    process.env.TIKTOK_CLIENT_KEY,
+      client_key:    clientKey,
       redirect_uri:  redirectUri,
       grant_type:    'authorization_code',
       code,
@@ -60,9 +60,9 @@ async function exchangeTikTokToken(code, redirectUri, verifier) {
   return { accessToken: data.data?.access_token, refreshToken: data.data?.refresh_token, expiresIn: data.data?.expires_in };
 }
 
-async function exchangeFacebookToken(code, redirectUri, verifier) {
+async function exchangeFacebookToken(code, redirectUri, verifier, appId) {
   const params = new URLSearchParams({
-    client_id:     process.env.FACEBOOK_APP_ID,
+    client_id:     appId,
     redirect_uri:  redirectUri,
     code,
     code_verifier: verifier,
@@ -77,15 +77,20 @@ async function exchangeFacebookToken(code, redirectUri, verifier) {
 // ── IPC Handler ─────────────────────────────────────────────────
 
 ipcMain.handle('auth:login', async (_, provider) => {
-  return new Promise((resolve) => {
-    const redirectUri = process.env.OAUTH_REDIRECT_URI || config.OAUTH_DEFAULT_REDIRECT;
+  return new Promise(async (resolve) => {
+    const redirectUri = process.env.OAUTH_REDIRECT_URI || 'http://localhost:3000/api/auth/callback';
     const { verifier, challenge } = generatePKCE();
     let authUrl = '';
 
+    // Read credentials from keytar (user-configured in Settings)
+    const googleClientId  = await keytar.getPassword(SERVICE_NAME, 'oauth_google_client_id')  || process.env.GOOGLE_CLIENT_ID;
+    const tiktokClientKey = await keytar.getPassword(SERVICE_NAME, 'oauth_tiktok_client_key') || process.env.TIKTOK_CLIENT_KEY;
+    const facebookAppId   = await keytar.getPassword(SERVICE_NAME, 'oauth_facebook_app_id')   || process.env.FACEBOOK_APP_ID;
+
     if (provider === 'youtube') {
-      if (!process.env.GOOGLE_CLIENT_ID) return resolve({ success: false, error: 'GOOGLE_CLIENT_ID not set in .env' });
+      if (!googleClientId) return resolve({ success: false, error: 'Google Client ID not configured. Add it in Settings → OAuth App Credentials.' });
       authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` + new URLSearchParams({
-        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_id: googleClientId,
         redirect_uri: redirectUri,
         response_type: 'code',
         scope: 'https://www.googleapis.com/auth/youtube.upload',
@@ -95,9 +100,9 @@ ipcMain.handle('auth:login', async (_, provider) => {
         code_challenge_method: 'S256',
       });
     } else if (provider === 'tiktok') {
-      if (!process.env.TIKTOK_CLIENT_KEY) return resolve({ success: false, error: 'TIKTOK_CLIENT_KEY not set in .env' });
+      if (!tiktokClientKey) return resolve({ success: false, error: 'TikTok Client Key not configured. Add it in Settings → OAuth App Credentials.' });
       authUrl = `https://www.tiktok.com/v2/auth/authorize?` + new URLSearchParams({
-        client_key: process.env.TIKTOK_CLIENT_KEY,
+        client_key: tiktokClientKey,
         response_type: 'code',
         scope: 'video.upload',
         redirect_uri: redirectUri,
@@ -105,9 +110,9 @@ ipcMain.handle('auth:login', async (_, provider) => {
         code_challenge_method: 'S256',
       });
     } else if (provider === 'facebook') {
-      if (!process.env.FACEBOOK_APP_ID) return resolve({ success: false, error: 'FACEBOOK_APP_ID not set in .env' });
+      if (!facebookAppId) return resolve({ success: false, error: 'Facebook App ID not configured. Add it in Settings → OAuth App Credentials.' });
       authUrl = `https://www.facebook.com/v17.0/dialog/oauth?` + new URLSearchParams({
-        client_id: process.env.FACEBOOK_APP_ID,
+        client_id: facebookAppId,
         redirect_uri: redirectUri,
         scope: 'pages_manage_posts,pages_read_engagement',
         code_challenge: challenge,
@@ -136,9 +141,9 @@ ipcMain.handle('auth:login', async (_, provider) => {
 
       try {
         let tokens;
-        if (provider === 'youtube')  tokens = await exchangeYouTubeToken(code, redirectUri, verifier);
-        if (provider === 'tiktok')   tokens = await exchangeTikTokToken(code, redirectUri, verifier);
-        if (provider === 'facebook') tokens = await exchangeFacebookToken(code, redirectUri, verifier);
+        if (provider === 'youtube')  tokens = await exchangeYouTubeToken(code, redirectUri, verifier, googleClientId);
+        if (provider === 'tiktok')   tokens = await exchangeTikTokToken(code, redirectUri, verifier, tiktokClientKey);
+        if (provider === 'facebook') tokens = await exchangeFacebookToken(code, redirectUri, verifier, facebookAppId);
 
 
         if (tokens?.accessToken) {
@@ -180,11 +185,12 @@ async function getValidToken(provider) {
 
     try {
       if (provider === 'youtube') {
+        const clientId = await keytar.getPassword(SERVICE_NAME, 'oauth_google_client_id') || process.env.GOOGLE_CLIENT_ID;
         const res = await fetch('https://oauth2.googleapis.com/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({
-            client_id:     process.env.GOOGLE_CLIENT_ID,
+            client_id:     clientId,
             grant_type:    'refresh_token',
             refresh_token: refreshToken,
           }),
