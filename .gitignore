@@ -4,6 +4,10 @@
 .env.production
 .env*.local
 
+# ==== Design / Planning Docs (private) ====
+*.pdf
+rancangan_*.pdf
+
 # ==== Next.js ====
 .next/
 out/
