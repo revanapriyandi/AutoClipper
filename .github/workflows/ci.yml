@@ -1,4 +1,4 @@
-name: AutoClipper CI — Lint, Type Check & Test
+name: CI — Lint, Type Check & Test
 
 on:
   push:
