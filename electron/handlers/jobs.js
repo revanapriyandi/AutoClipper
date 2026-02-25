@@ -8,14 +8,12 @@
  */
 
 const { ipcMain } = require('electron');
-const { PrismaClient } = require('@prisma/client');
 const keytar = require('keytar');
 const { runVideoRender } = require('./render');
 const { getValidToken } = require('./auth');
 const { writeLog } = require('./logger');
 
-
-const prisma = new PrismaClient();
+const prisma = require('../prisma');
 const SERVICE_NAME = 'AutoClipperApp';
 
 /** Max attempts before marking a job permanently FAILED */
@@ -58,9 +56,18 @@ async function processNextJob() {
           { status: 'QUEUED' },
           { status: 'RETRY_PENDING', nextRetryAt: { lte: now } },
         ],
+        AND: [
+          {
+            OR: [
+              { scheduledAt: null },
+              { scheduledAt: { lte: now } }
+            ]
+          }
+        ]
       },
       orderBy: { createdAt: 'asc' },
     });
+
 
     if (!job) { isProcessingQueue = false; return; }
 
@@ -143,9 +150,16 @@ async function processNextJob() {
   isProcessingQueue = false;
 }
 
-ipcMain.handle('job:enqueue', async (_, { type, payload }) => {
+ipcMain.handle('job:enqueue', async (_, { type, payload, scheduledAt }) => {
   try {
-    const job = await prisma.job.create({ data: { type, payloadJson: JSON.stringify(payload), status: 'QUEUED' } });
+    const job = await prisma.job.create({ 
+      data: { 
+        type, 
+        payloadJson: JSON.stringify(payload), 
+        status: 'QUEUED',
+        scheduledAt: scheduledAt ? new Date(scheduledAt) : null 
+      } 
+    });
     return { success: true, jobId: job.id };
   } catch (e) {
     return { success: false, error: e.message };

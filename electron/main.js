@@ -50,9 +50,13 @@ require('./handlers/broll');
 require('./handlers/caption');
 require('./handlers/logger');
 require('./handlers/facetrack');
+require('./handlers/dubbing');
 const { checkOnStartup } = require('./handlers/updater');
 
 require('./handlers/db');
+require('./handlers/db_calendar_addon');
+require('./handlers/db_theme_addon');
+require('./handlers/db_analytics_addon');
 
 const { pollJobQueue, prisma } = require('./handlers/jobs');
 

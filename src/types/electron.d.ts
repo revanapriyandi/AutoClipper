@@ -15,6 +15,12 @@ declare global {
       dbGetProjects: () => Promise<{ success: boolean; projects?: unknown[]; error?: string }>;
       dbGetProject: (id: string) => Promise<{ success: boolean; project?: unknown; error?: string }>;
       dbGetClipHistory: () => Promise<{ success: boolean; clips?: unknown[]; error?: string }>;
+      dbGetScheduledJobs: () => Promise<{ success: boolean; jobs?: unknown[]; error?: string }>;
+      dbGetThemePresets: () => Promise<{ success: boolean; presets?: { id: string; name: string; fontFamily: string; primaryColor: string; outlineColor: string; alignment: string; marginV: string }[]; error?: string }>;
+      dbCreateThemePreset: (data: { name: string; fontFamily: string; primaryColor: string; outlineColor: string; alignment: string; marginV: string }) => Promise<{ success: boolean; preset?: unknown; error?: string }>;
+      dbDeleteThemePreset: (id: string) => Promise<{ success: boolean; error?: string }>;
+      dbGetAnalytics: () => Promise<{ success: boolean; analytics?: unknown[]; error?: string }>;
+      dbUpdateAnalytics: (data: { clipId: string; platform: string; views?: number; likes?: number; comments?: number; shares?: number }) => Promise<{ success: boolean; analytics?: unknown; error?: string }>;
       // System Utilities
 
       openFilePicker: (filters?: { name: string; extensions: string[] }[]) => Promise<{ success: boolean; filePath?: string }>;
@@ -43,7 +49,7 @@ declare global {
       renderClip:  (options: unknown) => Promise<{ success: boolean; outputPath?: string; error?: string }>;
       uploadVideo: (opts: { platform: string; videoPath: string; title?: string; description?: string; tags?: string[]; pageId?: string }) => Promise<{ success: boolean; videoId?: string; url?: string; publishId?: string; error?: string }>;
       // Background Jobs
-      enqueueJob: (type: string, payload: unknown) => Promise<{ success: boolean; jobId?: string; error?: string }>;
+      enqueueJob: (type: string, payload: unknown, scheduledAt?: string | Date) => Promise<{ success: boolean; jobId?: string; error?: string }>;
       getJob: (jobId: string) => Promise<{ success: boolean; job?: { id: string; status: string; error?: string } }>;
       // OAuth
       authLogin:   (provider: string) => Promise<{ success: boolean; error?: string }>;
@@ -74,9 +80,11 @@ declare global {
       facetrackSetEnabled: (enabled: boolean) => Promise<{ success: boolean; enabled: boolean }>;
       facetrackGetEnabled: () => Promise<{ success: boolean; enabled: boolean }>;
       facetrackDetect:     (opts: { videoPath: string; width?: number; height?: number }) => Promise<{ success: boolean; xOffset?: number; error?: string }>;
+      // AI Dubbing
+      dubbingSetEnabled:   (enabled: boolean) => Promise<{ success: boolean; enabled: boolean }>;
+      dubbingGetEnabled:   () => Promise<{ success: boolean; enabled: boolean }>;
     };
   }
 }
 
 export {};
-

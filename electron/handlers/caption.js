@@ -102,6 +102,34 @@ Return JSON only.`;
       const data = await res.json();
       captionData = JSON.parse(data.content[0].text);
 
+    } else if (provider === 'local') {
+      const localType  = await getSetting('local_ai_type', config.LOCAL_AI_DEFAULT_TYPE);
+      const localUrl   = await getSetting('local_ai_url', config.LOCAL_AI_DEFAULT_URL);
+      const localModel = await getSetting('local_model_name', config.LOCAL_AI_DEFAULT_MODEL);
+      
+      if (localType === 'openai_compatible') {
+        const res = await fetch(`${localUrl}/chat/completions`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer not-needed` },
+          body: JSON.stringify({
+            model: localModel,
+            response_format: { type: 'json_object' },
+            messages: [{ role: 'system', content: CAPTION_SYSTEM_PROMPT }, { role: 'user', content: userPrompt }]
+          })
+        });
+        const data = await res.json();
+        captionData = JSON.parse(data.choices[0].message.content);
+      } else {
+        const res = await fetch(`${localUrl}/api/generate`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: localModel,
+            prompt: `${CAPTION_SYSTEM_PROMPT}\n\n${userPrompt}`,
+            stream: false, format: 'json'
+          })
+        });
+        const data = await res.json();
+        captionData = JSON.parse(data.response);
+      }
     } else {
       throw new Error('No supported LLM provider configured for caption generation.');
     }

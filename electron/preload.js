@@ -10,6 +10,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   dbGetProjects:       ()          => ipcRenderer.invoke('db:getProjects'),
   dbGetProject:        (id)        => ipcRenderer.invoke('db:getProject', id),
   dbGetClipHistory:    ()          => ipcRenderer.invoke('db:getClipHistory'),
+  dbGetScheduledJobs:  ()          => ipcRenderer.invoke('db:getScheduledJobs'),
+  
+  dbGetThemePresets:   ()          => ipcRenderer.invoke('db:getThemePresets'),
+  dbCreateThemePreset: (data)      => ipcRenderer.invoke('db:createThemePreset', data),
+  dbDeleteThemePreset: (id)        => ipcRenderer.invoke('db:deleteThemePreset', id),
+
+  dbGetAnalytics:      ()          => ipcRenderer.invoke('db:getAnalytics'),
+  dbUpdateAnalytics:   (data)      => ipcRenderer.invoke('db:updateAnalytics', data),
   // System
 
   openFilePicker:      (filters)   => ipcRenderer.invoke('dialog:openFile', { filters }),
@@ -47,9 +55,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => ipcRenderer.removeListener('updater:status', handler);
   },
   // Face Tracking
-  facetrackSetEnabled: (en)      => ipcRenderer.invoke('facetrack:setEnabled', en),
+  facetrackSetEnabled: (enabled) => ipcRenderer.invoke('facetrack:setEnabled', enabled),
   facetrackGetEnabled: ()        => ipcRenderer.invoke('facetrack:getEnabled'),
   facetrackDetect:     (opts)    => ipcRenderer.invoke('facetrack:detect', opts),
+  
+  // AI Dubbing
+  dubbingSetEnabled:   (enabled) => ipcRenderer.invoke('dubbing:setEnabled', enabled),
+  dubbingGetEnabled:   ()        => ipcRenderer.invoke('dubbing:getEnabled'),
   // Jobs
   enqueueJob:          (type, payload) => ipcRenderer.invoke('job:enqueue', { type, payload }),
   getJob:              (jobId)         => ipcRenderer.invoke('job:get', { jobId }),

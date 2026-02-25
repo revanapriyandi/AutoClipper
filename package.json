@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "main": "electron/main.js",
-
   "scripts": {
     "dev": "next dev",
     "build": "dotenv -e .env -- next build",
@@ -22,7 +21,6 @@
       "repo": "AutoClipper"
     },
     "directories": {
-
       "output": "dist"
     },
     "files": [
@@ -44,7 +42,6 @@
       "node_modules/@prisma/client/**/*",
       "node_modules/.prisma/**/*"
     ],
-
     "win": {
       "target": "nsis"
     },
@@ -69,6 +66,7 @@
     "axios": "^1.13.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.3.1",
     "electron-updater": "^6.3.9",
     "fluent-ffmpeg": "^2.1.3",
@@ -78,6 +76,7 @@
     "next-intl": "^4.8.3",
     "react": "^18",
     "react-dom": "^18",
+    "recharts": "^3.7.0",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7"
   },

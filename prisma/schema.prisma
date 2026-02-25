@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
 }
+
 
 model Project {
   id          String   @id @default(uuid())
@@ -67,7 +67,9 @@ model Clip {
 
   project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   assets     Asset[]
+  analytics  Analytics[]
 }
+
 
 model Asset {
   id          String   @id @default(uuid())
@@ -87,8 +89,36 @@ model Job {
   attempts     Int       @default(0)
   error        String?
   nextRetryAt  DateTime?  // Set when status = RETRY_PENDING
+  scheduledAt  DateTime?  // For Content Calendar Scheduler
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+}
+
+model ThemePreset {
+  id          String   @id @default(uuid())
+  name        String
+  fontFamily  String   @default("Arial")
+  primaryColor String  @default("&H0000FFFF")
+  outlineColor String  @default("&H00000000")
+  alignment   String   @default("2")
+  marginV     String   @default("150")
+  createdAt   DateTime @default(now())
+}
+
+model Analytics {
+  id          String   @id @default(uuid())
+  clipId      String
+  platform    String   // "youtube", "tiktok", "facebook"
+  views       Int      @default(0)
+  likes       Int      @default(0)
+  comments    Int      @default(0)
+  shares      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  clip        Clip     @relation(fields: [clipId], references: [id], onDelete: Cascade)
+
+  @@unique([clipId, platform])
 }
 
 model Settings {

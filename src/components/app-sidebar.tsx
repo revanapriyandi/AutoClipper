@@ -14,11 +14,12 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Settings, Film, Rocket, Scissors } from "lucide-react";
-
+import { Home, Settings, Film, Rocket, Scissors, Calendar, BarChart3 } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/",           label: "Dashboard",  icon: Home },
+  { href: "/calendar",   label: "Calendar",   icon: Calendar },
+  { href: "/analytics",  label: "Analytics",  icon: BarChart3 },
   { href: "/history",    label: "History",    icon: Film },
   { href: "/settings",   label: "Settings",   icon: Settings },
   { href: "/onboarding", label: "Setup Guide", icon: Rocket },

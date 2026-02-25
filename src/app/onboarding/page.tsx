@@ -196,7 +196,13 @@ export default function OnboardingPage() {
                     />
                   </div>
                 ))}
-                <p className="text-xs text-muted-foreground">API keys lainnya bisa ditambahkan di Settings kapan saja.</p>
+                {llmProvider === "local" && (
+                  <div className="p-3 bg-muted/50 rounded-lg text-sm text-center border">
+                    <Cpu className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
+                    <strong>Local AI Aktif</strong><br />Anda tidak memerlukan API Key untuk LLM. Konfigurasi endpoint (Ollama/Custom API) dapat diatur spesifik di halaman Settings nanti.
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground pt-2 border-t">API keys lainnya bisa ditambahkan di Settings kapan saja.</p>
               </div>
             )}
 

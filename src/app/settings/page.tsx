@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Trash } from "lucide-react";
 // Global window.electronAPI types are declared in src/types/electron.d.ts
 
 // ---- Provider/Model type (matches electron/config.js) ----
@@ -26,6 +28,7 @@ export default function SettingsPage() {
   const [groqKey,       setGroqKey]       = useState("");
   const [mistralKey,    setMistralKey]    = useState("");
   const [cohereKey,     setCohereKey]     = useState("");
+  const [elevenLabsKey, setElevenLabsKey] = useState("");
   const [deepgramKey,   setDeepgramKey]   = useState("");
   const [assemblyaiKey, setAssemblyaiKey] = useState("");
 
@@ -45,7 +48,22 @@ export default function SettingsPage() {
   const [statusMsg, setStatusMsg] = useState("");
   const [saving,    setSaving]    = useState(false);
 
+  // ---- Brand Kits State ----
+  const [presets, setPresets] = useState<{ id: string; name: string; fontFamily: string; primaryColor: string; outlineColor: string; alignment: string; marginV: string }[]>([]);
+  const [newPresetName, setNewPresetName] = useState("");
+  const [presetFont, setPresetFont] = useState("Arial");
+  const [presetPrimaryColor, setPresetPrimaryColor] = useState("&H0000FFFF");
+  const [presetOutlineColor, setPresetOutlineColor] = useState("&H00000000");
+  const [presetAlignment, setPresetAlignment] = useState("2");
+  const [presetMarginV, setPresetMarginV] = useState("150");
+
   const api = typeof window !== "undefined" ? window.electronAPI : undefined;
+
+  const loadPresets = async () => {
+    if (!api?.dbGetThemePresets) return;
+    const res = await api.dbGetThemePresets();
+    if (res.success && res.presets) setPresets(res.presets);
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -65,6 +83,7 @@ export default function SettingsPage() {
       setGroqKey(      await load("groq_api_key"));
       setMistralKey(   await load("mistral_api_key"));
       setCohereKey(    await load("cohere_api_key"));
+      setElevenLabsKey(await load("elevenlabs_key"));
       setDeepgramKey(  await load("deepgram_key"));
       setAssemblyaiKey(await load("assemblyai_key"));
       setLlmProvider(  await load("ai_scoring_provider") || "openai");
@@ -89,6 +108,7 @@ export default function SettingsPage() {
         ["groq_api_key",      groqKey],
         ["mistral_api_key",   mistralKey],
         ["cohere_api_key",    cohereKey],
+        ["elevenlabs_key",    elevenLabsKey],
         ["deepgram_key",      deepgramKey],
         ["assemblyai_key",    assemblyaiKey],
         ["ai_scoring_provider", llmProvider],
@@ -102,7 +122,7 @@ export default function SettingsPage() {
       for (const [key, val] of pairs) {
         if (val) await api.setKey(key, val);
       }
-      setStatusMsg("✅ Settings saved to OS Keychain.");
+      setStatusMsg("✅ Settings saved securely to OS Keychain!");
     } else {
       setStatusMsg("⚠️ Settings saved in memory only (Electron not detected).");
     }
@@ -127,17 +147,62 @@ export default function SettingsPage() {
     </div>
   );
 
+  // ---- Brand Kits handlers ----
+  const handleCreatePreset = async () => {
+    if (!api?.dbCreateThemePreset) { setStatusMsg("Requires Electron"); return; }
+    if (!newPresetName) { setStatusMsg("⚠️ Preset name is required."); return; }
+    
+    setSaving(true);
+    const res = await api.dbCreateThemePreset({
+      name: newPresetName,
+      fontFamily: presetFont,
+      primaryColor: presetPrimaryColor,
+      outlineColor: presetOutlineColor,
+      alignment: presetAlignment,
+      marginV: presetMarginV
+    });
+    
+    if (res.success) {
+      setStatusMsg(`✅ Preset '${newPresetName}' created!`);
+      setNewPresetName("");
+      loadPresets();
+    } else {
+      setStatusMsg(`❌ Error creating preset: ${res.error}`);
+    }
+    setSaving(false);
+  };
+
+  const handleDeletePreset = async (id: string) => {
+    if (!api?.dbDeleteThemePreset) return;
+    setSaving(true);
+    const res = await api.dbDeleteThemePreset(id);
+    if (res.success) {
+      setStatusMsg("✅ Preset deleted.");
+      loadPresets();
+    } else {
+      setStatusMsg(`❌ Error deleting preset: ${res.error}`);
+    }
+    setSaving(false);
+  };
+
   return (
     <div className="grid gap-6 max-w-3xl">
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Settings</h2>
-        <p className="text-muted-foreground">Manage AI providers, models, and API keys.</p>
+        <p className="text-muted-foreground">Manage AI parameters, API keys, and global brand configurations.</p>
       </div>
 
       {statusMsg && <p className="text-sm border p-2 rounded-md bg-muted/30">{statusMsg}</p>}
 
-      {/* ── AI Model Selection ──────────────────────────── */}
-      <Card>
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="grid w-[400px] grid-cols-2">
+          <TabsTrigger value="general">Global Settings</TabsTrigger>
+          <TabsTrigger value="brandkits">Brand Kits</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general" className="grid gap-6 mt-4">
+          {/* ── AI Model Selection ──────────────────────────── */}
+          <Card>
         <CardHeader>
           <CardTitle>🤖 AI Scoring Model</CardTitle>
           <CardDescription>Select LLM provider & model for clip scoring.</CardDescription>
@@ -221,6 +286,7 @@ export default function SettingsPage() {
             <KeyRow label="Groq API Key"       value={groqKey}       setter={setGroqKey}       placeholder="gsk_..." />
             <KeyRow label="Mistral API Key"    value={mistralKey}    setter={setMistralKey}    />
             <KeyRow label="Cohere API Key"     value={cohereKey}     setter={setCohereKey}     />
+            <KeyRow label="ElevenLabs Key"     value={elevenLabsKey} setter={setElevenLabsKey} placeholder="sk-eleven..." />
             <KeyRow label="Deepgram Key"       value={deepgramKey}   setter={setDeepgramKey}   />
             <KeyRow label="AssemblyAI Key"     value={assemblyaiKey} setter={setAssemblyaiKey} placeholder="..." />
           </div>
@@ -259,13 +325,20 @@ export default function SettingsPage() {
           />
           <FeatureToggle
             api={api}
+            getKey="dubbingGetEnabled"
+            setKey="dubbingSetEnabled"
+            title="🗣️ AI Dubbing & Auto-Translation"
+            description="Kloning suara ganda otomatis dalam berbagai bahasa. Membutuhkan ElevenLabs API Key."
+          />
+          <FeatureToggle
+            api={api}
             getKey="updaterGetEnabled"
             setKey="updaterSetEnabled"
             title="🔄 Auto-Update Check"
             description="Cek update terbaru AutoClipper saat aplikasi dibuka. Update tidak akan otomatis didownload — Anda selalu diminta konfirmasi terlebih dahulu."
             extra={
               <Button variant="outline" size="sm" className="text-xs h-7 mt-2"
-                onClick={() => api?.updaterCheckNow?.()}>
+                onClick={() => { const a = api as unknown as { updaterCheckNow?: () => void }; if (a.updaterCheckNow) a.updaterCheckNow(); }}>
                 Check Now
               </Button>
             }
@@ -278,13 +351,82 @@ export default function SettingsPage() {
             description="Simpan log error ke file lokal (~/.autoclipper/logs/). Log dirotasi otomatis, maksimal 7 hari. Berguna untuk debugging masalah."
             extra={
               <Button variant="outline" size="sm" className="text-xs h-7 mt-2"
-                onClick={async () => { await api?.loggerClearLogs?.(); setStatusMsg("✅ Logs cleared."); }}>
+                onClick={async () => { const a = api as unknown as { loggerClearLogs?: () => Promise<void> }; if (a.loggerClearLogs) { await a.loggerClearLogs(); setStatusMsg("✅ Logs cleared."); } }}>
                 Clear Logs
               </Button>
             }
           />
         </CardContent>
       </Card>
+      </TabsContent>
+
+      <TabsContent value="brandkits" className="grid gap-6 mt-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>🎨 Create New Brand Kit</CardTitle>
+            <CardDescription>Simpan preferensi warna, font, dan layout subtitle untuk digunakan kembali dengan cepat.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold">Preset Name</Label>
+              <Input className="h-8 text-xs max-w-xs" value={newPresetName} onChange={e => setNewPresetName(e.target.value)} placeholder="e.g. 'Viral Shorts Yellow'" />
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 py-2 border-t">
+              {[
+                { label: "Font Family", value: presetFont, setter: setPresetFont, options: [["Arial","Arial"],["Impact","Impact"],["Roboto","Roboto"],["Comic Sans MS","Comic Sans"],["Montserrat","Montserrat"]] },
+                { label: "Primary Color", value: presetPrimaryColor, setter: setPresetPrimaryColor, options: [["&H0000FFFF","Yellow"],["&H0000FF00","Green"],["&H00FF0000","Blue"],["&H00FFFFFF","White"]] },
+                { label: "Outline Color", value: presetOutlineColor, setter: setPresetOutlineColor, options: [["&H00000000","Black"],["&H000000FF","Red"],["&H00FFFFFF","White"],["&H00808080","Gray"]] },
+                { label: "Alignment", value: presetAlignment, setter: setPresetAlignment, options: [["2","Bottom Center"],["8","Top Center"],["5","Middle Center"]] },
+              ].map(({ label, value, setter, options }) => (
+                <div key={label}>
+                  <label className="text-xs font-semibold">{label}</label>
+                  <select className="w-full text-xs box-border border rounded p-1.5 mt-1" value={value} onChange={e => setter(e.target.value)}>
+                    {options.map(([val, name]) => <option key={val} value={val}>{name}</option>)}
+                  </select>
+                </div>
+              ))}
+              <div>
+                <label className="text-xs font-semibold">Margin Bottom</label>
+                <Input type="number" className="h-8 text-xs mt-1" value={presetMarginV} onChange={e => setPresetMarginV(e.target.value)} />
+              </div>
+            </div>
+            <Button onClick={handleCreatePreset} disabled={saving} className="w-max mt-2">
+              Save Preset
+            </Button>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {presets.length === 0 && (
+            <p className="text-sm text-muted-foreground col-span-full">No Brand Kits saved yet.</p>
+          )}
+          {presets.map(p => (
+            <Card key={p.id}>
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-start">
+                  <CardTitle className="text-base truncate" title={p.name}>{p.name}</CardTitle>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:bg-red-500/10" onClick={() => handleDeletePreset(p.id)}>
+                    <Trash className="w-3 h-3" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="text-xs space-y-1 text-muted-foreground">
+                <p>Font: <span className="font-medium text-foreground">{p.fontFamily}</span></p>
+                <div className="flex gap-2 items-center">
+                  <span>Fill:</span>
+                  <div className="w-3 h-3 border rounded-sm" style={{ backgroundColor: p.primaryColor.includes('FFFF') ? 'yellow' : p.primaryColor.includes('FFFFFF') ? 'white' : p.primaryColor.includes('FF0000') ? 'blue' : 'green' }} />
+                </div>
+                <div className="flex gap-2 items-center">
+                  <span>Outline:</span>
+                  <div className="w-3 h-3 border rounded-sm bg-black" />
+                </div>
+                <p>Margin Bottom: {p.marginV}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </TabsContent>
+      </Tabs>
     </div>
   );
 }
@@ -293,7 +435,7 @@ export default function SettingsPage() {
 function FeatureToggle({
   api, getKey, setKey, title, description, extra
 }: {
-  api: Window["electronAPI"] | undefined;
+  api: typeof window.electronAPI | undefined;
   getKey: string;
   setKey: string;
   title: string;
@@ -304,10 +446,14 @@ function FeatureToggle({
 
   useEffect(() => {
     if (!api) { setEnabled(true); return; }
-    const apiRecord = api as unknown as Record<string, unknown>;
-    (apiRecord[getKey] as () => Promise<{ enabled: boolean }>)()
-      .then(r => setEnabled(r.enabled))
-      .catch(() => setEnabled(true));
+    const apiRecord = api as unknown as Record<string, () => Promise<{ enabled: boolean }>>;
+    if (apiRecord[getKey]) {
+      apiRecord[getKey]()
+        .then((r: { enabled: boolean }) => setEnabled(r.enabled))
+        .catch(() => setEnabled(true));
+    } else {
+      setEnabled(true);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -315,8 +461,10 @@ function FeatureToggle({
     if (enabled === null || !api) return;
     const next = !enabled;
     setEnabled(next);
-    const apiRecord = api as unknown as Record<string, unknown>;
-    await (apiRecord[setKey] as (v: boolean) => Promise<unknown>)(next);
+    const apiRecord = api as unknown as Record<string, (v: boolean) => Promise<unknown>>;
+    if (apiRecord[setKey]) {
+      await apiRecord[setKey](next);
+    }
   };
 
   return (

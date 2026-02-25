@@ -102,6 +102,12 @@ export default function HistoryPage() {
             const st = STATUS_BADGE[clip.status] || STATUS_BADGE.PENDING;
             const videoAsset = clip.assets?.find(a => a.kind === "video");
 
+            // Mock approximate max duration calculation for visual timeline
+            // (Assumptions: max duration recorded across clips or defaults to 60s max view)
+            const MAX_PROJECT_DURATION_MS = Math.max(clip.endMs * 1.5, 60000); 
+            const startPct = Math.min((clip.startMs / MAX_PROJECT_DURATION_MS) * 100, 95);
+            const widthPct = Math.min(((clip.endMs - clip.startMs) / MAX_PROJECT_DURATION_MS) * 100, 100 - startPct);
+
             return (
               <Card key={clip.id} className="flex flex-col hover:border-primary/40 transition-colors">
                 <CardHeader className="pb-2">
@@ -114,8 +120,16 @@ export default function HistoryPage() {
                     </span>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-2 flex-1">
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <CardContent className="space-y-3 flex-1">
+                  {/* Mini Visual Timeline */}
+                  <div className="w-full h-1.5 bg-muted rounded-full relative overflow-hidden mt-1 mb-2">
+                    <div 
+                      className="absolute top-0 bottom-0 bg-primary/80 rounded-full min-w-[4px]" 
+                      style={{ left: `${startPct}%`, width: `${Math.max(widthPct, 2)}%` }} 
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
                     <span className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
                       {formatDuration(clip.startMs, clip.endMs)}
@@ -130,7 +144,9 @@ export default function HistoryPage() {
                     </span>
                   </div>
                   {clip.caption && (
-                    <p className="text-xs text-muted-foreground line-clamp-2">{clip.caption}</p>
+                    <div className="bg-muted/30 p-2 rounded border-l-2 border-primary/40 mt-1">
+                      <p className="text-xs text-muted-foreground line-clamp-2 italic">&quot;{clip.caption}&quot;</p>
+                    </div>
                   )}
                   <div className="flex gap-2 pt-1">
                     <Link href={`/projects/${clip.projectId}`}>

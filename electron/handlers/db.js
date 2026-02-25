@@ -1,8 +1,7 @@
 const { ipcMain } = require('electron');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../prisma');
 const ffmpeg = require('fluent-ffmpeg');
 
-const prisma = new PrismaClient();
 
 ipcMain.handle('db:createProject', async (_, { title, sourcePath }) => {
   try {

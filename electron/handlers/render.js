@@ -92,7 +92,30 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     '1:1':   ['crop=ih:ih',       'scale=1080:1080'],
     '4:5':   ['crop=ih*4/5:ih',  'scale=1080:1350'],
   };
-  const formatFilters = FORMAT_FILTERS[options.format || '9:16'] || FORMAT_FILTERS['9:16'];
+  let formatFilters = FORMAT_FILTERS[options.format || '9:16'] || FORMAT_FILTERS['9:16'];
+
+  // Apply Smart Face Tracking for Vertical Formats
+  if ((options.format === '9:16' || !options.format) || options.format === '4:5') {
+    let vw = 1920, vh = 1080;
+    try {
+      const meta = await new Promise((res, rej) => ffmpeg.ffprobe(sourcePath, (err, d) => err ? rej(err) : res(d)));
+      const v = meta.streams.find(s => s.codec_type === 'video');
+      if (v && v.width) { vw = v.width; vh = v.height; }
+    } catch (e) { console.warn('[FFprobe] Failed to get exact dimensions, using 1080p assumption'); }
+    
+    const { getCropOffset } = require('./facetrack');
+    const xOff = await getCropOffset(sourcePath, vw, vh);
+
+    if (options.format === '4:5') {
+       // Re-calculate the offset center for 4:5 based on 9:16's returned xOff
+       const faceCenterX = xOff + Math.round(vh * 9 / 16 / 2);
+       const cropW = Math.round(vh * 4 / 5);
+       const adjX = Math.max(0, Math.min(vw - cropW, Math.round(faceCenterX - cropW / 2)));
+       formatFilters = [`crop=ih*4/5:ih:${adjX}:0`, 'scale=1080:1350'];
+    } else {
+       formatFilters = [`crop=ih*9/16:ih:${xOff}:0`, 'scale=1080:1920'];
+    }
+  }
 
   await new Promise((resolve, reject) => {
     const command = ffmpeg(sourcePath).setStartTime(startSec).setDuration(durationSec);
