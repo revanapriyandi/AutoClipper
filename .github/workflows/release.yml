@@ -29,14 +29,8 @@ jobs:
       - name: Generate Prisma Client (Per OS)
         run: npx prisma generate
 
-      - name: Create Production .env
-        run: |
-          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
-          echo "TIKTOK_CLIENT_KEY=${{ secrets.TIKTOK_CLIENT_KEY }}" >> .env
-          echo "FACEBOOK_APP_ID=${{ secrets.FACEBOOK_APP_ID }}" >> .env
-          echo "PEXELS_API_KEY=${{ secrets.PEXELS_API_KEY }}" >> .env
-          echo "OAUTH_REDIRECT_URI=http://localhost:3000/api/auth/callback" >> .env
-          echo "DATABASE_URL=file:./dev.db" >> .env
+      - name: Create Build .env
+        run: echo 'DATABASE_URL=file:./dev.db' > .env
         shell: bash
 
       - name: Build Next.js
