@@ -149,7 +149,7 @@ export default function HistoryPage() {
                     </div>
                   )}
                   <div className="flex gap-2 pt-1">
-                    <Link href={`/projects/${clip.projectId}`}>
+                    <Link href={`/projects/detail?id=${clip.projectId}`}>
                       <Button variant="outline" size="sm" className="text-xs h-7">
                         <FolderOpen className="h-3 w-3 mr-1" /> Buka Studio
                       </Button>

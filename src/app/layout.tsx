@@ -3,8 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { I18nProvider } from "@/components/I18nProvider";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -17,14 +16,12 @@ export const metadata: Metadata = {
   description: "AI-powered video auto-cut & auto-post desktop application",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const locale = await getLocale();
-  const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
@@ -32,7 +29,7 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NextIntlClientProvider locale={locale} messages={messages}>
+          <I18nProvider>
             <OnboardingGuard>
               <SidebarProvider>
                 <AppSidebar />
@@ -53,7 +50,7 @@ export default async function RootLayout({
                 </main>
               </SidebarProvider>
             </OnboardingGuard>
-          </NextIntlClientProvider>
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -11,6 +11,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   dbGetProject:        (id)        => ipcRenderer.invoke('db:getProject', id),
   dbGetClipHistory:    ()          => ipcRenderer.invoke('db:getClipHistory'),
   dbGetScheduledJobs:  ()          => ipcRenderer.invoke('db:getScheduledJobs'),
+  // Autopilot
+  autopilotGetConfig:  ()          => ipcRenderer.invoke('autopilot:getConfig'),
+  autopilotSaveConfig: (data)      => ipcRenderer.invoke('autopilot:saveConfig', data),
+  autopilotToggle:     (active)    => ipcRenderer.invoke('autopilot:toggle', active),
+  autopilotRunNow:     ()          => ipcRenderer.invoke('autopilot:runNow'),
+
   
   dbGetThemePresets:   ()          => ipcRenderer.invoke('db:getThemePresets'),
   dbCreateThemePreset: (data)      => ipcRenderer.invoke('db:createThemePreset', data),
@@ -21,6 +27,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // System
 
   openFilePicker:      (filters)   => ipcRenderer.invoke('dialog:openFile', { filters }),
+  openDirectoryPicker: (opts)      => ipcRenderer.invoke('dialog:openDirectory', opts || {}),
+  storageDirsGet:      ()          => ipcRenderer.invoke('storage:getDirs'),
+  storageDirsSet:      (cat, dir)  => ipcRenderer.invoke('storage:setDir', { category: cat, dirPath: dir }),
+
   showItemInFolder:    (filePath)  => ipcRenderer.invoke('shell:showItemInFolder', filePath),
   openExternal:        (url)       => ipcRenderer.invoke('shell:openExternal', url),
   readVideoAsDataUrl:  (filePath)  => ipcRenderer.invoke('file:readAsDataUrl', filePath),
@@ -62,6 +72,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // AI Dubbing
   dubbingSetEnabled:   (enabled) => ipcRenderer.invoke('dubbing:setEnabled', enabled),
   dubbingGetEnabled:   ()        => ipcRenderer.invoke('dubbing:getEnabled'),
+  
+  // FFmpeg
+  ffmpegCheckInstallation: ()    => ipcRenderer.invoke('ffmpeg:checkInstallation'),
   // Jobs
   enqueueJob:          (type, payload) => ipcRenderer.invoke('job:enqueue', { type, payload }),
   getJob:              (jobId)         => ipcRenderer.invoke('job:get', { jobId }),

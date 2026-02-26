@@ -126,3 +126,13 @@ model Settings {
   key   String @unique
   value String
 }
+
+model AutopilotConfig {
+  id                String   @id @default(uuid())
+  keywords          String // e.g., "podcast clips, motivation"
+  targetPlatform    String   @default("youtube") // e.g., "youtube", "tiktok"
+  maxDailyDownloads Int      @default(3)
+  isActive          Boolean  @default(false) // The Master Switch
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}

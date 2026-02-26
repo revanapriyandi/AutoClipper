@@ -5,20 +5,15 @@
  * - broll:search  — search Pexels for videos matching keywords
  * - broll:download — download a Pexels video to local cache
  */
-const { ipcMain } = require('electron');
+const { ipcMain, app } = require('electron');
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 const keytar = require('keytar');
+const { getDir } = require('../paths');
 
 const SERVICE_NAME = 'AutoClipperApp';
 const PEXELS_API_URL = 'https://api.pexels.com/videos/search';
-const BROLL_CACHE_DIR = path.join(os.homedir(), '.autoclipper', 'broll_cache');
 
-// Ensure cache directory exists
-if (!fs.existsSync(BROLL_CACHE_DIR)) {
-  fs.mkdirSync(BROLL_CACHE_DIR, { recursive: true });
-}
 
 // ── Search Pexels for video clips ────────────────────────────────
 ipcMain.handle('broll:search', async (_, { keywords, orientation = 'portrait', perPage = 5 }) => {
@@ -68,7 +63,8 @@ ipcMain.handle('broll:search', async (_, { keywords, orientation = 'portrait', p
 // ── Download a Pexels video to local cache ───────────────────────
 ipcMain.handle('broll:download', async (_, { videoId, downloadUrl }) => {
   try {
-    const cacheFile = path.join(BROLL_CACHE_DIR, `broll_${videoId}.mp4`);
+    const cacheDir = await getDir('brollCache');
+    const cacheFile = path.join(cacheDir, `broll_${videoId}.mp4`);
 
     // Return cached version if already downloaded
     if (fs.existsSync(cacheFile)) {
@@ -92,12 +88,13 @@ ipcMain.handle('broll:download', async (_, { videoId, downloadUrl }) => {
 // ── List cached B-Roll files ─────────────────────────────────────
 ipcMain.handle('broll:listCache', async () => {
   try {
-    const files = fs.readdirSync(BROLL_CACHE_DIR).map(f => ({
+    const cacheDir = await getDir('brollCache');
+    const files = fs.readdirSync(cacheDir).map(f => ({
       name: f,
-      path: path.join(BROLL_CACHE_DIR, f),
-      size: fs.statSync(path.join(BROLL_CACHE_DIR, f)).size,
+      path: path.join(cacheDir, f),
+      size: fs.statSync(path.join(cacheDir, f)).size,
     }));
-    return { success: true, files, cacheDir: BROLL_CACHE_DIR };
+    return { success: true, files, cacheDir };
   } catch (e) {
     return { success: false, error: e.message };
   }
@@ -106,8 +103,9 @@ ipcMain.handle('broll:listCache', async () => {
 // ── Clear B-Roll cache ───────────────────────────────────────────
 ipcMain.handle('broll:clearCache', async () => {
   try {
-    const files = fs.readdirSync(BROLL_CACHE_DIR);
-    for (const f of files) fs.unlinkSync(path.join(BROLL_CACHE_DIR, f));
+    const cacheDir = await getDir('brollCache');
+    const files = fs.readdirSync(cacheDir);
+    for (const f of files) fs.unlinkSync(path.join(cacheDir, f));
     return { success: true, cleared: files.length };
   } catch (e) {
     return { success: false, error: e.message };

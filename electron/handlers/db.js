@@ -41,6 +41,7 @@ ipcMain.handle('db:getProjects', async () => {
 
 ipcMain.handle('db:getProject', async (_, id) => {
   try {
+    if (!id) throw new Error("Project ID is undefined or missing");
     const project = await prisma.project.findUnique({ where: { id } });
     if (!project) throw new Error("Project not found");
     return { success: true, project };

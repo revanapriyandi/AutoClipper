@@ -63,6 +63,11 @@ export type Analytics = $Result.DefaultSelection<Prisma.$AnalyticsPayload>
  * 
  */
 export type Settings = $Result.DefaultSelection<Prisma.$SettingsPayload>
+/**
+ * Model AutopilotConfig
+ * 
+ */
+export type AutopilotConfig = $Result.DefaultSelection<Prisma.$AutopilotConfigPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -280,6 +285,16 @@ export class PrismaClient<
     * ```
     */
   get settings(): Prisma.SettingsDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.autopilotConfig`: Exposes CRUD operations for the **AutopilotConfig** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AutopilotConfigs
+    * const autopilotConfigs = await prisma.autopilotConfig.findMany()
+    * ```
+    */
+  get autopilotConfig(): Prisma.AutopilotConfigDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -723,7 +738,8 @@ export namespace Prisma {
     Job: 'Job',
     ThemePreset: 'ThemePreset',
     Analytics: 'Analytics',
-    Settings: 'Settings'
+    Settings: 'Settings',
+    AutopilotConfig: 'AutopilotConfig'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -739,7 +755,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "project" | "clipProfile" | "transcript" | "clipCandidate" | "clip" | "asset" | "job" | "themePreset" | "analytics" | "settings"
+      modelProps: "project" | "clipProfile" | "transcript" | "clipCandidate" | "clip" | "asset" | "job" | "themePreset" | "analytics" | "settings" | "autopilotConfig"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1483,6 +1499,80 @@ export namespace Prisma {
           }
         }
       }
+      AutopilotConfig: {
+        payload: Prisma.$AutopilotConfigPayload<ExtArgs>
+        fields: Prisma.AutopilotConfigFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AutopilotConfigFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotConfigPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AutopilotConfigFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotConfigPayload>
+          }
+          findFirst: {
+            args: Prisma.AutopilotConfigFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotConfigPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AutopilotConfigFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotConfigPayload>
+          }
+          findMany: {
+            args: Prisma.AutopilotConfigFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotConfigPayload>[]
+          }
+          create: {
+            args: Prisma.AutopilotConfigCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotConfigPayload>
+          }
+          createMany: {
+            args: Prisma.AutopilotConfigCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AutopilotConfigCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotConfigPayload>[]
+          }
+          delete: {
+            args: Prisma.AutopilotConfigDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotConfigPayload>
+          }
+          update: {
+            args: Prisma.AutopilotConfigUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotConfigPayload>
+          }
+          deleteMany: {
+            args: Prisma.AutopilotConfigDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AutopilotConfigUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AutopilotConfigUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotConfigPayload>[]
+          }
+          upsert: {
+            args: Prisma.AutopilotConfigUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotConfigPayload>
+          }
+          aggregate: {
+            args: Prisma.AutopilotConfigAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAutopilotConfig>
+          }
+          groupBy: {
+            args: Prisma.AutopilotConfigGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AutopilotConfigGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AutopilotConfigCountArgs<ExtArgs>
+            result: $Utils.Optional<AutopilotConfigCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1601,6 +1691,7 @@ export namespace Prisma {
     themePreset?: ThemePresetOmit
     analytics?: AnalyticsOmit
     settings?: SettingsOmit
+    autopilotConfig?: AutopilotConfigOmit
   }
 
   /* Types for Logging */
@@ -12628,6 +12719,1059 @@ export namespace Prisma {
 
 
   /**
+   * Model AutopilotConfig
+   */
+
+  export type AggregateAutopilotConfig = {
+    _count: AutopilotConfigCountAggregateOutputType | null
+    _avg: AutopilotConfigAvgAggregateOutputType | null
+    _sum: AutopilotConfigSumAggregateOutputType | null
+    _min: AutopilotConfigMinAggregateOutputType | null
+    _max: AutopilotConfigMaxAggregateOutputType | null
+  }
+
+  export type AutopilotConfigAvgAggregateOutputType = {
+    maxDailyDownloads: number | null
+  }
+
+  export type AutopilotConfigSumAggregateOutputType = {
+    maxDailyDownloads: number | null
+  }
+
+  export type AutopilotConfigMinAggregateOutputType = {
+    id: string | null
+    keywords: string | null
+    targetPlatform: string | null
+    maxDailyDownloads: number | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AutopilotConfigMaxAggregateOutputType = {
+    id: string | null
+    keywords: string | null
+    targetPlatform: string | null
+    maxDailyDownloads: number | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AutopilotConfigCountAggregateOutputType = {
+    id: number
+    keywords: number
+    targetPlatform: number
+    maxDailyDownloads: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AutopilotConfigAvgAggregateInputType = {
+    maxDailyDownloads?: true
+  }
+
+  export type AutopilotConfigSumAggregateInputType = {
+    maxDailyDownloads?: true
+  }
+
+  export type AutopilotConfigMinAggregateInputType = {
+    id?: true
+    keywords?: true
+    targetPlatform?: true
+    maxDailyDownloads?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AutopilotConfigMaxAggregateInputType = {
+    id?: true
+    keywords?: true
+    targetPlatform?: true
+    maxDailyDownloads?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AutopilotConfigCountAggregateInputType = {
+    id?: true
+    keywords?: true
+    targetPlatform?: true
+    maxDailyDownloads?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AutopilotConfigAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AutopilotConfig to aggregate.
+     */
+    where?: AutopilotConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AutopilotConfigs to fetch.
+     */
+    orderBy?: AutopilotConfigOrderByWithRelationInput | AutopilotConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AutopilotConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AutopilotConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AutopilotConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AutopilotConfigs
+    **/
+    _count?: true | AutopilotConfigCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AutopilotConfigAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AutopilotConfigSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AutopilotConfigMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AutopilotConfigMaxAggregateInputType
+  }
+
+  export type GetAutopilotConfigAggregateType<T extends AutopilotConfigAggregateArgs> = {
+        [P in keyof T & keyof AggregateAutopilotConfig]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAutopilotConfig[P]>
+      : GetScalarType<T[P], AggregateAutopilotConfig[P]>
+  }
+
+
+
+
+  export type AutopilotConfigGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AutopilotConfigWhereInput
+    orderBy?: AutopilotConfigOrderByWithAggregationInput | AutopilotConfigOrderByWithAggregationInput[]
+    by: AutopilotConfigScalarFieldEnum[] | AutopilotConfigScalarFieldEnum
+    having?: AutopilotConfigScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AutopilotConfigCountAggregateInputType | true
+    _avg?: AutopilotConfigAvgAggregateInputType
+    _sum?: AutopilotConfigSumAggregateInputType
+    _min?: AutopilotConfigMinAggregateInputType
+    _max?: AutopilotConfigMaxAggregateInputType
+  }
+
+  export type AutopilotConfigGroupByOutputType = {
+    id: string
+    keywords: string
+    targetPlatform: string
+    maxDailyDownloads: number
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: AutopilotConfigCountAggregateOutputType | null
+    _avg: AutopilotConfigAvgAggregateOutputType | null
+    _sum: AutopilotConfigSumAggregateOutputType | null
+    _min: AutopilotConfigMinAggregateOutputType | null
+    _max: AutopilotConfigMaxAggregateOutputType | null
+  }
+
+  type GetAutopilotConfigGroupByPayload<T extends AutopilotConfigGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AutopilotConfigGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AutopilotConfigGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AutopilotConfigGroupByOutputType[P]>
+            : GetScalarType<T[P], AutopilotConfigGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AutopilotConfigSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    keywords?: boolean
+    targetPlatform?: boolean
+    maxDailyDownloads?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["autopilotConfig"]>
+
+  export type AutopilotConfigSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    keywords?: boolean
+    targetPlatform?: boolean
+    maxDailyDownloads?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["autopilotConfig"]>
+
+  export type AutopilotConfigSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    keywords?: boolean
+    targetPlatform?: boolean
+    maxDailyDownloads?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["autopilotConfig"]>
+
+  export type AutopilotConfigSelectScalar = {
+    id?: boolean
+    keywords?: boolean
+    targetPlatform?: boolean
+    maxDailyDownloads?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AutopilotConfigOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "keywords" | "targetPlatform" | "maxDailyDownloads" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["autopilotConfig"]>
+
+  export type $AutopilotConfigPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AutopilotConfig"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      keywords: string
+      targetPlatform: string
+      maxDailyDownloads: number
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["autopilotConfig"]>
+    composites: {}
+  }
+
+  type AutopilotConfigGetPayload<S extends boolean | null | undefined | AutopilotConfigDefaultArgs> = $Result.GetResult<Prisma.$AutopilotConfigPayload, S>
+
+  type AutopilotConfigCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AutopilotConfigFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AutopilotConfigCountAggregateInputType | true
+    }
+
+  export interface AutopilotConfigDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AutopilotConfig'], meta: { name: 'AutopilotConfig' } }
+    /**
+     * Find zero or one AutopilotConfig that matches the filter.
+     * @param {AutopilotConfigFindUniqueArgs} args - Arguments to find a AutopilotConfig
+     * @example
+     * // Get one AutopilotConfig
+     * const autopilotConfig = await prisma.autopilotConfig.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AutopilotConfigFindUniqueArgs>(args: SelectSubset<T, AutopilotConfigFindUniqueArgs<ExtArgs>>): Prisma__AutopilotConfigClient<$Result.GetResult<Prisma.$AutopilotConfigPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AutopilotConfig that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AutopilotConfigFindUniqueOrThrowArgs} args - Arguments to find a AutopilotConfig
+     * @example
+     * // Get one AutopilotConfig
+     * const autopilotConfig = await prisma.autopilotConfig.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AutopilotConfigFindUniqueOrThrowArgs>(args: SelectSubset<T, AutopilotConfigFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AutopilotConfigClient<$Result.GetResult<Prisma.$AutopilotConfigPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AutopilotConfig that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotConfigFindFirstArgs} args - Arguments to find a AutopilotConfig
+     * @example
+     * // Get one AutopilotConfig
+     * const autopilotConfig = await prisma.autopilotConfig.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AutopilotConfigFindFirstArgs>(args?: SelectSubset<T, AutopilotConfigFindFirstArgs<ExtArgs>>): Prisma__AutopilotConfigClient<$Result.GetResult<Prisma.$AutopilotConfigPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AutopilotConfig that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotConfigFindFirstOrThrowArgs} args - Arguments to find a AutopilotConfig
+     * @example
+     * // Get one AutopilotConfig
+     * const autopilotConfig = await prisma.autopilotConfig.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AutopilotConfigFindFirstOrThrowArgs>(args?: SelectSubset<T, AutopilotConfigFindFirstOrThrowArgs<ExtArgs>>): Prisma__AutopilotConfigClient<$Result.GetResult<Prisma.$AutopilotConfigPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AutopilotConfigs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotConfigFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AutopilotConfigs
+     * const autopilotConfigs = await prisma.autopilotConfig.findMany()
+     * 
+     * // Get first 10 AutopilotConfigs
+     * const autopilotConfigs = await prisma.autopilotConfig.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const autopilotConfigWithIdOnly = await prisma.autopilotConfig.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AutopilotConfigFindManyArgs>(args?: SelectSubset<T, AutopilotConfigFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AutopilotConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AutopilotConfig.
+     * @param {AutopilotConfigCreateArgs} args - Arguments to create a AutopilotConfig.
+     * @example
+     * // Create one AutopilotConfig
+     * const AutopilotConfig = await prisma.autopilotConfig.create({
+     *   data: {
+     *     // ... data to create a AutopilotConfig
+     *   }
+     * })
+     * 
+     */
+    create<T extends AutopilotConfigCreateArgs>(args: SelectSubset<T, AutopilotConfigCreateArgs<ExtArgs>>): Prisma__AutopilotConfigClient<$Result.GetResult<Prisma.$AutopilotConfigPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AutopilotConfigs.
+     * @param {AutopilotConfigCreateManyArgs} args - Arguments to create many AutopilotConfigs.
+     * @example
+     * // Create many AutopilotConfigs
+     * const autopilotConfig = await prisma.autopilotConfig.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AutopilotConfigCreateManyArgs>(args?: SelectSubset<T, AutopilotConfigCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AutopilotConfigs and returns the data saved in the database.
+     * @param {AutopilotConfigCreateManyAndReturnArgs} args - Arguments to create many AutopilotConfigs.
+     * @example
+     * // Create many AutopilotConfigs
+     * const autopilotConfig = await prisma.autopilotConfig.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AutopilotConfigs and only return the `id`
+     * const autopilotConfigWithIdOnly = await prisma.autopilotConfig.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AutopilotConfigCreateManyAndReturnArgs>(args?: SelectSubset<T, AutopilotConfigCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AutopilotConfigPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AutopilotConfig.
+     * @param {AutopilotConfigDeleteArgs} args - Arguments to delete one AutopilotConfig.
+     * @example
+     * // Delete one AutopilotConfig
+     * const AutopilotConfig = await prisma.autopilotConfig.delete({
+     *   where: {
+     *     // ... filter to delete one AutopilotConfig
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AutopilotConfigDeleteArgs>(args: SelectSubset<T, AutopilotConfigDeleteArgs<ExtArgs>>): Prisma__AutopilotConfigClient<$Result.GetResult<Prisma.$AutopilotConfigPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AutopilotConfig.
+     * @param {AutopilotConfigUpdateArgs} args - Arguments to update one AutopilotConfig.
+     * @example
+     * // Update one AutopilotConfig
+     * const autopilotConfig = await prisma.autopilotConfig.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AutopilotConfigUpdateArgs>(args: SelectSubset<T, AutopilotConfigUpdateArgs<ExtArgs>>): Prisma__AutopilotConfigClient<$Result.GetResult<Prisma.$AutopilotConfigPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AutopilotConfigs.
+     * @param {AutopilotConfigDeleteManyArgs} args - Arguments to filter AutopilotConfigs to delete.
+     * @example
+     * // Delete a few AutopilotConfigs
+     * const { count } = await prisma.autopilotConfig.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AutopilotConfigDeleteManyArgs>(args?: SelectSubset<T, AutopilotConfigDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AutopilotConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotConfigUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AutopilotConfigs
+     * const autopilotConfig = await prisma.autopilotConfig.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AutopilotConfigUpdateManyArgs>(args: SelectSubset<T, AutopilotConfigUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AutopilotConfigs and returns the data updated in the database.
+     * @param {AutopilotConfigUpdateManyAndReturnArgs} args - Arguments to update many AutopilotConfigs.
+     * @example
+     * // Update many AutopilotConfigs
+     * const autopilotConfig = await prisma.autopilotConfig.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AutopilotConfigs and only return the `id`
+     * const autopilotConfigWithIdOnly = await prisma.autopilotConfig.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AutopilotConfigUpdateManyAndReturnArgs>(args: SelectSubset<T, AutopilotConfigUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AutopilotConfigPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AutopilotConfig.
+     * @param {AutopilotConfigUpsertArgs} args - Arguments to update or create a AutopilotConfig.
+     * @example
+     * // Update or create a AutopilotConfig
+     * const autopilotConfig = await prisma.autopilotConfig.upsert({
+     *   create: {
+     *     // ... data to create a AutopilotConfig
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AutopilotConfig we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AutopilotConfigUpsertArgs>(args: SelectSubset<T, AutopilotConfigUpsertArgs<ExtArgs>>): Prisma__AutopilotConfigClient<$Result.GetResult<Prisma.$AutopilotConfigPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AutopilotConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotConfigCountArgs} args - Arguments to filter AutopilotConfigs to count.
+     * @example
+     * // Count the number of AutopilotConfigs
+     * const count = await prisma.autopilotConfig.count({
+     *   where: {
+     *     // ... the filter for the AutopilotConfigs we want to count
+     *   }
+     * })
+    **/
+    count<T extends AutopilotConfigCountArgs>(
+      args?: Subset<T, AutopilotConfigCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AutopilotConfigCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AutopilotConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotConfigAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AutopilotConfigAggregateArgs>(args: Subset<T, AutopilotConfigAggregateArgs>): Prisma.PrismaPromise<GetAutopilotConfigAggregateType<T>>
+
+    /**
+     * Group by AutopilotConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotConfigGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AutopilotConfigGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AutopilotConfigGroupByArgs['orderBy'] }
+        : { orderBy?: AutopilotConfigGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AutopilotConfigGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAutopilotConfigGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AutopilotConfig model
+   */
+  readonly fields: AutopilotConfigFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AutopilotConfig.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AutopilotConfigClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AutopilotConfig model
+   */
+  interface AutopilotConfigFieldRefs {
+    readonly id: FieldRef<"AutopilotConfig", 'String'>
+    readonly keywords: FieldRef<"AutopilotConfig", 'String'>
+    readonly targetPlatform: FieldRef<"AutopilotConfig", 'String'>
+    readonly maxDailyDownloads: FieldRef<"AutopilotConfig", 'Int'>
+    readonly isActive: FieldRef<"AutopilotConfig", 'Boolean'>
+    readonly createdAt: FieldRef<"AutopilotConfig", 'DateTime'>
+    readonly updatedAt: FieldRef<"AutopilotConfig", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AutopilotConfig findUnique
+   */
+  export type AutopilotConfigFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which AutopilotConfig to fetch.
+     */
+    where: AutopilotConfigWhereUniqueInput
+  }
+
+  /**
+   * AutopilotConfig findUniqueOrThrow
+   */
+  export type AutopilotConfigFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which AutopilotConfig to fetch.
+     */
+    where: AutopilotConfigWhereUniqueInput
+  }
+
+  /**
+   * AutopilotConfig findFirst
+   */
+  export type AutopilotConfigFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which AutopilotConfig to fetch.
+     */
+    where?: AutopilotConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AutopilotConfigs to fetch.
+     */
+    orderBy?: AutopilotConfigOrderByWithRelationInput | AutopilotConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AutopilotConfigs.
+     */
+    cursor?: AutopilotConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AutopilotConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AutopilotConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AutopilotConfigs.
+     */
+    distinct?: AutopilotConfigScalarFieldEnum | AutopilotConfigScalarFieldEnum[]
+  }
+
+  /**
+   * AutopilotConfig findFirstOrThrow
+   */
+  export type AutopilotConfigFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which AutopilotConfig to fetch.
+     */
+    where?: AutopilotConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AutopilotConfigs to fetch.
+     */
+    orderBy?: AutopilotConfigOrderByWithRelationInput | AutopilotConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AutopilotConfigs.
+     */
+    cursor?: AutopilotConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AutopilotConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AutopilotConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AutopilotConfigs.
+     */
+    distinct?: AutopilotConfigScalarFieldEnum | AutopilotConfigScalarFieldEnum[]
+  }
+
+  /**
+   * AutopilotConfig findMany
+   */
+  export type AutopilotConfigFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which AutopilotConfigs to fetch.
+     */
+    where?: AutopilotConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AutopilotConfigs to fetch.
+     */
+    orderBy?: AutopilotConfigOrderByWithRelationInput | AutopilotConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AutopilotConfigs.
+     */
+    cursor?: AutopilotConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AutopilotConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AutopilotConfigs.
+     */
+    skip?: number
+    distinct?: AutopilotConfigScalarFieldEnum | AutopilotConfigScalarFieldEnum[]
+  }
+
+  /**
+   * AutopilotConfig create
+   */
+  export type AutopilotConfigCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+    /**
+     * The data needed to create a AutopilotConfig.
+     */
+    data: XOR<AutopilotConfigCreateInput, AutopilotConfigUncheckedCreateInput>
+  }
+
+  /**
+   * AutopilotConfig createMany
+   */
+  export type AutopilotConfigCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AutopilotConfigs.
+     */
+    data: AutopilotConfigCreateManyInput | AutopilotConfigCreateManyInput[]
+  }
+
+  /**
+   * AutopilotConfig createManyAndReturn
+   */
+  export type AutopilotConfigCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+    /**
+     * The data used to create many AutopilotConfigs.
+     */
+    data: AutopilotConfigCreateManyInput | AutopilotConfigCreateManyInput[]
+  }
+
+  /**
+   * AutopilotConfig update
+   */
+  export type AutopilotConfigUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+    /**
+     * The data needed to update a AutopilotConfig.
+     */
+    data: XOR<AutopilotConfigUpdateInput, AutopilotConfigUncheckedUpdateInput>
+    /**
+     * Choose, which AutopilotConfig to update.
+     */
+    where: AutopilotConfigWhereUniqueInput
+  }
+
+  /**
+   * AutopilotConfig updateMany
+   */
+  export type AutopilotConfigUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AutopilotConfigs.
+     */
+    data: XOR<AutopilotConfigUpdateManyMutationInput, AutopilotConfigUncheckedUpdateManyInput>
+    /**
+     * Filter which AutopilotConfigs to update
+     */
+    where?: AutopilotConfigWhereInput
+    /**
+     * Limit how many AutopilotConfigs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AutopilotConfig updateManyAndReturn
+   */
+  export type AutopilotConfigUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+    /**
+     * The data used to update AutopilotConfigs.
+     */
+    data: XOR<AutopilotConfigUpdateManyMutationInput, AutopilotConfigUncheckedUpdateManyInput>
+    /**
+     * Filter which AutopilotConfigs to update
+     */
+    where?: AutopilotConfigWhereInput
+    /**
+     * Limit how many AutopilotConfigs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AutopilotConfig upsert
+   */
+  export type AutopilotConfigUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+    /**
+     * The filter to search for the AutopilotConfig to update in case it exists.
+     */
+    where: AutopilotConfigWhereUniqueInput
+    /**
+     * In case the AutopilotConfig found by the `where` argument doesn't exist, create a new AutopilotConfig with this data.
+     */
+    create: XOR<AutopilotConfigCreateInput, AutopilotConfigUncheckedCreateInput>
+    /**
+     * In case the AutopilotConfig was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AutopilotConfigUpdateInput, AutopilotConfigUncheckedUpdateInput>
+  }
+
+  /**
+   * AutopilotConfig delete
+   */
+  export type AutopilotConfigDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+    /**
+     * Filter which AutopilotConfig to delete.
+     */
+    where: AutopilotConfigWhereUniqueInput
+  }
+
+  /**
+   * AutopilotConfig deleteMany
+   */
+  export type AutopilotConfigDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AutopilotConfigs to delete
+     */
+    where?: AutopilotConfigWhereInput
+    /**
+     * Limit how many AutopilotConfigs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AutopilotConfig without action
+   */
+  export type AutopilotConfigDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotConfig
+     */
+    select?: AutopilotConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotConfig
+     */
+    omit?: AutopilotConfigOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -12766,6 +13910,19 @@ export namespace Prisma {
   export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
 
 
+  export const AutopilotConfigScalarFieldEnum: {
+    id: 'id',
+    keywords: 'keywords',
+    targetPlatform: 'targetPlatform',
+    maxDailyDownloads: 'maxDailyDownloads',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AutopilotConfigScalarFieldEnum = (typeof AutopilotConfigScalarFieldEnum)[keyof typeof AutopilotConfigScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -12805,6 +13962,13 @@ export namespace Prisma {
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -13467,6 +14631,70 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Settings"> | string
     key?: StringWithAggregatesFilter<"Settings"> | string
     value?: StringWithAggregatesFilter<"Settings"> | string
+  }
+
+  export type AutopilotConfigWhereInput = {
+    AND?: AutopilotConfigWhereInput | AutopilotConfigWhereInput[]
+    OR?: AutopilotConfigWhereInput[]
+    NOT?: AutopilotConfigWhereInput | AutopilotConfigWhereInput[]
+    id?: StringFilter<"AutopilotConfig"> | string
+    keywords?: StringFilter<"AutopilotConfig"> | string
+    targetPlatform?: StringFilter<"AutopilotConfig"> | string
+    maxDailyDownloads?: IntFilter<"AutopilotConfig"> | number
+    isActive?: BoolFilter<"AutopilotConfig"> | boolean
+    createdAt?: DateTimeFilter<"AutopilotConfig"> | Date | string
+    updatedAt?: DateTimeFilter<"AutopilotConfig"> | Date | string
+  }
+
+  export type AutopilotConfigOrderByWithRelationInput = {
+    id?: SortOrder
+    keywords?: SortOrder
+    targetPlatform?: SortOrder
+    maxDailyDownloads?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AutopilotConfigWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AutopilotConfigWhereInput | AutopilotConfigWhereInput[]
+    OR?: AutopilotConfigWhereInput[]
+    NOT?: AutopilotConfigWhereInput | AutopilotConfigWhereInput[]
+    keywords?: StringFilter<"AutopilotConfig"> | string
+    targetPlatform?: StringFilter<"AutopilotConfig"> | string
+    maxDailyDownloads?: IntFilter<"AutopilotConfig"> | number
+    isActive?: BoolFilter<"AutopilotConfig"> | boolean
+    createdAt?: DateTimeFilter<"AutopilotConfig"> | Date | string
+    updatedAt?: DateTimeFilter<"AutopilotConfig"> | Date | string
+  }, "id">
+
+  export type AutopilotConfigOrderByWithAggregationInput = {
+    id?: SortOrder
+    keywords?: SortOrder
+    targetPlatform?: SortOrder
+    maxDailyDownloads?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AutopilotConfigCountOrderByAggregateInput
+    _avg?: AutopilotConfigAvgOrderByAggregateInput
+    _max?: AutopilotConfigMaxOrderByAggregateInput
+    _min?: AutopilotConfigMinOrderByAggregateInput
+    _sum?: AutopilotConfigSumOrderByAggregateInput
+  }
+
+  export type AutopilotConfigScalarWhereWithAggregatesInput = {
+    AND?: AutopilotConfigScalarWhereWithAggregatesInput | AutopilotConfigScalarWhereWithAggregatesInput[]
+    OR?: AutopilotConfigScalarWhereWithAggregatesInput[]
+    NOT?: AutopilotConfigScalarWhereWithAggregatesInput | AutopilotConfigScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AutopilotConfig"> | string
+    keywords?: StringWithAggregatesFilter<"AutopilotConfig"> | string
+    targetPlatform?: StringWithAggregatesFilter<"AutopilotConfig"> | string
+    maxDailyDownloads?: IntWithAggregatesFilter<"AutopilotConfig"> | number
+    isActive?: BoolWithAggregatesFilter<"AutopilotConfig"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"AutopilotConfig"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AutopilotConfig"> | Date | string
   }
 
   export type ProjectCreateInput = {
@@ -14170,6 +15398,76 @@ export namespace Prisma {
     value?: StringFieldUpdateOperationsInput | string
   }
 
+  export type AutopilotConfigCreateInput = {
+    id?: string
+    keywords: string
+    targetPlatform?: string
+    maxDailyDownloads?: number
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AutopilotConfigUncheckedCreateInput = {
+    id?: string
+    keywords: string
+    targetPlatform?: string
+    maxDailyDownloads?: number
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AutopilotConfigUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    keywords?: StringFieldUpdateOperationsInput | string
+    targetPlatform?: StringFieldUpdateOperationsInput | string
+    maxDailyDownloads?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AutopilotConfigUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    keywords?: StringFieldUpdateOperationsInput | string
+    targetPlatform?: StringFieldUpdateOperationsInput | string
+    maxDailyDownloads?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AutopilotConfigCreateManyInput = {
+    id?: string
+    keywords: string
+    targetPlatform?: string
+    maxDailyDownloads?: number
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AutopilotConfigUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    keywords?: StringFieldUpdateOperationsInput | string
+    targetPlatform?: StringFieldUpdateOperationsInput | string
+    maxDailyDownloads?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AutopilotConfigUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    keywords?: StringFieldUpdateOperationsInput | string
+    targetPlatform?: StringFieldUpdateOperationsInput | string
+    maxDailyDownloads?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -14750,6 +16048,57 @@ export namespace Prisma {
     value?: SortOrder
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type AutopilotConfigCountOrderByAggregateInput = {
+    id?: SortOrder
+    keywords?: SortOrder
+    targetPlatform?: SortOrder
+    maxDailyDownloads?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AutopilotConfigAvgOrderByAggregateInput = {
+    maxDailyDownloads?: SortOrder
+  }
+
+  export type AutopilotConfigMaxOrderByAggregateInput = {
+    id?: SortOrder
+    keywords?: SortOrder
+    targetPlatform?: SortOrder
+    maxDailyDownloads?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AutopilotConfigMinOrderByAggregateInput = {
+    id?: SortOrder
+    keywords?: SortOrder
+    targetPlatform?: SortOrder
+    maxDailyDownloads?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AutopilotConfigSumOrderByAggregateInput = {
+    maxDailyDownloads?: SortOrder
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type TranscriptCreateNestedManyWithoutProjectInput = {
     create?: XOR<TranscriptCreateWithoutProjectInput, TranscriptUncheckedCreateWithoutProjectInput> | TranscriptCreateWithoutProjectInput[] | TranscriptUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: TranscriptCreateOrConnectWithoutProjectInput | TranscriptCreateOrConnectWithoutProjectInput[]
@@ -15062,6 +16411,10 @@ export namespace Prisma {
     update?: XOR<XOR<ClipUpdateToOneWithWhereWithoutAnalyticsInput, ClipUpdateWithoutAnalyticsInput>, ClipUncheckedUpdateWithoutAnalyticsInput>
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -15248,6 +16601,19 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type TranscriptCreateWithoutProjectInput = {

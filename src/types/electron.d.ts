@@ -83,6 +83,15 @@ declare global {
       // AI Dubbing
       dubbingSetEnabled:   (enabled: boolean) => Promise<{ success: boolean; enabled: boolean }>;
       dubbingGetEnabled:   () => Promise<{ success: boolean; enabled: boolean }>;
+      // Autopilot
+      autopilotGetConfig:  () => Promise<{ success: boolean; config?: { id: string; keywords: string; targetPlatform: string; maxDailyDownloads: number; isActive: boolean }; error?: string }>;
+      autopilotSaveConfig: (data: { keywords: string; targetPlatform: string; maxDailyDownloads: number; isActive: boolean }) => Promise<{ success: boolean; config?: unknown; error?: string }>;
+      autopilotToggle:     (isActive: boolean) => Promise<{ success: boolean; config?: unknown; error?: string }>;
+      autopilotRunNow:     () => Promise<{ success: boolean; project?: unknown; videoTitle?: string; error?: string }>;
+      // Storage Paths
+      openDirectoryPicker: (opts?: { title?: string }) => Promise<{ success: boolean; dirPath?: string }>;
+      storageDirsGet:      () => Promise<{ success: boolean; dirs?: Record<string, { current: string; default: string }>; error?: string }>;
+      storageDirsSet:      (category: string, dirPath: string) => Promise<{ success: boolean; error?: string }>;
     };
   }
 }

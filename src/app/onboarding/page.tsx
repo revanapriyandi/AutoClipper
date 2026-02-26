@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, ChevronRight, ChevronLeft, Rocket, Key, Cpu, Globe } from "lucide-react";
-
+import { CheckCircle2, ChevronRight, ChevronLeft, Rocket, Key, Cpu, Globe, Loader2 } from "lucide-react";
 
 const ONBOARDING_KEY = "autoclipper_onboarded";
 
@@ -52,15 +51,17 @@ const STEPS = [
 const LLM_QUICK = [
   { id: "openai",  label: "OpenAI GPT-5",      key: "openai_key",     default: "gpt-5-mini",      hint: "sk-..." },
   { id: "gemini",  label: "Google Gemini 3",    key: "gemini_api_key", default: "gemini-3-flash",  hint: "AIza..." },
-  { id: "groq",    label: "Groq (Fastest)",      key: "groq_api_key",   default: "gpt-oss-20b",     hint: "gsk_..." },
+  { id: "groq",    label: "Groq (Fastest)",      key: "groq_api_key",   default: "llama3-8b-8192",  hint: "gsk_..." },
   { id: "local",   label: "Local (Ollama)",       key: "",               default: "",                hint: "" },
 ];
 
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [llmProvider, setLlmProvider] = useState("openai");
   const [asrProvider, setAsrProvider] = useState("deepgram");
+  
   const [keys, setKeys] = useState<Record<string, string>>({
     openai_key: "", gemini_api_key: "", groq_api_key: "",
     deepgram_key: "", assemblyai_key: "", pexels_api_key: "",
@@ -72,33 +73,82 @@ export default function OnboardingPage() {
     // Skip onboarding if already done
     if (typeof window !== "undefined" && localStorage.getItem(ONBOARDING_KEY)) {
       router.replace("/");
+      return;
     }
-  }, [router]);
+
+    // Load existing preferences if any
+    const loadExistingData = async () => {
+      if (!api?.getKey) return;
+      try {
+        const load = async (k: string) => (await api.getKey(k))?.value || "";
+        
+        const existingLlm = await load("ai_scoring_provider");
+        if (existingLlm) setLlmProvider(existingLlm);
+        
+        const existingAsr = await load("asr_provider");
+        if (existingAsr) setAsrProvider(existingAsr);
+
+        const loadedKeys = {
+          openai_key: await load("openai_key"),
+          gemini_api_key: await load("gemini_api_key"),
+          groq_api_key: await load("groq_api_key"),
+          deepgram_key: await load("deepgram_key"),
+          assemblyai_key: await load("assemblyai_key"),
+          pexels_api_key: await load("pexels_api_key"),
+        };
+        
+        setKeys(prev => ({ ...prev, ...loadedKeys }));
+      } catch (e) {
+        console.error("Failed to load existing keys", e);
+      }
+    };
+
+    loadExistingData();
+  }, [router, api]);
 
   const currentStep = STEPS[step];
   const Icon = currentStep.icon;
   const progress = ((step) / (STEPS.length - 1)) * 100;
 
-  const handleSave = async () => {
+  const handleSaveStepData = async () => {
     if (!api?.setKey) return;
-    const pairs: [string, string][] = [
-      ["ai_scoring_provider", llmProvider],
-      ["ai_scoring_model",    LLM_QUICK.find(p => p.id === llmProvider)?.default || ""],
-      ["asr_provider",        asrProvider],
-      ...Object.entries(keys).filter(([, v]) => v.trim()),
-    ];
-    for (const [k, v] of pairs) await api.setKey(k, v);
+    try {
+      if (currentStep.id === "llm") {
+        await api.setKey("ai_scoring_provider", llmProvider);
+        const defaultModel = LLM_QUICK.find(p => p.id === llmProvider)?.default || "";
+        await api.setKey("ai_scoring_model", defaultModel);
+      } else if (currentStep.id === "asr") {
+        await api.setKey("asr_provider", asrProvider);
+      } else if (currentStep.id === "apikeys") {
+        const pairsToSave = Object.entries(keys).filter(([, v]) => v.trim());
+        for (const [k, v] of pairsToSave) {
+          await api.setKey(k, v);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to save step data", e);
+    }
   };
 
   const handleFinish = async () => {
-    await handleSave();
+    setLoading(true);
+    await handleSaveStepData();
     localStorage.setItem(ONBOARDING_KEY, "1");
     router.push("/");
   };
 
   const handleNext = async () => {
-    if (step === STEPS.length - 1) { handleFinish(); return; }
-    if (step === STEPS.length - 2) await handleSave(); // Save before done screen
+    if (step === STEPS.length - 1) { 
+      await handleFinish(); 
+      return; 
+    }
+    
+    setLoading(true);
+    // Explicitly save data when moving forward from an interactive step
+    if (["llm", "asr", "apikeys"].includes(currentStep.id)) {
+      await handleSaveStepData();
+    }
+    setLoading(false);
     setStep(s => Math.min(s + 1, STEPS.length - 1));
   };
 
@@ -153,7 +203,7 @@ export default function OnboardingPage() {
                       key={p.id}
                       onClick={() => setLlmProvider(p.id)}
                       className={[
-                        "flex flex-col items-start p-4 rounded-xl border text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        "flex flex-col items-start p-4 rounded-xl border text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 relative",
                         llmProvider === p.id 
                           ? "border-primary bg-primary/5 shadow-sm" 
                           : "border-border hover:bg-muted/50 text-muted-foreground hover:text-foreground",
@@ -161,6 +211,7 @@ export default function OnboardingPage() {
                     >
                       <div className="font-medium text-foreground">{p.label}</div>
                       {p.default && <div className="text-xs mt-1 text-muted-foreground">{p.default}</div>}
+                      {llmProvider === p.id && <CheckCircle2 className="h-4 w-4 absolute top-4 right-4 text-primary" />}
                     </button>
                   ))}
                 </div>
@@ -177,7 +228,7 @@ export default function OnboardingPage() {
                       key={p.id}
                       onClick={() => setAsrProvider(p.id)}
                       className={[
-                        "flex flex-col items-start p-4 rounded-xl border text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        "flex flex-col items-start p-4 rounded-xl border text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 relative",
                         asrProvider === p.id 
                           ? "border-primary bg-primary/5 shadow-sm" 
                           : "border-border hover:bg-muted/50 text-muted-foreground hover:text-foreground",
@@ -185,6 +236,7 @@ export default function OnboardingPage() {
                     >
                       <div className="font-medium text-foreground">{p.label}</div>
                       <div className="text-xs mt-1 text-muted-foreground">{p.sub}</div>
+                      {asrProvider === p.id && <CheckCircle2 className="h-4 w-4 absolute top-4 right-4 text-primary" />}
                     </button>
                   ))}
                 </div>
@@ -252,7 +304,7 @@ export default function OnboardingPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setStep(s => Math.max(s - 1, 0))}
-                disabled={step === 0}
+                disabled={step === 0 || loading}
                 className="text-muted-foreground hover:text-foreground"
               >
                 <ChevronLeft className="h-4 w-4 mr-1.5" /> 
@@ -274,8 +326,11 @@ export default function OnboardingPage() {
                 size="sm" 
                 onClick={handleNext} 
                 className="min-w-[100px]"
+                disabled={loading}
               >
-                {step === STEPS.length - 1 ? (
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : step === STEPS.length - 1 ? (
                   <>Selesai <Rocket className="h-4 w-4 ml-1.5" /></>
                 ) : (
                   <>Lanjut <ChevronRight className="h-4 w-4 ml-1.5" /></>
@@ -291,7 +346,8 @@ export default function OnboardingPage() {
           {step < STEPS.length - 1 && (
             <button 
               onClick={handleFinish} 
-              className="text-xs text-muted-foreground hover:text-foreground hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
+              disabled={loading}
+              className="text-xs text-muted-foreground hover:text-foreground hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1 disabled:opacity-50"
             >
               Lewati setup dan atur nanti
             </button>

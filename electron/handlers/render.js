@@ -2,11 +2,12 @@
  * electron/handlers/render.js
  * FFmpeg rendering with real-time progress streaming via IPC
  */
-const { ipcMain, BrowserWindow } = require('electron');
+const { ipcMain, BrowserWindow, app } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const ffmpeg = require('fluent-ffmpeg');
+const { getDir } = require('../paths');
 
 function formatAssTime(seconds) {
   const date = new Date(0);
@@ -158,6 +159,14 @@ ipcMain.handle('render:clip', async (_, options) => {
   try {
     const jobId = options.jobId || `render_${Date.now()}`;
     broadcastProgress(jobId, 0);
+
+    // Derive a safe output path in the user-configured clips folder
+    if (!options.outputPath) {
+      const clipsDir = await getDir('clips');
+      const baseName = path.basename(options.sourcePath || 'clip', path.extname(options.sourcePath || '.mp4'));
+      options.outputPath = path.join(clipsDir, `${baseName}_${jobId}.mp4`);
+    }
+
     const outputPath = await runVideoRender(options, jobId);
     return { success: true, outputPath, jobId };
   } catch (e) {

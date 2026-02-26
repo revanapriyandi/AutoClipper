@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,9 @@ interface ProjectRecord {
 }
 
 // ---- Component ----
-export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
+function ProjectDetailsContent() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const [project, setProject] = useState<ProjectRecord | null>(null);
   const [loading, setLoading] = useState(false);
   const [candidates, setCandidates] = useState<ScoredCandidate[]>([]);
@@ -57,7 +60,8 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
       try {
         const api = window.electronAPI;
         if (!api) throw new Error("Electron API not found");
-        const data = await api.dbGetProject(params.id) as { success: boolean, project?: ProjectRecord, error?: string };
+        if (!id) throw new Error("No Project ID provided in URL");
+        const data = await api.dbGetProject(id) as { success: boolean, project?: ProjectRecord, error?: string };
         if (data.success && data.project) {
           setProject(data.project);
           setStatus("Ready. Click 'Auto-Cut Clips' to start the AI pipeline.");
@@ -79,7 +83,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
       }
     }
     loadProject();
-  }, [params.id]);
+  }, [id]);
 
   const loadVideoPreview = async (sourcePath: string) => {
     const api = window.electronAPI;
@@ -111,8 +115,8 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
         deepgramKey = keyRes.value || "";
       }
       if (!deepgramKey) {
-        setStatus("⚠️ Deepgram API Key belum diset di Settings. Menggunakan mock data...");
-        loadMockData();
+        setStatus("⚠️ Deepgram API Key belum dipasang. Silakan konfigurasikan via menu Settings terlebih dahulu.");
+        setLoading(false);
         return;
       }
 
@@ -167,26 +171,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
     }
   };
 
-  const loadMockData = () => {
-    const { enriched, brollKeywordMap: newMap } = enrichCandidates([{
-      startMs: 15000, endMs: 45000, wordCount: 42,
-      transcriptText: "This is a viral hook that catches attention. It delivers value immediately and ends with a strong payoff that viewers will remember.",
-      chunks: [
-        { startMs: 15000, endMs: 20000, text: "This is a viral hook that catches attention.", words: [
-          { startMs: 15000, endMs: 15800, text: "This" }, { startMs: 15800, endMs: 16200, text: "is" },
-          { startMs: 16200, endMs: 16600, text: "a" }, { startMs: 16600, endMs: 17500, text: "viral" }, { startMs: 17500, endMs: 20000, text: "hook" }
-        ]},
-        { startMs: 20000, endMs: 30000, text: "It delivers value immediately.", words: [] },
-        { startMs: 30000, endMs: 45000, text: "Ends with a strong payoff viewers remember.", words: [] },
-      ],
-      scores: { hook: 23, clarity: 20, payoff: 22, standalone: 24, explanation: "Strong viral hook with clear value." },
-      totalScore: 89
-    }]);
-    setCandidates(enriched);
-    setBrollKeywordMap(newMap);
-    setLoading(false);
-    setStatus("✅ Mock data loaded (add Deepgram key in Settings for real processing).");
-  };
+
 
   // ============================
   // Render Clip
@@ -201,12 +186,13 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
       return;
     }
 
-    const outputPath = project.sourcePath.replace(/\.[^/.]+$/, `_clip${index + 1}_${Date.now()}.mp4`);
+    const jobId = `render_clip${index + 1}_${Date.now()}`;
+    const outputPath = `__CLIPS__/clip_${jobId}.mp4`; // placeholder; actual path resolved by backend
 
     try {
       const res = await api.enqueueJob('RENDER', {
+        jobId,
         sourcePath: project.sourcePath,
-        outputPath,
         startMs: clip.startMs,
         endMs: clip.endMs,
         segments: clip.chunks.map(c => ({
@@ -218,12 +204,11 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
         style: { font: fontName, primaryColor, outlineColor, alignment: parseInt(alignment), marginV: parseInt(marginV) }
       });
 
-      if (!res.success || !res.jobId) {
+      if (!res.success) {
         setStatus("Failed to enqueue render: " + res.error);
         return;
       }
 
-      const jobId = res.jobId;
       setStatus(`⏳ Render job ${jobId} queued. Processing...`);
 
       const interval = setInterval(async () => {
@@ -528,5 +513,13 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function ProjectDetailsPage() {
+  return (
+    <Suspense fallback={<div className="p-10 flex justify-center"><Loader2 className="animate-spin text-muted-foreground mr-2 h-5 w-5" />Loading Project...</div>}>
+      <ProjectDetailsContent />
+    </Suspense>
   );
 }

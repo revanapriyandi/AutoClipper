@@ -57,6 +57,9 @@ require('./handlers/db');
 require('./handlers/db_calendar_addon');
 require('./handlers/db_theme_addon');
 require('./handlers/db_analytics_addon');
+require('./handlers/ffmpeg'); // Added FFmpeg static bindings
+
+const { startAutopilotPoller } = require('./handlers/autopilot');
 
 const { pollJobQueue, prisma } = require('./handlers/jobs');
 
@@ -64,9 +67,27 @@ const { pollJobQueue, prisma } = require('./handlers/jobs');
 // ── BrowserWindow ──────────────────────────────────────────────────
 
 function createWindow() {
+  // 1. Create the Splash Screen Window
+  const splashWindow = new BrowserWindow({
+    width: 500,
+    height: 350,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+    }
+  });
+
+  splashWindow.loadFile(path.join(__dirname, 'splash.html'));
+
+  // 2. Create the Main Application Window (Hidden initially)
   const mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
+    show: false, // Don't show until ready
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -76,15 +97,31 @@ function createWindow() {
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:3000');
-    mainWindow.webContents.openDevTools();
+    // Open DevTools in a detached window so it doesn't mess with layout loading
+    // mainWindow.webContents.openDevTools({ mode: 'detach' });
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../out/index.html'));
+    mainWindow.loadFile(path.join(__dirname, '../out/index.html')).catch(err => {
+      console.error("Failed to load out/index.html", err);
+    });
   }
+
+  // 3. Wait for the main window to be conceptually ready to show
+  mainWindow.once('ready-to-show', () => {
+    // Artificial delay to ensure Next.js client-side rendering is ready
+    setTimeout(() => {
+      if (!splashWindow.isDestroyed()) {
+        splashWindow.destroy();
+      }
+      mainWindow.show();
+      mainWindow.focus();
+    }, 1500); // 1.5 second artificial delay for the splash page
+  });
 }
 
 app.whenReady().then(() => {
   createWindow();
   pollJobQueue();
+  startAutopilotPoller();
   checkOnStartup(); // Check for updates on startup (respects user toggle)
 
   app.on('activate', () => {

@@ -215,6 +215,16 @@ exports.Prisma.SettingsScalarFieldEnum = {
   value: 'value'
 };
 
+exports.Prisma.AutopilotConfigScalarFieldEnum = {
+  id: 'id',
+  keywords: 'keywords',
+  targetPlatform: 'targetPlatform',
+  maxDailyDownloads: 'maxDailyDownloads',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -236,7 +246,8 @@ exports.Prisma.ModelName = {
   Job: 'Job',
   ThemePreset: 'ThemePreset',
   Analytics: 'Analytics',
-  Settings: 'Settings'
+  Settings: 'Settings',
+  AutopilotConfig: 'AutopilotConfig'
 };
 
 /**

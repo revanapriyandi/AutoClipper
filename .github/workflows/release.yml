@@ -9,39 +9,6 @@ permissions:
   contents: write
 
 jobs:
-  # ── macOS Intel ──────────────────────────────────────────────
-  build-macos-intel:
-    runs-on: macos-12
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
-      - name: Build Next.js
-        run: npm run build
-        env:
-          DATABASE_URL: file:./dev.db
-          NEXT_TELEMETRY_DISABLED: 1
-
-      - name: Build & Publish (macOS Intel)
-        run: npx electron-builder --mac --publish always
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-macos-intel
-          path: dist/*.dmg
-
   # ── macOS Apple Silicon ───────────────────────────────────────
   build-macos-arm:
     runs-on: macos-latest
