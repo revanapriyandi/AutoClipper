@@ -161,4 +161,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('compilation:progress', handler);
     return () => ipcRenderer.removeListener('compilation:progress', handler);
   },
+
+  // ── Menu Events ─────────────────────────────────────────────────────────────
+  onMenuNavigate: (callback) => {
+    const handler = (_, route) => callback(route);
+    ipcRenderer.on('menu:navigate', handler);
+    return () => ipcRenderer.removeListener('menu:navigate', handler);
+  },
+  onMenuNewProject: (callback) => {
+    const handler = () => callback();
+    ipcRenderer.on('menu:newProject', handler);
+    return () => ipcRenderer.removeListener('menu:newProject', handler);
+  },
+  onMenuOpenSettings: (callback) => {
+    const handler = () => callback();
+    ipcRenderer.on('menu:openSettings', handler);
+    return () => ipcRenderer.removeListener('menu:openSettings', handler);
+  },
 });

@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { OnboardingGuard } from "@/components/onboarding-guard";
 import { NotificationToast } from "@/components/NotificationToast";
+import { MenuListener } from "@/components/MenuListener";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -53,6 +54,7 @@ export default function RootLayout({
             </OnboardingGuard>
           </I18nProvider>
           <NotificationToast />
+          <MenuListener />
         </ThemeProvider>
       </body>
     </html>

@@ -92,6 +92,12 @@ declare global {
       openDirectoryPicker: (opts?: { title?: string }) => Promise<{ success: boolean; dirPath?: string }>;
       storageDirsGet:      () => Promise<{ success: boolean; dirs?: Record<string, { current: string; default: string }>; error?: string }>;
       storageDirsSet:      (category: string, dirPath: string) => Promise<{ success: boolean; error?: string }>;
+      
+      // Menu Events
+      onCompilationProgress: (callback: (data: { jobId: string; percent: number }) => void) => () => void;
+      onMenuNavigate: (callback: (route: string) => void) => () => void;
+      onMenuNewProject: (callback: () => void) => () => void;
+      onMenuOpenSettings: (callback: () => void) => () => void;
     };
   }
 }
