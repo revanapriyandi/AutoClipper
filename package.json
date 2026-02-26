@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "@deepgram/sdk": "^4.11.3",
+    "@prisma/adapter-better-sqlite3": "^7.4.1",
     "@prisma/client": "^7.4.1",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.8",
@@ -60,6 +61,7 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
     "axios": "^1.13.5",
+    "better-sqlite3": "^12.6.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -70,6 +72,7 @@
     "lucide-react": "^0.575.0",
     "next": "14.2.35",
     "next-intl": "^4.8.3",
+    "next-themes": "^0.4.6",
     "react": "^18",
     "react-dom": "^18",
     "recharts": "^3.7.0",
@@ -77,6 +80,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/fluent-ffmpeg": "^2.1.28",
     "@types/node": "^20",
     "@types/react": "^18",
@@ -85,6 +89,7 @@
     "dotenv-cli": "^11.0.0",
     "electron": "^40.6.1",
     "electron-builder": "^26.8.1",
+    "electron-rebuild": "^3.2.9",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "jimp": "^1.6.0",

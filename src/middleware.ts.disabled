@@ -1,0 +1,12 @@
+import createMiddleware from 'next-intl/middleware';
+
+export default createMiddleware({
+  locales: ['id', 'en'],
+  defaultLocale: 'id',
+  localePrefix: 'never',
+});
+
+export const config = {
+  // Matches all pathnames except /api, /_next, and static files
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+};

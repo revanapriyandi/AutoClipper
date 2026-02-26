@@ -9,7 +9,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const nextConfig = {
   output: 'standalone',
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', 'fluent-ffmpeg'],
+    serverComponentsExternalPackages: ['@prisma/client', 'fluent-ffmpeg', 'better-sqlite3'],
   },
   webpack: (config) => {
     config.resolve.alias['@prisma/client'] = path.resolve(__dirname, 'electron/prisma-client');

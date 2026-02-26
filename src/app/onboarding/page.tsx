@@ -103,142 +103,182 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <div className="w-full max-w-lg">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 sm:p-8">
+      <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
 
         {/* Progress bar */}
-        <div className="w-full bg-muted rounded-full h-1.5 mb-8">
+        <div className="w-full bg-muted overflow-hidden rounded-full h-1.5">
           <div
-            className={`h-1.5 rounded-full bg-gradient-to-r ${currentStep.color} transition-all duration-500`}
+            className="h-full bg-primary transition-all duration-500 ease-in-out"
             style={{ width: `${progress}%` }}
           />
         </div>
 
-        <Card className="border-border/50 shadow-2xl">
-          <CardContent className="p-8">
+        <Card className="shadow-none border-border">
+          <CardContent className="p-8 sm:p-10 flex flex-col gap-8">
 
-            {/* Icon + Title */}
-            <div className="text-center mb-8">
-              <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${currentStep.color} mb-4`}>
-                <Icon className="h-8 w-8 text-white" />
+            {/* Header */}
+            <div className="flex flex-col items-center text-center gap-4">
+              <div className="p-3 bg-muted/50 rounded-2xl ring-1 ring-border/50">
+                <Icon className="h-6 w-6 text-foreground" />
               </div>
-              <h1 className="text-2xl font-bold">{currentStep.title}</h1>
-              <p className="text-muted-foreground mt-1 text-sm">{currentStep.subtitle}</p>
+              <div className="space-y-1.5">
+                <h1 className="text-2xl font-semibold tracking-tight">{currentStep.title}</h1>
+                <p className="text-sm text-muted-foreground">{currentStep.subtitle}</p>
+              </div>
             </div>
 
             {/* Step Content */}
-            {currentStep.id === "welcome" && (
-              <div className="grid grid-cols-3 gap-3 text-center text-sm">
-                {["🤖 AI Auto-Cut", "📝 Auto-Subtitles", "🚀 Social Upload"].map(f => (
-                  <div key={f} className="bg-muted/50 rounded-lg p-3 font-medium">{f}</div>
-                ))}
-              </div>
-            )}
+            <div className="min-h-[220px] flex flex-col justify-center">
+              {currentStep.id === "welcome" && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center text-sm">
+                  {[
+                    { title: "AI Auto-Cut", desc: "Temukan momen terbaik otomatis", icon: "🤖" },
+                    { title: "Auto-Subtitles", desc: "Transkripsi super cepat", icon: "📝" },
+                    { title: "Social Upload", desc: "Langsung ke platform pilihan", icon: "🚀" }
+                  ].map(f => (
+                    <div key={f.title} className="flex flex-col items-center gap-2 p-4 border rounded-xl bg-card">
+                      <div className="text-2xl">{f.icon}</div>
+                      <div className="font-medium text-foreground">{f.title}</div>
+                      <div className="text-xs text-muted-foreground">{f.desc}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-            {currentStep.id === "llm" && (
-              <div className="grid grid-cols-2 gap-3">
-                {LLM_QUICK.map(p => (
-                  <button
-                    key={p.id}
-                    onClick={() => setLlmProvider(p.id)}
-                    className={[
-                      "p-3 rounded-lg border text-sm font-medium text-left transition-all",
-                      llmProvider === p.id ? "border-primary bg-primary/10" : "border-border hover:border-primary/50",
-                    ].join(" ")}
-                  >
-                    <div>{p.label}</div>
-                    {p.default && <div className="text-xs text-muted-foreground mt-0.5">{p.default}</div>}
-                  </button>
-                ))}
-              </div>
-            )}
+              {currentStep.id === "llm" && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {LLM_QUICK.map(p => (
+                    <button
+                      key={p.id}
+                      onClick={() => setLlmProvider(p.id)}
+                      className={[
+                        "flex flex-col items-start p-4 rounded-xl border text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        llmProvider === p.id 
+                          ? "border-primary bg-primary/5 shadow-sm" 
+                          : "border-border hover:bg-muted/50 text-muted-foreground hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      <div className="font-medium text-foreground">{p.label}</div>
+                      {p.default && <div className="text-xs mt-1 text-muted-foreground">{p.default}</div>}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-            {currentStep.id === "asr" && (
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { id: "deepgram",       label: "Deepgram", sub: "nova-3 (Recommended)" },
-                  { id: "openai_whisper", label: "OpenAI Whisper", sub: "whisper-1" },
-                  { id: "assemblyai",     label: "AssemblyAI", sub: "best" },
-                ].map(p => (
-                  <button
-                    key={p.id}
-                    onClick={() => setAsrProvider(p.id)}
-                    className={[
-                      "p-3 rounded-lg border text-sm font-medium text-left transition-all",
-                      asrProvider === p.id ? "border-primary bg-primary/10" : "border-border hover:border-primary/50",
-                    ].join(" ")}
-                  >
-                    <div>{p.label}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{p.sub}</div>
-                  </button>
-                ))}
-              </div>
-            )}
+              {currentStep.id === "asr" && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[
+                    { id: "deepgram",       label: "Deepgram", sub: "nova-3 (Recommended)" },
+                    { id: "openai_whisper", label: "OpenAI Whisper", sub: "whisper-1" },
+                    { id: "assemblyai",     label: "AssemblyAI", sub: "best" },
+                  ].map(p => (
+                    <button
+                      key={p.id}
+                      onClick={() => setAsrProvider(p.id)}
+                      className={[
+                        "flex flex-col items-start p-4 rounded-xl border text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                        asrProvider === p.id 
+                          ? "border-primary bg-primary/5 shadow-sm" 
+                          : "border-border hover:bg-muted/50 text-muted-foreground hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      <div className="font-medium text-foreground">{p.label}</div>
+                      <div className="text-xs mt-1 text-muted-foreground">{p.sub}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
 
-            {currentStep.id === "apikeys" && (
-              <div className="space-y-3">
-                {[
-                  { key: "openai_key",     label: "OpenAI API Key",    show: llmProvider === "openai",  hint: "sk-..." },
-                  { key: "gemini_api_key", label: "Gemini API Key",     show: llmProvider === "gemini",  hint: "AIza..." },
-                  { key: "groq_api_key",   label: "Groq API Key",       show: llmProvider === "groq",    hint: "gsk_..." },
-                  { key: "deepgram_key",   label: "Deepgram API Key",   show: asrProvider === "deepgram", hint: "Enter key..." },
-                  { key: "assemblyai_key", label: "AssemblyAI Key",     show: asrProvider === "assemblyai", hint: "Enter key..." },
-                  { key: "pexels_api_key", label: "Pexels API Key",     show: true, hint: "For B-Roll download (free at pexels.com/api)" },
-                ].filter(f => f.show).map(f => (
-                  <div key={f.key} className="space-y-1">
-                    <Label className="text-xs">{f.label}</Label>
-                    <Input
-                      type="password"
-                      value={keys[f.key] || ""}
-                      onChange={e => setKeys(k => ({ ...k, [f.key]: e.target.value }))}
-                      placeholder={f.hint}
-                      className="h-8 text-xs"
-                    />
+              {currentStep.id === "apikeys" && (
+                <div className="space-y-5">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {[
+                      { key: "openai_key",     label: "OpenAI API Key",    show: llmProvider === "openai",  hint: "sk-..." },
+                      { key: "gemini_api_key", label: "Gemini API Key",     show: llmProvider === "gemini",  hint: "AIza..." },
+                      { key: "groq_api_key",   label: "Groq API Key",       show: llmProvider === "groq",    hint: "gsk_..." },
+                      { key: "deepgram_key",   label: "Deepgram API Key",   show: asrProvider === "deepgram", hint: "Enter key..." },
+                      { key: "assemblyai_key", label: "AssemblyAI Key",     show: asrProvider === "assemblyai", hint: "Enter key..." },
+                      { key: "pexels_api_key", label: "Pexels API Key",     show: true, hint: "For B-Roll (pexels.com/api)" },
+                    ].filter(f => f.show).map(f => (
+                      <div key={f.key} className="space-y-2">
+                        <Label htmlFor={f.key} className="text-xs font-semibold">{f.label}</Label>
+                        <Input
+                          id={f.key}
+                          type="password"
+                          value={keys[f.key] || ""}
+                          onChange={e => setKeys(k => ({ ...k, [f.key]: e.target.value }))}
+                          placeholder={f.hint}
+                          className="h-9 transition-colors focus-visible:ring-primary"
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
-                {llmProvider === "local" && (
-                  <div className="p-3 bg-muted/50 rounded-lg text-sm text-center border">
-                    <Cpu className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-                    <strong>Local AI Aktif</strong><br />Anda tidak memerlukan API Key untuk LLM. Konfigurasi endpoint (Ollama/Custom API) dapat diatur spesifik di halaman Settings nanti.
-                  </div>
-                )}
-                <p className="text-xs text-muted-foreground pt-2 border-t">API keys lainnya bisa ditambahkan di Settings kapan saja.</p>
-              </div>
-            )}
 
-            {currentStep.id === "done" && (
-              <div className="space-y-3">
-                {["✅ AI Provider dikonfigurasi", "✅ Transcription siap", "✅ API Keys tersimpan aman"].map(item => (
-                  <div key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
-                    {item}
-                  </div>
-                ))}
-              </div>
-            )}
+                  {llmProvider === "local" && (
+                    <div className="flex items-start gap-3 p-4 bg-muted/30 rounded-xl border border-border/50">
+                      <Cpu className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                      <div className="space-y-1">
+                        <p className="font-medium text-sm text-foreground">Local AI Aktif</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          Anda tidak memerlukan API Key eksternal. Konfigurasi endpoint untuk Ollama atau server kustom lainnya dapat diatur di halaman <span className="font-medium text-foreground">Settings</span> setelah setup selesai.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  <p className="text-[11px] text-muted-foreground text-center">🔐 Keys disimpan dengan aman menggunakan sistem operasi, bukan di cloud.</p>
+                </div>
+              )}
 
-            {/* Navigation */}
-            <div className="flex justify-between mt-8">
+              {currentStep.id === "done" && (
+                <div className="flex flex-col gap-3 mx-auto max-w-sm w-full">
+                  {[
+                    { text: "AI Provider telah dikonfigurasi", icon: Cpu },
+                    { text: "Mesin Transkripsi siap digunakan", icon: Globe },
+                    { text: "API Keys disimpan ke Keychain lokal", icon: Key },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 rounded-lg border bg-card/50">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                      <span className="text-sm font-medium text-muted-foreground">{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer Navigation */}
+            <div className="flex items-center justify-between pt-6 mt-4 border-t border-border/40">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setStep(s => Math.max(s - 1, 0))}
                 disabled={step === 0}
+                className="text-muted-foreground hover:text-foreground"
               >
-                <ChevronLeft className="h-4 w-4 mr-1" /> Back
+                <ChevronLeft className="h-4 w-4 mr-1.5" /> 
+                <span className="hidden sm:inline">Kembali</span>
               </Button>
-              <div className="flex gap-1.5 items-center">
+              
+              <div className="flex gap-2 items-center">
                 {STEPS.map((_, i) => (
-                  i === step
-                    ? <div key={i} className={`h-1.5 w-6 rounded-full bg-gradient-to-r ${currentStep.color}`} />
-                    : <div key={i} className="h-1.5 w-1.5 rounded-full bg-muted" />
+                  <div 
+                    key={i} 
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      i === step ? "w-6 bg-primary" : "w-1.5 bg-border hover:bg-muted-foreground/30"
+                    }`} 
+                  />
                 ))}
               </div>
-              <Button size="sm" onClick={handleNext} className={`bg-gradient-to-r ${currentStep.color} text-white border-0`}>
+
+              <Button 
+                size="sm" 
+                onClick={handleNext} 
+                className="min-w-[100px]"
+              >
                 {step === STEPS.length - 1 ? (
-                  <><Rocket className="h-4 w-4 mr-1" /> Get Started</>
+                  <>Selesai <Rocket className="h-4 w-4 ml-1.5" /></>
                 ) : (
-                  <>Next <ChevronRight className="h-4 w-4 ml-1" /></>
+                  <>Lanjut <ChevronRight className="h-4 w-4 ml-1.5" /></>
                 )}
               </Button>
             </div>
@@ -246,12 +286,18 @@ export default function OnboardingPage() {
           </CardContent>
         </Card>
 
-        {/* Skip */}
-        {step < STEPS.length - 1 && (
-          <p className="text-center mt-4 text-xs text-muted-foreground">
-            <button onClick={handleFinish} className="hover:underline">Skip setup — configure later in Settings</button>
-          </p>
-        )}
+        {/* Skip button below card */}
+        <div className="flex justify-center h-8">
+          {step < STEPS.length - 1 && (
+            <button 
+              onClick={handleFinish} 
+              className="text-xs text-muted-foreground hover:text-foreground hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
+            >
+              Lewati setup dan atur nanti
+            </button>
+          )}
+        </div>
+
       </div>
     </div>
   );

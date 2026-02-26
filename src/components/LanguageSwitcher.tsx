@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -8,15 +8,29 @@ import { Button } from "@/components/ui/button";
 const LOCALE_KEY = "autoclipper_locale";
 
 export function LanguageSwitcher() {
-  const currentLocale = typeof window !== "undefined"
-    ? (localStorage.getItem(LOCALE_KEY) || "id")
-    : "id";
+  const [mounted, setMounted] = useState(false);
+  const [currentLocale, setCurrentLocale] = useState("id");
+
+  useEffect(() => {
+    setMounted(true);
+    setCurrentLocale(localStorage.getItem(LOCALE_KEY) || "id");
+  }, []);
 
   const toggleLocale = useCallback(() => {
     const next = currentLocale === "id" ? "en" : "id";
     localStorage.setItem(LOCALE_KEY, next);
     window.location.reload();
   }, [currentLocale]);
+
+  // Prevent hydration mismatch by rendering default SSR state until mounted
+  if (!mounted) {
+    return (
+      <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs" title="Toggle language / Ganti bahasa">
+        <Globe className="h-3.5 w-3.5" />
+        EN
+      </Button>
+    );
+  }
 
   return (
     <Button

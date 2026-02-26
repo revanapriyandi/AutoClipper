@@ -48,12 +48,11 @@ if (isPackaged) {
   }
 }
 
-// Require the Prisma client from the custom output path
-// (relative to this file: electron/prisma-client)
 const { PrismaClient } = require('./prisma-client');
+const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3');
 
-const prisma = new PrismaClient({
-  datasourceUrl: `file:${dbPath}`,
-});
+const adapter = new PrismaBetterSqlite3({ url: dbPath });
+
+const prisma = new PrismaClient({ adapter });
 
 module.exports = prisma;

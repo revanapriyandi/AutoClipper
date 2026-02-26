@@ -6,6 +6,9 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { OnboardingGuard } from "@/components/onboarding-guard";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,29 +24,37 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className="dark">
+    <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <SidebarProvider>
-            <AppSidebar />
-            <main className="w-full h-screen overflow-y-auto">
-              {/* ── Top Bar ─────────────────────────────── */}
-              <div className="flex items-center justify-between px-4 py-3 border-b bg-background/80 backdrop-blur sticky top-0 z-10">
-                <div className="flex items-center gap-3">
-                  <SidebarTrigger />
-                  <span className="text-base font-semibold tracking-tight">AutoClipper</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <LanguageSwitcher />
-                </div>
-              </div>
-              {/* ── Page Content ─────────────────────────── */}
-              <div className="p-6">
-                {children}
-              </div>
-            </main>
-          </SidebarProvider>
-        </NextIntlClientProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <OnboardingGuard>
+              <SidebarProvider>
+                <AppSidebar />
+                <main className="w-full h-screen overflow-y-auto">
+                  <div className="flex items-center justify-between px-4 py-3 border-b bg-background/80 backdrop-blur sticky top-0 z-10">
+                    <div className="flex items-center gap-3">
+                      <SidebarTrigger />
+                      <span className="text-base font-semibold tracking-tight">AutoClipper</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <ThemeToggle />
+                      <LanguageSwitcher />
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    {children}
+                  </div>
+                </main>
+              </SidebarProvider>
+            </OnboardingGuard>
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
