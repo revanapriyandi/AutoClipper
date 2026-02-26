@@ -9,8 +9,8 @@ permissions:
   contents: write
 
 jobs:
-  # ── macOS Apple Silicon ───────────────────────────────────────
-  build-macos-arm:
+  # ── macOS (x64 & arm64) ───────────────────────────────────────
+  build-macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,18 +31,18 @@ jobs:
           DATABASE_URL: file:./dev.db
           NEXT_TELEMETRY_DISABLED: 1
 
-      - name: Build & Publish (macOS ARM)
-        run: npx electron-builder --mac --arm64 --publish always
+      - name: Build & Publish (macOS Universal)
+        run: npx electron-builder --mac --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist-macos-arm
+          name: dist-macos
           path: dist/*.dmg
 
-  # ── Linux ─────────────────────────────────────────────────────
+  # ── Linux (x64 & arm64) ───────────────────────────────────────
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -73,9 +73,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dist-linux
-          path: dist/*.AppImage
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
 
-  # ── Windows ───────────────────────────────────────────────────
+  # ── Windows (x64, arm64, ia32) ────────────────────────────────
   build-windows:
     runs-on: windows-2022
     defaults:
