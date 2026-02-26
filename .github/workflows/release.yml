@@ -3,43 +3,144 @@ name: Release Build
 on:
   push:
     tags:
-      - "v*" # Trigger build hanya saat push tag seperti v1.0.0
+      - "v*"
 
 permissions:
   contents: write
 
 jobs:
-  build:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-
+  # ── macOS Intel ──────────────────────────────────────────────
+  build-macos-intel:
+    runs-on: macos-13
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
+          cache: npm
 
       - name: Install Dependencies
         run: npm ci
 
-      - name: Generate Prisma Client (Per OS)
+      - name: Generate Prisma Client
         run: npx prisma generate
 
       - name: Build Next.js
         run: npm run build
         env:
           DATABASE_URL: file:./dev.db
-          SKIP_ENV_VALIDATION: 1
           NEXT_TELEMETRY_DISABLED: 1
 
-      - name: Build & Publish Electron Apps
+      - name: Build & Publish (macOS Intel)
+        run: npx electron-builder --mac --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --publish always
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-macos-intel
+          path: dist/*.dmg
+
+  # ── macOS Apple Silicon ───────────────────────────────────────
+  build-macos-arm:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build Next.js
+        run: npm run build
+        env:
+          DATABASE_URL: file:./dev.db
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Build & Publish (macOS ARM)
+        run: npx electron-builder --mac --arm64 --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-macos-arm
+          path: dist/*.dmg
+
+  # ── Linux ─────────────────────────────────────────────────────
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build Next.js
+        run: npm run build
+        env:
+          DATABASE_URL: file:./dev.db
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Build & Publish (Linux)
+        run: npx electron-builder --linux --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-linux
+          path: dist/*.AppImage
+
+  # ── Windows ───────────────────────────────────────────────────
+  build-windows:
+    runs-on: windows-2022
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build Next.js
+        run: npm run build
+        env:
+          DATABASE_URL: file:./dev.db
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Build & Publish (Windows)
+        run: npx electron-builder --win --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-windows
+          path: dist/*.exe
