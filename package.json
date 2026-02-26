@@ -1,11 +1,13 @@
 {
   "name": "autoclipper",
   "version": "1.0.0",
+  "description": "AI-powered desktop app to auto-cut, caption, and publish viral short videos to YouTube, TikTok & Facebook.",
+  "author": "revanapriyandi",
   "private": true,
   "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
-    "build": "dotenv -e .env -- next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
