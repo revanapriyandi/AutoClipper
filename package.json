@@ -12,7 +12,8 @@
     "lint": "next lint",
     "test": "vitest run",
     "electron:dev": "concurrently -k \"npm run dev\" \"wait-on tcp:localhost:3000 && electron .\"",
-    "electron:build": "npm run build && electron-builder"
+    "electron:build": "npm run build && electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "build": {
     "appId": "com.autoclipper.app",
@@ -156,7 +157,6 @@
     "dotenv-cli": "^11.0.0",
     "electron": "^40.6.1",
     "electron-builder": "^26.8.1",
-    "electron-rebuild": "^3.2.9",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "jimp": "^1.6.0",
