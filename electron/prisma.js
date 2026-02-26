@@ -53,9 +53,7 @@ if (isPackaged) {
 const { PrismaClient } = require('./prisma-client');
 
 const prisma = new PrismaClient({
-  datasources: {
-    db: { url: `file:${dbPath}` }
-  }
+  datasourceUrl: `file:${dbPath}`,
 });
 
 module.exports = prisma;
