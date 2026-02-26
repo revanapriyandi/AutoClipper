@@ -29,12 +29,12 @@ jobs:
       - name: Generate Prisma Client (Per OS)
         run: npx prisma generate
 
-      - name: Create Build .env
-        run: echo 'DATABASE_URL=file:./dev.db' > .env
-        shell: bash
-
       - name: Build Next.js
         run: npm run build
+        env:
+          DATABASE_URL: file:./dev.db
+          SKIP_ENV_VALIDATION: 1
+          NEXT_TELEMETRY_DISABLED: 1
 
       - name: Build & Publish Electron Apps
         env:
