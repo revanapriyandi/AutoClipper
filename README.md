@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="public/favicon.ico" alt="AutoClipper Logo" width="120" />
+  <img src="public/icon.png" alt="AutoClipper Logo" width="120" />
   <br>
   AutoClipper
 </h1>

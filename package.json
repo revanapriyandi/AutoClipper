@@ -23,24 +23,59 @@
       "repo": "AutoClipper"
     },
     "directories": {
-      "output": "dist"
+      "output": "dist",
+      "buildResources": "build"
     },
+    "compression": "maximum",
     "files": [
       "out/**/*",
       "electron/**/*",
       "package.json",
-      "prisma/schema.prisma"
+      "prisma/schema.prisma",
+      "prisma/dev.db",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,readme.md,readme,CHANGES,HISTORY,LICENCE,LICENSE,NOTICE,*.txt,*.md}",
+      "!**/node_modules/*/{test,__tests__,tests,spec,specs,example,examples,demo,demos,docs,doc,coverage}/**",
+      "!**/node_modules/.bin/**",
+      "!**/*.map",
+      "!**/*.ts",
+      "!**/.eslintrc*",
+      "!**/.prettierrc*"
     ],
     "asarUnpack": [
       "**/*.node",
-      "electron/prisma-client/*.node"
+      "electron/prisma-client/*.node",
+      "node_modules/better-sqlite3/**",
+      "node_modules/keytar/**",
+      "node_modules/ffmpeg-static/**",
+      "node_modules/ffprobe-static/**"
     ],
     "win": {
-      "target": "nsis",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "build/icon.ico"
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
     "mac": {
-      "target": "dmg",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
       "icon": "build/icon.png",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
@@ -48,7 +83,14 @@
       "entitlementsInherit": "build/entitlements.mac.plist"
     },
     "linux": {
-      "target": "AppImage",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "build/icon.png"
     }
   },
@@ -65,7 +107,6 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
-    "axios": "^1.13.5",
     "better-sqlite3": "^12.6.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
