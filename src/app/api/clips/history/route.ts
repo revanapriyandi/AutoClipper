@@ -15,7 +15,7 @@ export async function GET() {
       },
     });
 
-    const result = clips.map(c => ({
+    const result = clips.map((c: (typeof clips)[number]) => ({
       id: c.id,
       projectId: c.projectId,
       projectTitle: c.project.title,
