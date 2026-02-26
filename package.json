@@ -29,20 +29,11 @@
       "out/**/*",
       "electron/**/*",
       "package.json",
-      "prisma/**/*",
-      "prisma.config.ts"
-    ],
-    "extraResources": [
-      {
-        "from": ".env",
-        "to": ".env"
-      }
+      "prisma/schema.prisma"
     ],
     "asarUnpack": [
       "**/*.node",
-      "node_modules/@prisma/engines/**/*",
-      "node_modules/@prisma/client/**/*",
-      "node_modules/.prisma/**/*"
+      "electron/prisma-client/*.node"
     ],
     "win": {
       "target": "nsis",
