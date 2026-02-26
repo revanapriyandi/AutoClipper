@@ -128,6 +128,9 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
+      - name: Generate ICO (ImageMagick - Windows)
+        run: magick convert build/icon.png -define icon:auto-resize=256,128,64,48,32,16 build/icon.ico
+
       - name: Build Next.js
         run: npm run build
         env:
