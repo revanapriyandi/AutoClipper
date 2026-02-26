@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Play, Download, Edit3, Send, Music, FolderOpen, ExternalLink } from "lucide-react";
+import { Loader2, Play, Download, Edit3, Send, Music, FolderOpen, ExternalLink, Clapperboard } from "lucide-react";
 import { ScoredCandidate } from "@/lib/ai/scoring";
 import { enrichCandidates } from "@/lib/ai/enrichment";
 import { generateCandidates } from "@/lib/ai/segmentation";
@@ -26,6 +26,7 @@ interface ProjectRecord {
 // ---- Component ----
 function ProjectDetailsContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const id = searchParams.get("id");
   const [project, setProject] = useState<ProjectRecord | null>(null);
   const [loading, setLoading] = useState(false);
@@ -374,6 +375,24 @@ function ProjectDetailsContent() {
                 <div className="flex gap-2 justify-between items-center mt-4">
                   <span className="text-xs text-muted-foreground">{(c.startMs / 1000).toFixed(1)}s – {(c.endMs / 1000).toFixed(1)}s</span>
                   <div className="flex gap-2 flex-wrap justify-end">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                      onClick={() => {
+                        if (!project) return;
+                        const q = new URLSearchParams({
+                          projectId: project.id,
+                          clipIndex: String(i),
+                          startMs:   String(c.startMs),
+                          endMs:     String(c.endMs),
+                          source:    project.sourcePath,
+                        });
+                        router.push(`/editor?${q.toString()}`);
+                      }}
+                    >
+                      <Clapperboard className="mr-1 h-3 w-3" /> Video Editor
+                    </Button>
                     <Button variant="outline" size="sm" onClick={() => openEditor(c, i)}>
                       <Edit3 className="mr-1 h-3 w-3" /> Edit Subs
                     </Button>
