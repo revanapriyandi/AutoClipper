@@ -14,16 +14,21 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Settings, Film, Scissors, Calendar, BarChart3, Zap, Layers } from "lucide-react";
+import {
+  Home, Settings, Film, Scissors, Calendar, BarChart3,
+  Zap, Layers, ListTodo, Clapperboard
+} from "lucide-react";
 
 const NAV_ITEMS = [
-  { href: "/",              label: "Dashboard",     icon: Home     },
-  { href: "/autopilot",    label: "Autopilot",     icon: Zap      },
-  { href: "/calendar",     label: "Calendar",      icon: Calendar },
-  { href: "/analytics",    label: "Analytics",     icon: BarChart3 },
-  { href: "/history",      label: "History",       icon: Film     },
-  { href: "/clip-profiles", label: "Clip Profiles", icon: Layers  },
-  { href: "/settings",     label: "Settings",      icon: Settings },
+  { href: "/",              label: "Dashboard",    icon: Home        },
+  { href: "/autopilot",    label: "Autopilot",    icon: Zap         },
+  { href: "/calendar",     label: "Calendar",     icon: Calendar    },
+  { href: "/analytics",    label: "Analytics",    icon: BarChart3   },
+  { href: "/history",      label: "History",      icon: Film        },
+  { href: "/clip-profiles",label: "Clip Profiles",icon: Layers      },
+  { href: "/compilation",  label: "Compilation",  icon: Clapperboard },
+  { href: "/jobs",         label: "Job Queue",    icon: ListTodo    },
+  { href: "/settings",     label: "Settings",     icon: Settings    },
 ];
 
 export function AppSidebar() {

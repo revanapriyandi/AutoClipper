@@ -17,6 +17,11 @@ interface AutopilotConfig {
   keywords: string;
   targetPlatform: string;
   maxDailyDownloads: number;
+  minViews: number;
+  maxAgeDays: number;
+  sourceType: string;
+  playlistUrl?: string;
+  rssUrl?: string;
 }
 
 interface AutopilotStats {
@@ -38,6 +43,11 @@ export default function AutopilotPage() {
     keywords: "podcast clips, motivation, interview highlights",
     targetPlatform: "youtube",
     maxDailyDownloads: 3,
+    minViews: 10000,
+    maxAgeDays: 30,
+    sourceType: "search",
+    playlistUrl: "",
+    rssUrl: "",
   });
   const [stats, setStats] = useState<AutopilotStats>({ totalDownloads: 0, totalClips: 0, totalPosted: 0 });
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -60,11 +70,17 @@ export default function AutopilotPage() {
       if (!api?.autopilotGetConfig) return;
       const res = await api.autopilotGetConfig();
       if (res?.success && res.config) {
+        const cfg = res.config as AutopilotConfig & { id?: string };
         setConfig({
-          isActive: res.config.isActive ?? false,
-          keywords: res.config.keywords ?? "",
-          targetPlatform: res.config.targetPlatform ?? "youtube",
-          maxDailyDownloads: res.config.maxDailyDownloads ?? 3,
+          isActive: cfg.isActive ?? false,
+          keywords: cfg.keywords ?? "",
+          targetPlatform: cfg.targetPlatform ?? "youtube",
+          maxDailyDownloads: cfg.maxDailyDownloads ?? 3,
+          minViews: cfg.minViews ?? 10000,
+          maxAgeDays: cfg.maxAgeDays ?? 30,
+          sourceType: cfg.sourceType ?? "search",
+          playlistUrl: cfg.playlistUrl ?? "",
+          rssUrl: cfg.rssUrl ?? "",
         });
       }
 
@@ -210,14 +226,15 @@ export default function AutopilotPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="font-semibold text-sm">Platform Sumber</Label>
+                <Label className="font-semibold text-sm">Source Type</Label>
                 <select
-                  value={config.targetPlatform}
-                  onChange={e => setConfig(prev => ({ ...prev, targetPlatform: e.target.value }))}
+                  value={config.sourceType}
+                  onChange={e => setConfig(prev => ({ ...prev, sourceType: e.target.value }))}
                   className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
                 >
-                  <option value="youtube">YouTube</option>
-                  <option value="tiktok" disabled>TikTok (Coming Soon)</option>
+                  <option value="search">🔍 YouTube Search</option>
+                  <option value="playlist">📋 YouTube Playlist</option>
+                  <option value="rss">📡 RSS / Podcast Feed</option>
                 </select>
               </div>
               <div className="space-y-2">
@@ -229,6 +246,49 @@ export default function AutopilotPage() {
                 />
               </div>
             </div>
+            {/* Playlist URL */}
+            {config.sourceType === "playlist" && (
+              <div className="space-y-2">
+                <Label className="font-semibold text-sm">YouTube Playlist URL</Label>
+                <Input
+                  value={config.playlistUrl || ""}
+                  onChange={e => setConfig(prev => ({ ...prev, playlistUrl: e.target.value }))}
+                  placeholder="https://youtube.com/playlist?list=..."
+                />
+              </div>
+            )}
+            {/* RSS URL */}
+            {config.sourceType === "rss" && (
+              <div className="space-y-2">
+                <Label className="font-semibold text-sm">RSS / Podcast Feed URL</Label>
+                <Input
+                  value={config.rssUrl || ""}
+                  onChange={e => setConfig(prev => ({ ...prev, rssUrl: e.target.value }))}
+                  placeholder="https://feeds.example.com/podcast.rss"
+                />
+              </div>
+            )}
+            {/* Smart Filters */}
+            {config.sourceType === "search" && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="font-semibold text-sm">Min Views</Label>
+                  <Input
+                    type="number" min={0}
+                    value={config.minViews}
+                    onChange={e => setConfig(prev => ({ ...prev, minViews: Number(e.target.value) }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-semibold text-sm">Max Age (days)</Label>
+                  <Input
+                    type="number" min={1} max={365}
+                    value={config.maxAgeDays}
+                    onChange={e => setConfig(prev => ({ ...prev, maxAgeDays: Number(e.target.value) }))}
+                  />
+                </div>
+              </div>
+            )}
 
             {msg && (
               <div className={`text-sm px-3 py-2 rounded-lg font-medium flex items-center gap-2 ${msg.type === "success" ? "bg-green-500/10 text-green-400" : msg.type === "error" ? "bg-red-500/10 text-red-400" : "bg-blue-500/10 text-blue-400"}`}>

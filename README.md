@@ -5,7 +5,7 @@
 </h1>
 
 <p align="center">
-  <strong>Industry-Standard AI Video Clipper & Social Publisher</strong><br>
+  <strong>Industry-Standard AI Video Clipper &amp; Social Publisher</strong><br>
   Built with <em>Electron, Next.js, Prisma SQLite,</em> and <em>FFmpeg</em>.
 </p>
 
@@ -20,82 +20,99 @@
 
 **AutoClipper** is a powerful, locally-run desktop application designed to transform long-form videos (podcasts, streams, interviews) into viral short-form content (TikToks, YouTube Shorts, Instagram Reels) completely autonomously using AI.
 
-It handles the entire pipeline: from **Transcription** (ASR), **AI Hook Generation/Scoring** (LLM), **Dynamic Face Tracking & Cropping** (MediaPipe/SignalStats), to **Automated Video Rendering** (FFmpeg) and scheduled **Social Media Posting** (OAuth PKCE).
+---
+
+## ✨ Core Features
+
+- **🤖 AI-Powered Curation** — Segments long videos into 15-60s clips, scored by virality using OpenAI, Gemini, Claude, Groq, or local Ollama.
+- **🗣️ Advanced Transcription** — Deepgram, AssemblyAI, or local Whisper.
+- **🎯 Dynamic Face Tracking** — MediaPipe auto-crops to 9:16 vertical format.
+- **📝 Subtitle Engine** — ASS/SSA karaoke animation with brand kits and theme presets.
+- **📤 Social Publishing** — Scheduled posting to YouTube Shorts, TikTok, and Facebook Reels via OAuth PKCE.
+- **🎬 CapCut-Style Video Editor** — Full timeline editor with color grading, text overlays, and audio mixing.
 
 ---
 
-## ✨ Key Features
+## 🚀 New Features (v1.0.0)
 
-- **🤖 AI-Powered Curation**: Automatically segments long videos into 15-60s clips, scored by virality using Local AI (Ollama/LM Studio) or Cloud LLMs (OpenAI, Gemini, Claude, Groq).
-- **🗣️ Advanced Transcription**: Fast, accurate speech-to-text with Deepgram, AssemblyAI, or Whisper.
-- **🎯 Dynamic Face Tracking**: Intelligently crops 16:9 videos into 9:16 vertical shorts by tracking the speaker's face, extracting precise crop offsets dynamically using FFprobe and AI Vision.
-- **💬 Stylized Subtitles (Karaoke Mode)**: Auto-generates fully customizable, animated subtitles with "Brand Kits" (Fonts, Colors, Alignment).
-- **🎛️ B-Roll & Music Integration**: Mentions of keywords automatically fetch B-Rolls from Pexels. Inject Background Music to elevate production value.
-- **🌐 AI Dubbing**: Translate and lip-sync clips to global languages seamlessly via ElevenLabs API.
-- **📅 Social Media Auto-Scheduler**: Authenticate via secure PKCE OAuth to directly upload rendered clips to YouTube Shorts, TikTok, and Facebook Reels.
-- **🛡️ Secure By Design**: All API Keys are stored in your OS native secure Keychain, and `SQLite` databases are safely sandboxed in local UserDara, never exposed externally.
+### 1. Job Queue Dashboard 📋
 
-## 🚀 Quick Start (Development)
+Real-time job monitoring with retry/cancel, progress bars, status filters, and auto-retry with exponential backoff (max 3 attempts).
 
-To run AutoClipper locally from the source, ensure you have **Node.js (v20+)** and **Git** installed.
+### 2. Analytics Platform Sync 📊
 
-1. **Clone the repository:**
+Auto-fetch real stats from YouTube Data API v3, TikTok Creator API, and Facebook Graph API. Syncs every 6 hours in the background.
 
-   ```bash
-   git clone https://github.com/revanapriyandi/AutoClipper.git
-   cd AutoClipper
-   ```
+### 3. Smart Autopilot 🤖
 
-2. **Install Dependencies:**
+Enhanced automation with min-views filter, max-age filter, multi-source support (YouTube Search, Playlist, RSS/Podcast feeds), and URL deduplication.
 
-   ```bash
-   npm install
-   ```
+### 4. AI Thumbnail Generator 🖼️
 
-3. **Database Initialization:**
+FFmpeg scene detection + Gemini Vision API scoring + text overlay. Generates 2 variants: clean frame and text-overlay frame.
 
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
+### 5. Full Dubbing Pipeline 🎙️
 
-4. **Environment Setup:**
-   Create a `.env` file in the root directory for OAuth features (optional for local running if not posting to socials).
+ElevenLabs TTS pipeline: browse voices → translate text (Gemini/OpenAI) → synthesize audio → FFmpeg merge with video.
 
-   ```env
-   GOOGLE_CLIENT_ID=your-google-oauth-client-id
-   TIKTOK_CLIENT_KEY=your-tiktok-client-id
-   FACEBOOK_APP_ID=your-facebook-app-id
-   PEXELS_API_KEY=your-pexels-api
-   OAUTH_REDIRECT_URI=http://localhost:3000/api/auth/callback
-   DATABASE_URL=file:./dev.db
-   ```
+### 6. Content Calendar 📅
 
-5. **Start the App:**
-   ```bash
-   npm run electron:dev
-   ```
+Monthly grid calendar with scheduled post view, day-click detail panel, and AI-powered optimal posting time suggestions from your analytics data.
 
-## 📦 Building for Production
+### 7. Clip Compilation Mode 🎬
 
-AutoClipper uses `electron-builder` coupled with **GitHub Actions** to automate cross-platform builds.
+Combine clips into compilation videos. Manual selection or Auto Best-Of (AI auto-selects top N by virality score) with real-time progress.
 
-To build manually:
+---
+
+## 🏗️ Tech Stack
+
+| Layer       | Technology                                                  |
+| ----------- | ----------------------------------------------------------- |
+| Desktop     | Electron 28+                                                |
+| Frontend    | Next.js 14, React 18, shadcn/ui                             |
+| Database    | Prisma + SQLite                                             |
+| AI/LLM      | OpenAI, Gemini, Groq, Ollama, Claude                        |
+| Video       | FFmpeg, fluent-ffmpeg                                       |
+| TTS         | ElevenLabs multilingual v2                                  |
+| Social APIs | YouTube Data API v3, TikTok Creator API, Facebook Graph API |
+| Security    | keytar (OS native keychain)                                 |
+
+---
+
+## 🛠️ Setup
 
 ```bash
-npm run electron:build
+npm install
+npx prisma generate
+npx prisma db push
+npm run electron:dev   # Development
+npm run build          # Production build
 ```
-
-This will compile the Next.js static output and package the `.asar` Electron runtime for your current OS.
-
-## 🤝 Contributing
-
-We welcome contributions to make AutoClipper even better! Please read our [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to open issues, submit pull requests, and set up your development environment.
-
-## 📄 License
-
-This project is open-sourced under the [MIT License](./LICENSE).
 
 ---
 
-_Built with ❤️ for Content Creators by Revan Apriyandi._
+## 📁 Project Structure
+
+```
+electron/handlers/
+├── jobs.js              # Job queue (retry + broadcasts)
+├── analytics_sync.js    # Platform analytics sync
+├── autopilot.js         # Smart autopilot (search/playlist/rss)
+├── thumbnail.js         # AI thumbnail generator
+├── dubbing.js           # ElevenLabs TTS pipeline
+├── compilation.js       # Clip compilation (concat + best-of)
+└── db_calendar_addon.js # Calendar + optimal posting times
+
+src/app/
+├── jobs/page.tsx         # Job Queue Dashboard
+├── calendar/page.tsx     # Content Calendar
+├── compilation/page.tsx  # Compilation Mode
+└── autopilot/page.tsx    # Smart Autopilot
+```
+
+---
+
+## License
+
+MIT © [revanapriyandi](https://github.com/revanapriyandi)

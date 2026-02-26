@@ -169,7 +169,7 @@ function ProjectDetailsContent() {
     try {
       const api = window.electronAPI;
       if (!api?.captionGenerate) return;
-      const res = await api.captionGenerate({ transcriptText: clip.transcriptText, count: 3 }) as { success: boolean; captions?: string[] };
+      const res = await api.captionGenerate({ transcriptText: clip.transcriptText, count: 3 } as { transcriptText: string; count?: number; platforms?: string[] }) as { success: boolean; captions?: string[] };
       if (res.success && res.captions) {
         setCaptionVariants(prev => ({ ...prev, [index]: res.captions! }));
       } else {

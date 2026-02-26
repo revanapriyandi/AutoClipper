@@ -17,6 +17,7 @@ model Project {
   sourcePath String
   durationMs Int?
   status     String   @default("DRAFT") // DRAFT, TRANSCRIBING, GENERATING, READY
+  tags       String? // Comma-separated tags e.g. "podcast,motivation"
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -74,7 +75,7 @@ model Clip {
 model Asset {
   id          String   @id @default(uuid())
   clipId      String
-  kind        String // "video", "thumbnail", "subtitle"
+  kind        String // "video", "thumbnail", "subtitle", "youtube_id", "tiktok_id", "facebook_id"
   storagePath String
   createdAt   DateTime @default(now())
 
@@ -83,7 +84,7 @@ model Asset {
 
 model Job {
   id          String    @id @default(uuid())
-  type        String // "RENDER", "POST"
+  type        String // "RENDER", "POST", "COMPILATION"
   payloadJson String
   status      String    @default("QUEUED") // QUEUED, PROCESSING, RETRY_PENDING, FAILED, COMPLETED
   attempts    Int       @default(0)
@@ -132,7 +133,21 @@ model AutopilotConfig {
   keywords          String // e.g., "podcast clips, motivation"
   targetPlatform    String   @default("youtube") // e.g., "youtube", "tiktok"
   maxDailyDownloads Int      @default(3)
-  isActive          Boolean  @default(false) // The Master Switch
+  isActive          Boolean  @default(false)
+  // Phase 3: Smart Autopilot fields
+  minViews          Int      @default(10000)
+  maxAgeDays        Int      @default(30)
+  sourceType        String   @default("search") // "search", "playlist", "rss"
+  playlistUrl       String? // For sourceType="playlist"
+  rssUrl            String? // For sourceType="rss"
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model AutopilotHistory {
+  id        String   @id @default(uuid())
+  url       String   @unique // Deduplicate by URL
+  title     String
+  projectId String? // Reference to created project
+  createdAt DateTime @default(now())
 }

@@ -1,6 +1,6 @@
 /**
  * electron/main.js
- * 
+ *
  * Entry point — BrowserWindow setup only.
  * All IPC handlers are in electron/handlers/*.js
  */
@@ -10,8 +10,8 @@ const path = require('path');
 
 // ── Environment & Database Path Setup (CRITICAL FOR PRODUCTION) ──
 const isDev = !app.isPackaged;
-const envPath = isDev 
-  ? path.join(__dirname, '../.env') 
+const envPath = isDev
+  ? path.join(__dirname, '../.env')
   : path.join(process.resourcesPath, '.env');
 require('dotenv').config({ path: envPath });
 
@@ -30,15 +30,14 @@ if (!require('fs').existsSync(targetDbPath) && !isDev) {
   if (require('fs').existsSync(sourceDbPath)) {
     require('fs').copyFileSync(sourceDbPath, targetDbPath);
   } else {
-    console.error("Source DB not found at:", sourceDbPath);
+    console.error('Source DB not found at:', sourceDbPath);
   }
 }
-
 
 // Force Prisma to use this writable SQLite file dynamically!
 process.env.DATABASE_URL = `file:${targetDbPath}`;
 
-// ── Register all IPC handlers ──────────────────────────────────────
+// ── Register all IPC handlers ──────────────────────────────────────────────
 
 require('./handlers/keychain');
 require('./handlers/system');
@@ -50,28 +49,28 @@ require('./handlers/broll');
 require('./handlers/caption');
 require('./handlers/logger');
 require('./handlers/facetrack');
-require('./handlers/dubbing');
+require('./handlers/dubbing');            // Phase 5: Full ElevenLabs dubbing
 const { checkOnStartup } = require('./handlers/updater');
 
 require('./handlers/db');
-require('./handlers/db_calendar_addon');
+require('./handlers/db_calendar_addon');  // Phase 6: Enhanced calendar
 require('./handlers/db_theme_addon');
 require('./handlers/db_analytics_addon');
 require('./handlers/db_clipprofile_addon');
-require('./handlers/ffmpeg'); // Added FFmpeg static bindings
-require('./handlers/thumbnail'); // F5: Thumbnail generator + SRT export
-require('./handlers/insights');  // F11: AI performance insights
-require('./handlers/webhook');   // F19: Webhook integration
+require('./handlers/ffmpeg');
+require('./handlers/thumbnail');          // Phase 4: AI thumbnail generator
+require('./handlers/insights');
+require('./handlers/webhook');
+require('./handlers/analytics_sync');     // Phase 2: Platform analytics sync
+require('./handlers/compilation');        // Phase 7: Clip compilation
 
-const { startAutopilotPoller } = require('./handlers/autopilot');
+const { startAutopilotPoller } = require('./handlers/autopilot');        // Phase 3: Smart autopilot
+const { pollJobQueue, prisma } = require('./handlers/jobs');             // Phase 1: Job queue
+const { startAnalyticsSyncPoller } = require('./handlers/analytics_sync'); // Phase 2: Auto sync
 
-const { pollJobQueue, prisma } = require('./handlers/jobs');
-
-
-// ── BrowserWindow ──────────────────────────────────────────────────
+// ── BrowserWindow ──────────────────────────────────────────────────────────
 
 function createWindow() {
-  // 1. Create the Splash Screen Window
   const splashWindow = new BrowserWindow({
     width: 500,
     height: 350,
@@ -82,16 +81,15 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-    }
+    },
   });
 
   splashWindow.loadFile(path.join(__dirname, 'splash.html'));
 
-  // 2. Create the Main Application Window (Hidden initially)
   const mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
-    show: false, // Don't show until ready
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -101,24 +99,18 @@ function createWindow() {
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:3000');
-    // Open DevTools in a detached window so it doesn't mess with layout loading
-    // mainWindow.webContents.openDevTools({ mode: 'detach' });
   } else {
     mainWindow.loadFile(path.join(__dirname, '../out/index.html')).catch(err => {
-      console.error("Failed to load out/index.html", err);
+      console.error('Failed to load out/index.html', err);
     });
   }
 
-  // 3. Wait for the main window to be conceptually ready to show
   mainWindow.once('ready-to-show', () => {
-    // Artificial delay to ensure Next.js client-side rendering is ready
     setTimeout(() => {
-      if (!splashWindow.isDestroyed()) {
-        splashWindow.destroy();
-      }
+      if (!splashWindow.isDestroyed()) splashWindow.destroy();
       mainWindow.show();
       mainWindow.focus();
-    }, 1500); // 1.5 second artificial delay for the splash page
+    }, 1500);
   });
 }
 
@@ -126,7 +118,8 @@ app.whenReady().then(() => {
   createWindow();
   pollJobQueue();
   startAutopilotPoller();
-  checkOnStartup(); // Check for updates on startup (respects user toggle)
+  startAnalyticsSyncPoller(); // Phase 2: Start 6-hour analytics sync
+  checkOnStartup();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

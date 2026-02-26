@@ -123,6 +123,7 @@ exports.Prisma.ProjectScalarFieldEnum = {
   sourcePath: 'sourcePath',
   durationMs: 'durationMs',
   status: 'status',
+  tags: 'tags',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -221,8 +222,21 @@ exports.Prisma.AutopilotConfigScalarFieldEnum = {
   targetPlatform: 'targetPlatform',
   maxDailyDownloads: 'maxDailyDownloads',
   isActive: 'isActive',
+  minViews: 'minViews',
+  maxAgeDays: 'maxAgeDays',
+  sourceType: 'sourceType',
+  playlistUrl: 'playlistUrl',
+  rssUrl: 'rssUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AutopilotHistoryScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  title: 'title',
+  projectId: 'projectId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -247,7 +261,8 @@ exports.Prisma.ModelName = {
   ThemePreset: 'ThemePreset',
   Analytics: 'Analytics',
   Settings: 'Settings',
-  AutopilotConfig: 'AutopilotConfig'
+  AutopilotConfig: 'AutopilotConfig',
+  AutopilotHistory: 'AutopilotHistory'
 };
 
 /**

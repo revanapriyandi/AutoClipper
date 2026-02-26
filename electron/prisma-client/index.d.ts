@@ -68,6 +68,11 @@ export type Settings = $Result.DefaultSelection<Prisma.$SettingsPayload>
  * 
  */
 export type AutopilotConfig = $Result.DefaultSelection<Prisma.$AutopilotConfigPayload>
+/**
+ * Model AutopilotHistory
+ * 
+ */
+export type AutopilotHistory = $Result.DefaultSelection<Prisma.$AutopilotHistoryPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -295,6 +300,16 @@ export class PrismaClient<
     * ```
     */
   get autopilotConfig(): Prisma.AutopilotConfigDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.autopilotHistory`: Exposes CRUD operations for the **AutopilotHistory** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AutopilotHistories
+    * const autopilotHistories = await prisma.autopilotHistory.findMany()
+    * ```
+    */
+  get autopilotHistory(): Prisma.AutopilotHistoryDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -739,7 +754,8 @@ export namespace Prisma {
     ThemePreset: 'ThemePreset',
     Analytics: 'Analytics',
     Settings: 'Settings',
-    AutopilotConfig: 'AutopilotConfig'
+    AutopilotConfig: 'AutopilotConfig',
+    AutopilotHistory: 'AutopilotHistory'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -755,7 +771,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "project" | "clipProfile" | "transcript" | "clipCandidate" | "clip" | "asset" | "job" | "themePreset" | "analytics" | "settings" | "autopilotConfig"
+      modelProps: "project" | "clipProfile" | "transcript" | "clipCandidate" | "clip" | "asset" | "job" | "themePreset" | "analytics" | "settings" | "autopilotConfig" | "autopilotHistory"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1573,6 +1589,80 @@ export namespace Prisma {
           }
         }
       }
+      AutopilotHistory: {
+        payload: Prisma.$AutopilotHistoryPayload<ExtArgs>
+        fields: Prisma.AutopilotHistoryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AutopilotHistoryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotHistoryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AutopilotHistoryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotHistoryPayload>
+          }
+          findFirst: {
+            args: Prisma.AutopilotHistoryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotHistoryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AutopilotHistoryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotHistoryPayload>
+          }
+          findMany: {
+            args: Prisma.AutopilotHistoryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotHistoryPayload>[]
+          }
+          create: {
+            args: Prisma.AutopilotHistoryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotHistoryPayload>
+          }
+          createMany: {
+            args: Prisma.AutopilotHistoryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AutopilotHistoryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotHistoryPayload>[]
+          }
+          delete: {
+            args: Prisma.AutopilotHistoryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotHistoryPayload>
+          }
+          update: {
+            args: Prisma.AutopilotHistoryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotHistoryPayload>
+          }
+          deleteMany: {
+            args: Prisma.AutopilotHistoryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AutopilotHistoryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AutopilotHistoryUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotHistoryPayload>[]
+          }
+          upsert: {
+            args: Prisma.AutopilotHistoryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AutopilotHistoryPayload>
+          }
+          aggregate: {
+            args: Prisma.AutopilotHistoryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAutopilotHistory>
+          }
+          groupBy: {
+            args: Prisma.AutopilotHistoryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AutopilotHistoryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AutopilotHistoryCountArgs<ExtArgs>
+            result: $Utils.Optional<AutopilotHistoryCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1692,6 +1782,7 @@ export namespace Prisma {
     analytics?: AnalyticsOmit
     settings?: SettingsOmit
     autopilotConfig?: AutopilotConfigOmit
+    autopilotHistory?: AutopilotHistoryOmit
   }
 
   /* Types for Logging */
@@ -1886,6 +1977,7 @@ export namespace Prisma {
     sourcePath: string | null
     durationMs: number | null
     status: string | null
+    tags: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1896,6 +1988,7 @@ export namespace Prisma {
     sourcePath: string | null
     durationMs: number | null
     status: string | null
+    tags: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1906,6 +1999,7 @@ export namespace Prisma {
     sourcePath: number
     durationMs: number
     status: number
+    tags: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -1926,6 +2020,7 @@ export namespace Prisma {
     sourcePath?: true
     durationMs?: true
     status?: true
+    tags?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1936,6 +2031,7 @@ export namespace Prisma {
     sourcePath?: true
     durationMs?: true
     status?: true
+    tags?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1946,6 +2042,7 @@ export namespace Prisma {
     sourcePath?: true
     durationMs?: true
     status?: true
+    tags?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2043,6 +2140,7 @@ export namespace Prisma {
     sourcePath: string
     durationMs: number | null
     status: string
+    tags: string | null
     createdAt: Date
     updatedAt: Date
     _count: ProjectCountAggregateOutputType | null
@@ -2072,6 +2170,7 @@ export namespace Prisma {
     sourcePath?: boolean
     durationMs?: boolean
     status?: boolean
+    tags?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     transcripts?: boolean | Project$transcriptsArgs<ExtArgs>
@@ -2086,6 +2185,7 @@ export namespace Prisma {
     sourcePath?: boolean
     durationMs?: boolean
     status?: boolean
+    tags?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["project"]>
@@ -2096,6 +2196,7 @@ export namespace Prisma {
     sourcePath?: boolean
     durationMs?: boolean
     status?: boolean
+    tags?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["project"]>
@@ -2106,11 +2207,12 @@ export namespace Prisma {
     sourcePath?: boolean
     durationMs?: boolean
     status?: boolean
+    tags?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "sourcePath" | "durationMs" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "sourcePath" | "durationMs" | "status" | "tags" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     transcripts?: boolean | Project$transcriptsArgs<ExtArgs>
     candidates?: boolean | Project$candidatesArgs<ExtArgs>
@@ -2133,6 +2235,7 @@ export namespace Prisma {
       sourcePath: string
       durationMs: number | null
       status: string
+      tags: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["project"]>
@@ -2566,6 +2669,7 @@ export namespace Prisma {
     readonly sourcePath: FieldRef<"Project", 'String'>
     readonly durationMs: FieldRef<"Project", 'Int'>
     readonly status: FieldRef<"Project", 'String'>
+    readonly tags: FieldRef<"Project", 'String'>
     readonly createdAt: FieldRef<"Project", 'DateTime'>
     readonly updatedAt: FieldRef<"Project", 'DateTime'>
   }
@@ -12732,10 +12836,14 @@ export namespace Prisma {
 
   export type AutopilotConfigAvgAggregateOutputType = {
     maxDailyDownloads: number | null
+    minViews: number | null
+    maxAgeDays: number | null
   }
 
   export type AutopilotConfigSumAggregateOutputType = {
     maxDailyDownloads: number | null
+    minViews: number | null
+    maxAgeDays: number | null
   }
 
   export type AutopilotConfigMinAggregateOutputType = {
@@ -12744,6 +12852,11 @@ export namespace Prisma {
     targetPlatform: string | null
     maxDailyDownloads: number | null
     isActive: boolean | null
+    minViews: number | null
+    maxAgeDays: number | null
+    sourceType: string | null
+    playlistUrl: string | null
+    rssUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -12754,6 +12867,11 @@ export namespace Prisma {
     targetPlatform: string | null
     maxDailyDownloads: number | null
     isActive: boolean | null
+    minViews: number | null
+    maxAgeDays: number | null
+    sourceType: string | null
+    playlistUrl: string | null
+    rssUrl: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -12764,6 +12882,11 @@ export namespace Prisma {
     targetPlatform: number
     maxDailyDownloads: number
     isActive: number
+    minViews: number
+    maxAgeDays: number
+    sourceType: number
+    playlistUrl: number
+    rssUrl: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -12772,10 +12895,14 @@ export namespace Prisma {
 
   export type AutopilotConfigAvgAggregateInputType = {
     maxDailyDownloads?: true
+    minViews?: true
+    maxAgeDays?: true
   }
 
   export type AutopilotConfigSumAggregateInputType = {
     maxDailyDownloads?: true
+    minViews?: true
+    maxAgeDays?: true
   }
 
   export type AutopilotConfigMinAggregateInputType = {
@@ -12784,6 +12911,11 @@ export namespace Prisma {
     targetPlatform?: true
     maxDailyDownloads?: true
     isActive?: true
+    minViews?: true
+    maxAgeDays?: true
+    sourceType?: true
+    playlistUrl?: true
+    rssUrl?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -12794,6 +12926,11 @@ export namespace Prisma {
     targetPlatform?: true
     maxDailyDownloads?: true
     isActive?: true
+    minViews?: true
+    maxAgeDays?: true
+    sourceType?: true
+    playlistUrl?: true
+    rssUrl?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -12804,6 +12941,11 @@ export namespace Prisma {
     targetPlatform?: true
     maxDailyDownloads?: true
     isActive?: true
+    minViews?: true
+    maxAgeDays?: true
+    sourceType?: true
+    playlistUrl?: true
+    rssUrl?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -12901,6 +13043,11 @@ export namespace Prisma {
     targetPlatform: string
     maxDailyDownloads: number
     isActive: boolean
+    minViews: number
+    maxAgeDays: number
+    sourceType: string
+    playlistUrl: string | null
+    rssUrl: string | null
     createdAt: Date
     updatedAt: Date
     _count: AutopilotConfigCountAggregateOutputType | null
@@ -12930,6 +13077,11 @@ export namespace Prisma {
     targetPlatform?: boolean
     maxDailyDownloads?: boolean
     isActive?: boolean
+    minViews?: boolean
+    maxAgeDays?: boolean
+    sourceType?: boolean
+    playlistUrl?: boolean
+    rssUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["autopilotConfig"]>
@@ -12940,6 +13092,11 @@ export namespace Prisma {
     targetPlatform?: boolean
     maxDailyDownloads?: boolean
     isActive?: boolean
+    minViews?: boolean
+    maxAgeDays?: boolean
+    sourceType?: boolean
+    playlistUrl?: boolean
+    rssUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["autopilotConfig"]>
@@ -12950,6 +13107,11 @@ export namespace Prisma {
     targetPlatform?: boolean
     maxDailyDownloads?: boolean
     isActive?: boolean
+    minViews?: boolean
+    maxAgeDays?: boolean
+    sourceType?: boolean
+    playlistUrl?: boolean
+    rssUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["autopilotConfig"]>
@@ -12960,11 +13122,16 @@ export namespace Prisma {
     targetPlatform?: boolean
     maxDailyDownloads?: boolean
     isActive?: boolean
+    minViews?: boolean
+    maxAgeDays?: boolean
+    sourceType?: boolean
+    playlistUrl?: boolean
+    rssUrl?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type AutopilotConfigOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "keywords" | "targetPlatform" | "maxDailyDownloads" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["autopilotConfig"]>
+  export type AutopilotConfigOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "keywords" | "targetPlatform" | "maxDailyDownloads" | "isActive" | "minViews" | "maxAgeDays" | "sourceType" | "playlistUrl" | "rssUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["autopilotConfig"]>
 
   export type $AutopilotConfigPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "AutopilotConfig"
@@ -12975,6 +13142,11 @@ export namespace Prisma {
       targetPlatform: string
       maxDailyDownloads: number
       isActive: boolean
+      minViews: number
+      maxAgeDays: number
+      sourceType: string
+      playlistUrl: string | null
+      rssUrl: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["autopilotConfig"]>
@@ -13405,6 +13577,11 @@ export namespace Prisma {
     readonly targetPlatform: FieldRef<"AutopilotConfig", 'String'>
     readonly maxDailyDownloads: FieldRef<"AutopilotConfig", 'Int'>
     readonly isActive: FieldRef<"AutopilotConfig", 'Boolean'>
+    readonly minViews: FieldRef<"AutopilotConfig", 'Int'>
+    readonly maxAgeDays: FieldRef<"AutopilotConfig", 'Int'>
+    readonly sourceType: FieldRef<"AutopilotConfig", 'String'>
+    readonly playlistUrl: FieldRef<"AutopilotConfig", 'String'>
+    readonly rssUrl: FieldRef<"AutopilotConfig", 'String'>
     readonly createdAt: FieldRef<"AutopilotConfig", 'DateTime'>
     readonly updatedAt: FieldRef<"AutopilotConfig", 'DateTime'>
   }
@@ -13772,6 +13949,999 @@ export namespace Prisma {
 
 
   /**
+   * Model AutopilotHistory
+   */
+
+  export type AggregateAutopilotHistory = {
+    _count: AutopilotHistoryCountAggregateOutputType | null
+    _min: AutopilotHistoryMinAggregateOutputType | null
+    _max: AutopilotHistoryMaxAggregateOutputType | null
+  }
+
+  export type AutopilotHistoryMinAggregateOutputType = {
+    id: string | null
+    url: string | null
+    title: string | null
+    projectId: string | null
+    createdAt: Date | null
+  }
+
+  export type AutopilotHistoryMaxAggregateOutputType = {
+    id: string | null
+    url: string | null
+    title: string | null
+    projectId: string | null
+    createdAt: Date | null
+  }
+
+  export type AutopilotHistoryCountAggregateOutputType = {
+    id: number
+    url: number
+    title: number
+    projectId: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type AutopilotHistoryMinAggregateInputType = {
+    id?: true
+    url?: true
+    title?: true
+    projectId?: true
+    createdAt?: true
+  }
+
+  export type AutopilotHistoryMaxAggregateInputType = {
+    id?: true
+    url?: true
+    title?: true
+    projectId?: true
+    createdAt?: true
+  }
+
+  export type AutopilotHistoryCountAggregateInputType = {
+    id?: true
+    url?: true
+    title?: true
+    projectId?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type AutopilotHistoryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AutopilotHistory to aggregate.
+     */
+    where?: AutopilotHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AutopilotHistories to fetch.
+     */
+    orderBy?: AutopilotHistoryOrderByWithRelationInput | AutopilotHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AutopilotHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AutopilotHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AutopilotHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AutopilotHistories
+    **/
+    _count?: true | AutopilotHistoryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AutopilotHistoryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AutopilotHistoryMaxAggregateInputType
+  }
+
+  export type GetAutopilotHistoryAggregateType<T extends AutopilotHistoryAggregateArgs> = {
+        [P in keyof T & keyof AggregateAutopilotHistory]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAutopilotHistory[P]>
+      : GetScalarType<T[P], AggregateAutopilotHistory[P]>
+  }
+
+
+
+
+  export type AutopilotHistoryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AutopilotHistoryWhereInput
+    orderBy?: AutopilotHistoryOrderByWithAggregationInput | AutopilotHistoryOrderByWithAggregationInput[]
+    by: AutopilotHistoryScalarFieldEnum[] | AutopilotHistoryScalarFieldEnum
+    having?: AutopilotHistoryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AutopilotHistoryCountAggregateInputType | true
+    _min?: AutopilotHistoryMinAggregateInputType
+    _max?: AutopilotHistoryMaxAggregateInputType
+  }
+
+  export type AutopilotHistoryGroupByOutputType = {
+    id: string
+    url: string
+    title: string
+    projectId: string | null
+    createdAt: Date
+    _count: AutopilotHistoryCountAggregateOutputType | null
+    _min: AutopilotHistoryMinAggregateOutputType | null
+    _max: AutopilotHistoryMaxAggregateOutputType | null
+  }
+
+  type GetAutopilotHistoryGroupByPayload<T extends AutopilotHistoryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AutopilotHistoryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AutopilotHistoryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AutopilotHistoryGroupByOutputType[P]>
+            : GetScalarType<T[P], AutopilotHistoryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AutopilotHistorySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    url?: boolean
+    title?: boolean
+    projectId?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["autopilotHistory"]>
+
+  export type AutopilotHistorySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    url?: boolean
+    title?: boolean
+    projectId?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["autopilotHistory"]>
+
+  export type AutopilotHistorySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    url?: boolean
+    title?: boolean
+    projectId?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["autopilotHistory"]>
+
+  export type AutopilotHistorySelectScalar = {
+    id?: boolean
+    url?: boolean
+    title?: boolean
+    projectId?: boolean
+    createdAt?: boolean
+  }
+
+  export type AutopilotHistoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "url" | "title" | "projectId" | "createdAt", ExtArgs["result"]["autopilotHistory"]>
+
+  export type $AutopilotHistoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AutopilotHistory"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      url: string
+      title: string
+      projectId: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["autopilotHistory"]>
+    composites: {}
+  }
+
+  type AutopilotHistoryGetPayload<S extends boolean | null | undefined | AutopilotHistoryDefaultArgs> = $Result.GetResult<Prisma.$AutopilotHistoryPayload, S>
+
+  type AutopilotHistoryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AutopilotHistoryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AutopilotHistoryCountAggregateInputType | true
+    }
+
+  export interface AutopilotHistoryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AutopilotHistory'], meta: { name: 'AutopilotHistory' } }
+    /**
+     * Find zero or one AutopilotHistory that matches the filter.
+     * @param {AutopilotHistoryFindUniqueArgs} args - Arguments to find a AutopilotHistory
+     * @example
+     * // Get one AutopilotHistory
+     * const autopilotHistory = await prisma.autopilotHistory.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AutopilotHistoryFindUniqueArgs>(args: SelectSubset<T, AutopilotHistoryFindUniqueArgs<ExtArgs>>): Prisma__AutopilotHistoryClient<$Result.GetResult<Prisma.$AutopilotHistoryPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AutopilotHistory that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AutopilotHistoryFindUniqueOrThrowArgs} args - Arguments to find a AutopilotHistory
+     * @example
+     * // Get one AutopilotHistory
+     * const autopilotHistory = await prisma.autopilotHistory.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AutopilotHistoryFindUniqueOrThrowArgs>(args: SelectSubset<T, AutopilotHistoryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AutopilotHistoryClient<$Result.GetResult<Prisma.$AutopilotHistoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AutopilotHistory that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotHistoryFindFirstArgs} args - Arguments to find a AutopilotHistory
+     * @example
+     * // Get one AutopilotHistory
+     * const autopilotHistory = await prisma.autopilotHistory.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AutopilotHistoryFindFirstArgs>(args?: SelectSubset<T, AutopilotHistoryFindFirstArgs<ExtArgs>>): Prisma__AutopilotHistoryClient<$Result.GetResult<Prisma.$AutopilotHistoryPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AutopilotHistory that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotHistoryFindFirstOrThrowArgs} args - Arguments to find a AutopilotHistory
+     * @example
+     * // Get one AutopilotHistory
+     * const autopilotHistory = await prisma.autopilotHistory.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AutopilotHistoryFindFirstOrThrowArgs>(args?: SelectSubset<T, AutopilotHistoryFindFirstOrThrowArgs<ExtArgs>>): Prisma__AutopilotHistoryClient<$Result.GetResult<Prisma.$AutopilotHistoryPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AutopilotHistories that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotHistoryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AutopilotHistories
+     * const autopilotHistories = await prisma.autopilotHistory.findMany()
+     * 
+     * // Get first 10 AutopilotHistories
+     * const autopilotHistories = await prisma.autopilotHistory.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const autopilotHistoryWithIdOnly = await prisma.autopilotHistory.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AutopilotHistoryFindManyArgs>(args?: SelectSubset<T, AutopilotHistoryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AutopilotHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AutopilotHistory.
+     * @param {AutopilotHistoryCreateArgs} args - Arguments to create a AutopilotHistory.
+     * @example
+     * // Create one AutopilotHistory
+     * const AutopilotHistory = await prisma.autopilotHistory.create({
+     *   data: {
+     *     // ... data to create a AutopilotHistory
+     *   }
+     * })
+     * 
+     */
+    create<T extends AutopilotHistoryCreateArgs>(args: SelectSubset<T, AutopilotHistoryCreateArgs<ExtArgs>>): Prisma__AutopilotHistoryClient<$Result.GetResult<Prisma.$AutopilotHistoryPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AutopilotHistories.
+     * @param {AutopilotHistoryCreateManyArgs} args - Arguments to create many AutopilotHistories.
+     * @example
+     * // Create many AutopilotHistories
+     * const autopilotHistory = await prisma.autopilotHistory.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AutopilotHistoryCreateManyArgs>(args?: SelectSubset<T, AutopilotHistoryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AutopilotHistories and returns the data saved in the database.
+     * @param {AutopilotHistoryCreateManyAndReturnArgs} args - Arguments to create many AutopilotHistories.
+     * @example
+     * // Create many AutopilotHistories
+     * const autopilotHistory = await prisma.autopilotHistory.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AutopilotHistories and only return the `id`
+     * const autopilotHistoryWithIdOnly = await prisma.autopilotHistory.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AutopilotHistoryCreateManyAndReturnArgs>(args?: SelectSubset<T, AutopilotHistoryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AutopilotHistoryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AutopilotHistory.
+     * @param {AutopilotHistoryDeleteArgs} args - Arguments to delete one AutopilotHistory.
+     * @example
+     * // Delete one AutopilotHistory
+     * const AutopilotHistory = await prisma.autopilotHistory.delete({
+     *   where: {
+     *     // ... filter to delete one AutopilotHistory
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AutopilotHistoryDeleteArgs>(args: SelectSubset<T, AutopilotHistoryDeleteArgs<ExtArgs>>): Prisma__AutopilotHistoryClient<$Result.GetResult<Prisma.$AutopilotHistoryPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AutopilotHistory.
+     * @param {AutopilotHistoryUpdateArgs} args - Arguments to update one AutopilotHistory.
+     * @example
+     * // Update one AutopilotHistory
+     * const autopilotHistory = await prisma.autopilotHistory.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AutopilotHistoryUpdateArgs>(args: SelectSubset<T, AutopilotHistoryUpdateArgs<ExtArgs>>): Prisma__AutopilotHistoryClient<$Result.GetResult<Prisma.$AutopilotHistoryPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AutopilotHistories.
+     * @param {AutopilotHistoryDeleteManyArgs} args - Arguments to filter AutopilotHistories to delete.
+     * @example
+     * // Delete a few AutopilotHistories
+     * const { count } = await prisma.autopilotHistory.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AutopilotHistoryDeleteManyArgs>(args?: SelectSubset<T, AutopilotHistoryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AutopilotHistories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotHistoryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AutopilotHistories
+     * const autopilotHistory = await prisma.autopilotHistory.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AutopilotHistoryUpdateManyArgs>(args: SelectSubset<T, AutopilotHistoryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AutopilotHistories and returns the data updated in the database.
+     * @param {AutopilotHistoryUpdateManyAndReturnArgs} args - Arguments to update many AutopilotHistories.
+     * @example
+     * // Update many AutopilotHistories
+     * const autopilotHistory = await prisma.autopilotHistory.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AutopilotHistories and only return the `id`
+     * const autopilotHistoryWithIdOnly = await prisma.autopilotHistory.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AutopilotHistoryUpdateManyAndReturnArgs>(args: SelectSubset<T, AutopilotHistoryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AutopilotHistoryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AutopilotHistory.
+     * @param {AutopilotHistoryUpsertArgs} args - Arguments to update or create a AutopilotHistory.
+     * @example
+     * // Update or create a AutopilotHistory
+     * const autopilotHistory = await prisma.autopilotHistory.upsert({
+     *   create: {
+     *     // ... data to create a AutopilotHistory
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AutopilotHistory we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AutopilotHistoryUpsertArgs>(args: SelectSubset<T, AutopilotHistoryUpsertArgs<ExtArgs>>): Prisma__AutopilotHistoryClient<$Result.GetResult<Prisma.$AutopilotHistoryPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AutopilotHistories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotHistoryCountArgs} args - Arguments to filter AutopilotHistories to count.
+     * @example
+     * // Count the number of AutopilotHistories
+     * const count = await prisma.autopilotHistory.count({
+     *   where: {
+     *     // ... the filter for the AutopilotHistories we want to count
+     *   }
+     * })
+    **/
+    count<T extends AutopilotHistoryCountArgs>(
+      args?: Subset<T, AutopilotHistoryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AutopilotHistoryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AutopilotHistory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotHistoryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AutopilotHistoryAggregateArgs>(args: Subset<T, AutopilotHistoryAggregateArgs>): Prisma.PrismaPromise<GetAutopilotHistoryAggregateType<T>>
+
+    /**
+     * Group by AutopilotHistory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AutopilotHistoryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AutopilotHistoryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AutopilotHistoryGroupByArgs['orderBy'] }
+        : { orderBy?: AutopilotHistoryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AutopilotHistoryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAutopilotHistoryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AutopilotHistory model
+   */
+  readonly fields: AutopilotHistoryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AutopilotHistory.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AutopilotHistoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AutopilotHistory model
+   */
+  interface AutopilotHistoryFieldRefs {
+    readonly id: FieldRef<"AutopilotHistory", 'String'>
+    readonly url: FieldRef<"AutopilotHistory", 'String'>
+    readonly title: FieldRef<"AutopilotHistory", 'String'>
+    readonly projectId: FieldRef<"AutopilotHistory", 'String'>
+    readonly createdAt: FieldRef<"AutopilotHistory", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AutopilotHistory findUnique
+   */
+  export type AutopilotHistoryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+    /**
+     * Filter, which AutopilotHistory to fetch.
+     */
+    where: AutopilotHistoryWhereUniqueInput
+  }
+
+  /**
+   * AutopilotHistory findUniqueOrThrow
+   */
+  export type AutopilotHistoryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+    /**
+     * Filter, which AutopilotHistory to fetch.
+     */
+    where: AutopilotHistoryWhereUniqueInput
+  }
+
+  /**
+   * AutopilotHistory findFirst
+   */
+  export type AutopilotHistoryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+    /**
+     * Filter, which AutopilotHistory to fetch.
+     */
+    where?: AutopilotHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AutopilotHistories to fetch.
+     */
+    orderBy?: AutopilotHistoryOrderByWithRelationInput | AutopilotHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AutopilotHistories.
+     */
+    cursor?: AutopilotHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AutopilotHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AutopilotHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AutopilotHistories.
+     */
+    distinct?: AutopilotHistoryScalarFieldEnum | AutopilotHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * AutopilotHistory findFirstOrThrow
+   */
+  export type AutopilotHistoryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+    /**
+     * Filter, which AutopilotHistory to fetch.
+     */
+    where?: AutopilotHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AutopilotHistories to fetch.
+     */
+    orderBy?: AutopilotHistoryOrderByWithRelationInput | AutopilotHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AutopilotHistories.
+     */
+    cursor?: AutopilotHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AutopilotHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AutopilotHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AutopilotHistories.
+     */
+    distinct?: AutopilotHistoryScalarFieldEnum | AutopilotHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * AutopilotHistory findMany
+   */
+  export type AutopilotHistoryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+    /**
+     * Filter, which AutopilotHistories to fetch.
+     */
+    where?: AutopilotHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AutopilotHistories to fetch.
+     */
+    orderBy?: AutopilotHistoryOrderByWithRelationInput | AutopilotHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AutopilotHistories.
+     */
+    cursor?: AutopilotHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AutopilotHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AutopilotHistories.
+     */
+    skip?: number
+    distinct?: AutopilotHistoryScalarFieldEnum | AutopilotHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * AutopilotHistory create
+   */
+  export type AutopilotHistoryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+    /**
+     * The data needed to create a AutopilotHistory.
+     */
+    data: XOR<AutopilotHistoryCreateInput, AutopilotHistoryUncheckedCreateInput>
+  }
+
+  /**
+   * AutopilotHistory createMany
+   */
+  export type AutopilotHistoryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AutopilotHistories.
+     */
+    data: AutopilotHistoryCreateManyInput | AutopilotHistoryCreateManyInput[]
+  }
+
+  /**
+   * AutopilotHistory createManyAndReturn
+   */
+  export type AutopilotHistoryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+    /**
+     * The data used to create many AutopilotHistories.
+     */
+    data: AutopilotHistoryCreateManyInput | AutopilotHistoryCreateManyInput[]
+  }
+
+  /**
+   * AutopilotHistory update
+   */
+  export type AutopilotHistoryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+    /**
+     * The data needed to update a AutopilotHistory.
+     */
+    data: XOR<AutopilotHistoryUpdateInput, AutopilotHistoryUncheckedUpdateInput>
+    /**
+     * Choose, which AutopilotHistory to update.
+     */
+    where: AutopilotHistoryWhereUniqueInput
+  }
+
+  /**
+   * AutopilotHistory updateMany
+   */
+  export type AutopilotHistoryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AutopilotHistories.
+     */
+    data: XOR<AutopilotHistoryUpdateManyMutationInput, AutopilotHistoryUncheckedUpdateManyInput>
+    /**
+     * Filter which AutopilotHistories to update
+     */
+    where?: AutopilotHistoryWhereInput
+    /**
+     * Limit how many AutopilotHistories to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AutopilotHistory updateManyAndReturn
+   */
+  export type AutopilotHistoryUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+    /**
+     * The data used to update AutopilotHistories.
+     */
+    data: XOR<AutopilotHistoryUpdateManyMutationInput, AutopilotHistoryUncheckedUpdateManyInput>
+    /**
+     * Filter which AutopilotHistories to update
+     */
+    where?: AutopilotHistoryWhereInput
+    /**
+     * Limit how many AutopilotHistories to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AutopilotHistory upsert
+   */
+  export type AutopilotHistoryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+    /**
+     * The filter to search for the AutopilotHistory to update in case it exists.
+     */
+    where: AutopilotHistoryWhereUniqueInput
+    /**
+     * In case the AutopilotHistory found by the `where` argument doesn't exist, create a new AutopilotHistory with this data.
+     */
+    create: XOR<AutopilotHistoryCreateInput, AutopilotHistoryUncheckedCreateInput>
+    /**
+     * In case the AutopilotHistory was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AutopilotHistoryUpdateInput, AutopilotHistoryUncheckedUpdateInput>
+  }
+
+  /**
+   * AutopilotHistory delete
+   */
+  export type AutopilotHistoryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+    /**
+     * Filter which AutopilotHistory to delete.
+     */
+    where: AutopilotHistoryWhereUniqueInput
+  }
+
+  /**
+   * AutopilotHistory deleteMany
+   */
+  export type AutopilotHistoryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AutopilotHistories to delete
+     */
+    where?: AutopilotHistoryWhereInput
+    /**
+     * Limit how many AutopilotHistories to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AutopilotHistory without action
+   */
+  export type AutopilotHistoryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AutopilotHistory
+     */
+    select?: AutopilotHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AutopilotHistory
+     */
+    omit?: AutopilotHistoryOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -13788,6 +14958,7 @@ export namespace Prisma {
     sourcePath: 'sourcePath',
     durationMs: 'durationMs',
     status: 'status',
+    tags: 'tags',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -13916,11 +15087,27 @@ export namespace Prisma {
     targetPlatform: 'targetPlatform',
     maxDailyDownloads: 'maxDailyDownloads',
     isActive: 'isActive',
+    minViews: 'minViews',
+    maxAgeDays: 'maxAgeDays',
+    sourceType: 'sourceType',
+    playlistUrl: 'playlistUrl',
+    rssUrl: 'rssUrl',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type AutopilotConfigScalarFieldEnum = (typeof AutopilotConfigScalarFieldEnum)[keyof typeof AutopilotConfigScalarFieldEnum]
+
+
+  export const AutopilotHistoryScalarFieldEnum: {
+    id: 'id',
+    url: 'url',
+    title: 'title',
+    projectId: 'projectId',
+    createdAt: 'createdAt'
+  };
+
+  export type AutopilotHistoryScalarFieldEnum = (typeof AutopilotHistoryScalarFieldEnum)[keyof typeof AutopilotHistoryScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -13991,6 +15178,7 @@ export namespace Prisma {
     sourcePath?: StringFilter<"Project"> | string
     durationMs?: IntNullableFilter<"Project"> | number | null
     status?: StringFilter<"Project"> | string
+    tags?: StringNullableFilter<"Project"> | string | null
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
     transcripts?: TranscriptListRelationFilter
@@ -14004,6 +15192,7 @@ export namespace Prisma {
     sourcePath?: SortOrder
     durationMs?: SortOrderInput | SortOrder
     status?: SortOrder
+    tags?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     transcripts?: TranscriptOrderByRelationAggregateInput
@@ -14020,6 +15209,7 @@ export namespace Prisma {
     sourcePath?: StringFilter<"Project"> | string
     durationMs?: IntNullableFilter<"Project"> | number | null
     status?: StringFilter<"Project"> | string
+    tags?: StringNullableFilter<"Project"> | string | null
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
     transcripts?: TranscriptListRelationFilter
@@ -14033,6 +15223,7 @@ export namespace Prisma {
     sourcePath?: SortOrder
     durationMs?: SortOrderInput | SortOrder
     status?: SortOrder
+    tags?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProjectCountOrderByAggregateInput
@@ -14051,6 +15242,7 @@ export namespace Prisma {
     sourcePath?: StringWithAggregatesFilter<"Project"> | string
     durationMs?: IntNullableWithAggregatesFilter<"Project"> | number | null
     status?: StringWithAggregatesFilter<"Project"> | string
+    tags?: StringNullableWithAggregatesFilter<"Project"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
   }
@@ -14642,6 +15834,11 @@ export namespace Prisma {
     targetPlatform?: StringFilter<"AutopilotConfig"> | string
     maxDailyDownloads?: IntFilter<"AutopilotConfig"> | number
     isActive?: BoolFilter<"AutopilotConfig"> | boolean
+    minViews?: IntFilter<"AutopilotConfig"> | number
+    maxAgeDays?: IntFilter<"AutopilotConfig"> | number
+    sourceType?: StringFilter<"AutopilotConfig"> | string
+    playlistUrl?: StringNullableFilter<"AutopilotConfig"> | string | null
+    rssUrl?: StringNullableFilter<"AutopilotConfig"> | string | null
     createdAt?: DateTimeFilter<"AutopilotConfig"> | Date | string
     updatedAt?: DateTimeFilter<"AutopilotConfig"> | Date | string
   }
@@ -14652,6 +15849,11 @@ export namespace Prisma {
     targetPlatform?: SortOrder
     maxDailyDownloads?: SortOrder
     isActive?: SortOrder
+    minViews?: SortOrder
+    maxAgeDays?: SortOrder
+    sourceType?: SortOrder
+    playlistUrl?: SortOrderInput | SortOrder
+    rssUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -14665,6 +15867,11 @@ export namespace Prisma {
     targetPlatform?: StringFilter<"AutopilotConfig"> | string
     maxDailyDownloads?: IntFilter<"AutopilotConfig"> | number
     isActive?: BoolFilter<"AutopilotConfig"> | boolean
+    minViews?: IntFilter<"AutopilotConfig"> | number
+    maxAgeDays?: IntFilter<"AutopilotConfig"> | number
+    sourceType?: StringFilter<"AutopilotConfig"> | string
+    playlistUrl?: StringNullableFilter<"AutopilotConfig"> | string | null
+    rssUrl?: StringNullableFilter<"AutopilotConfig"> | string | null
     createdAt?: DateTimeFilter<"AutopilotConfig"> | Date | string
     updatedAt?: DateTimeFilter<"AutopilotConfig"> | Date | string
   }, "id">
@@ -14675,6 +15882,11 @@ export namespace Prisma {
     targetPlatform?: SortOrder
     maxDailyDownloads?: SortOrder
     isActive?: SortOrder
+    minViews?: SortOrder
+    maxAgeDays?: SortOrder
+    sourceType?: SortOrder
+    playlistUrl?: SortOrderInput | SortOrder
+    rssUrl?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: AutopilotConfigCountOrderByAggregateInput
@@ -14693,8 +15905,65 @@ export namespace Prisma {
     targetPlatform?: StringWithAggregatesFilter<"AutopilotConfig"> | string
     maxDailyDownloads?: IntWithAggregatesFilter<"AutopilotConfig"> | number
     isActive?: BoolWithAggregatesFilter<"AutopilotConfig"> | boolean
+    minViews?: IntWithAggregatesFilter<"AutopilotConfig"> | number
+    maxAgeDays?: IntWithAggregatesFilter<"AutopilotConfig"> | number
+    sourceType?: StringWithAggregatesFilter<"AutopilotConfig"> | string
+    playlistUrl?: StringNullableWithAggregatesFilter<"AutopilotConfig"> | string | null
+    rssUrl?: StringNullableWithAggregatesFilter<"AutopilotConfig"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"AutopilotConfig"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"AutopilotConfig"> | Date | string
+  }
+
+  export type AutopilotHistoryWhereInput = {
+    AND?: AutopilotHistoryWhereInput | AutopilotHistoryWhereInput[]
+    OR?: AutopilotHistoryWhereInput[]
+    NOT?: AutopilotHistoryWhereInput | AutopilotHistoryWhereInput[]
+    id?: StringFilter<"AutopilotHistory"> | string
+    url?: StringFilter<"AutopilotHistory"> | string
+    title?: StringFilter<"AutopilotHistory"> | string
+    projectId?: StringNullableFilter<"AutopilotHistory"> | string | null
+    createdAt?: DateTimeFilter<"AutopilotHistory"> | Date | string
+  }
+
+  export type AutopilotHistoryOrderByWithRelationInput = {
+    id?: SortOrder
+    url?: SortOrder
+    title?: SortOrder
+    projectId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AutopilotHistoryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    url?: string
+    AND?: AutopilotHistoryWhereInput | AutopilotHistoryWhereInput[]
+    OR?: AutopilotHistoryWhereInput[]
+    NOT?: AutopilotHistoryWhereInput | AutopilotHistoryWhereInput[]
+    title?: StringFilter<"AutopilotHistory"> | string
+    projectId?: StringNullableFilter<"AutopilotHistory"> | string | null
+    createdAt?: DateTimeFilter<"AutopilotHistory"> | Date | string
+  }, "id" | "url">
+
+  export type AutopilotHistoryOrderByWithAggregationInput = {
+    id?: SortOrder
+    url?: SortOrder
+    title?: SortOrder
+    projectId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: AutopilotHistoryCountOrderByAggregateInput
+    _max?: AutopilotHistoryMaxOrderByAggregateInput
+    _min?: AutopilotHistoryMinOrderByAggregateInput
+  }
+
+  export type AutopilotHistoryScalarWhereWithAggregatesInput = {
+    AND?: AutopilotHistoryScalarWhereWithAggregatesInput | AutopilotHistoryScalarWhereWithAggregatesInput[]
+    OR?: AutopilotHistoryScalarWhereWithAggregatesInput[]
+    NOT?: AutopilotHistoryScalarWhereWithAggregatesInput | AutopilotHistoryScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AutopilotHistory"> | string
+    url?: StringWithAggregatesFilter<"AutopilotHistory"> | string
+    title?: StringWithAggregatesFilter<"AutopilotHistory"> | string
+    projectId?: StringNullableWithAggregatesFilter<"AutopilotHistory"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"AutopilotHistory"> | Date | string
   }
 
   export type ProjectCreateInput = {
@@ -14703,6 +15972,7 @@ export namespace Prisma {
     sourcePath: string
     durationMs?: number | null
     status?: string
+    tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     transcripts?: TranscriptCreateNestedManyWithoutProjectInput
@@ -14716,6 +15986,7 @@ export namespace Prisma {
     sourcePath: string
     durationMs?: number | null
     status?: string
+    tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     transcripts?: TranscriptUncheckedCreateNestedManyWithoutProjectInput
@@ -14729,6 +16000,7 @@ export namespace Prisma {
     sourcePath?: StringFieldUpdateOperationsInput | string
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transcripts?: TranscriptUpdateManyWithoutProjectNestedInput
@@ -14742,6 +16014,7 @@ export namespace Prisma {
     sourcePath?: StringFieldUpdateOperationsInput | string
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transcripts?: TranscriptUncheckedUpdateManyWithoutProjectNestedInput
@@ -14755,6 +16028,7 @@ export namespace Prisma {
     sourcePath: string
     durationMs?: number | null
     status?: string
+    tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -14765,6 +16039,7 @@ export namespace Prisma {
     sourcePath?: StringFieldUpdateOperationsInput | string
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -14775,6 +16050,7 @@ export namespace Prisma {
     sourcePath?: StringFieldUpdateOperationsInput | string
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15404,6 +16680,11 @@ export namespace Prisma {
     targetPlatform?: string
     maxDailyDownloads?: number
     isActive?: boolean
+    minViews?: number
+    maxAgeDays?: number
+    sourceType?: string
+    playlistUrl?: string | null
+    rssUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -15414,6 +16695,11 @@ export namespace Prisma {
     targetPlatform?: string
     maxDailyDownloads?: number
     isActive?: boolean
+    minViews?: number
+    maxAgeDays?: number
+    sourceType?: string
+    playlistUrl?: string | null
+    rssUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -15424,6 +16710,11 @@ export namespace Prisma {
     targetPlatform?: StringFieldUpdateOperationsInput | string
     maxDailyDownloads?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    minViews?: IntFieldUpdateOperationsInput | number
+    maxAgeDays?: IntFieldUpdateOperationsInput | number
+    sourceType?: StringFieldUpdateOperationsInput | string
+    playlistUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    rssUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15434,6 +16725,11 @@ export namespace Prisma {
     targetPlatform?: StringFieldUpdateOperationsInput | string
     maxDailyDownloads?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    minViews?: IntFieldUpdateOperationsInput | number
+    maxAgeDays?: IntFieldUpdateOperationsInput | number
+    sourceType?: StringFieldUpdateOperationsInput | string
+    playlistUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    rssUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15444,6 +16740,11 @@ export namespace Prisma {
     targetPlatform?: string
     maxDailyDownloads?: number
     isActive?: boolean
+    minViews?: number
+    maxAgeDays?: number
+    sourceType?: string
+    playlistUrl?: string | null
+    rssUrl?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -15454,6 +16755,11 @@ export namespace Prisma {
     targetPlatform?: StringFieldUpdateOperationsInput | string
     maxDailyDownloads?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    minViews?: IntFieldUpdateOperationsInput | number
+    maxAgeDays?: IntFieldUpdateOperationsInput | number
+    sourceType?: StringFieldUpdateOperationsInput | string
+    playlistUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    rssUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -15464,8 +16770,69 @@ export namespace Prisma {
     targetPlatform?: StringFieldUpdateOperationsInput | string
     maxDailyDownloads?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    minViews?: IntFieldUpdateOperationsInput | number
+    maxAgeDays?: IntFieldUpdateOperationsInput | number
+    sourceType?: StringFieldUpdateOperationsInput | string
+    playlistUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    rssUrl?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AutopilotHistoryCreateInput = {
+    id?: string
+    url: string
+    title: string
+    projectId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AutopilotHistoryUncheckedCreateInput = {
+    id?: string
+    url: string
+    title: string
+    projectId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AutopilotHistoryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AutopilotHistoryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AutopilotHistoryCreateManyInput = {
+    id?: string
+    url: string
+    title: string
+    projectId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AutopilotHistoryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AutopilotHistoryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -15491,6 +16858,20 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type DateTimeFilter<$PrismaModel = never> = {
@@ -15545,6 +16926,7 @@ export namespace Prisma {
     sourcePath?: SortOrder
     durationMs?: SortOrder
     status?: SortOrder
+    tags?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15559,6 +16941,7 @@ export namespace Prisma {
     sourcePath?: SortOrder
     durationMs?: SortOrder
     status?: SortOrder
+    tags?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15569,6 +16952,7 @@ export namespace Prisma {
     sourcePath?: SortOrder
     durationMs?: SortOrder
     status?: SortOrder
+    tags?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15608,6 +16992,23 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -15744,20 +17145,6 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
   export type AssetListRelationFilter = {
     every?: AssetWhereInput
     some?: AssetWhereInput
@@ -15822,23 +17209,6 @@ export namespace Prisma {
   export type ClipSumOrderByAggregateInput = {
     startMs?: SortOrder
     endMs?: SortOrder
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type ClipScalarRelationFilter = {
@@ -16059,12 +17429,19 @@ export namespace Prisma {
     targetPlatform?: SortOrder
     maxDailyDownloads?: SortOrder
     isActive?: SortOrder
+    minViews?: SortOrder
+    maxAgeDays?: SortOrder
+    sourceType?: SortOrder
+    playlistUrl?: SortOrder
+    rssUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type AutopilotConfigAvgOrderByAggregateInput = {
     maxDailyDownloads?: SortOrder
+    minViews?: SortOrder
+    maxAgeDays?: SortOrder
   }
 
   export type AutopilotConfigMaxOrderByAggregateInput = {
@@ -16073,6 +17450,11 @@ export namespace Prisma {
     targetPlatform?: SortOrder
     maxDailyDownloads?: SortOrder
     isActive?: SortOrder
+    minViews?: SortOrder
+    maxAgeDays?: SortOrder
+    sourceType?: SortOrder
+    playlistUrl?: SortOrder
+    rssUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16083,12 +17465,19 @@ export namespace Prisma {
     targetPlatform?: SortOrder
     maxDailyDownloads?: SortOrder
     isActive?: SortOrder
+    minViews?: SortOrder
+    maxAgeDays?: SortOrder
+    sourceType?: SortOrder
+    playlistUrl?: SortOrder
+    rssUrl?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type AutopilotConfigSumOrderByAggregateInput = {
     maxDailyDownloads?: SortOrder
+    minViews?: SortOrder
+    maxAgeDays?: SortOrder
   }
 
   export type BoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -16097,6 +17486,30 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type AutopilotHistoryCountOrderByAggregateInput = {
+    id?: SortOrder
+    url?: SortOrder
+    title?: SortOrder
+    projectId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AutopilotHistoryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    url?: SortOrder
+    title?: SortOrder
+    projectId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AutopilotHistoryMinOrderByAggregateInput = {
+    id?: SortOrder
+    url?: SortOrder
+    title?: SortOrder
+    projectId?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type TranscriptCreateNestedManyWithoutProjectInput = {
@@ -16151,6 +17564,10 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -16311,10 +17728,6 @@ export namespace Prisma {
     connect?: AnalyticsWhereUniqueInput | AnalyticsWhereUniqueInput[]
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-  }
-
   export type ProjectUpdateOneRequiredWithoutClipsNestedInput = {
     create?: XOR<ProjectCreateWithoutClipsInput, ProjectUncheckedCreateWithoutClipsInput>
     connectOrCreate?: ProjectCreateOrConnectWithoutClipsInput
@@ -16440,6 +17853,20 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -16506,6 +17933,23 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -16545,37 +17989,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
@@ -16794,6 +18207,7 @@ export namespace Prisma {
     sourcePath: string
     durationMs?: number | null
     status?: string
+    tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     candidates?: ClipCandidateCreateNestedManyWithoutProjectInput
@@ -16806,6 +18220,7 @@ export namespace Prisma {
     sourcePath: string
     durationMs?: number | null
     status?: string
+    tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     candidates?: ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
@@ -16834,6 +18249,7 @@ export namespace Prisma {
     sourcePath?: StringFieldUpdateOperationsInput | string
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     candidates?: ClipCandidateUpdateManyWithoutProjectNestedInput
@@ -16846,6 +18262,7 @@ export namespace Prisma {
     sourcePath?: StringFieldUpdateOperationsInput | string
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     candidates?: ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
@@ -16858,6 +18275,7 @@ export namespace Prisma {
     sourcePath: string
     durationMs?: number | null
     status?: string
+    tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     transcripts?: TranscriptCreateNestedManyWithoutProjectInput
@@ -16870,6 +18288,7 @@ export namespace Prisma {
     sourcePath: string
     durationMs?: number | null
     status?: string
+    tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     transcripts?: TranscriptUncheckedCreateNestedManyWithoutProjectInput
@@ -16898,6 +18317,7 @@ export namespace Prisma {
     sourcePath?: StringFieldUpdateOperationsInput | string
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transcripts?: TranscriptUpdateManyWithoutProjectNestedInput
@@ -16910,6 +18330,7 @@ export namespace Prisma {
     sourcePath?: StringFieldUpdateOperationsInput | string
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transcripts?: TranscriptUncheckedUpdateManyWithoutProjectNestedInput
@@ -16922,6 +18343,7 @@ export namespace Prisma {
     sourcePath: string
     durationMs?: number | null
     status?: string
+    tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     transcripts?: TranscriptCreateNestedManyWithoutProjectInput
@@ -16934,6 +18356,7 @@ export namespace Prisma {
     sourcePath: string
     durationMs?: number | null
     status?: string
+    tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     transcripts?: TranscriptUncheckedCreateNestedManyWithoutProjectInput
@@ -17016,6 +18439,7 @@ export namespace Prisma {
     sourcePath?: StringFieldUpdateOperationsInput | string
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transcripts?: TranscriptUpdateManyWithoutProjectNestedInput
@@ -17028,6 +18452,7 @@ export namespace Prisma {
     sourcePath?: StringFieldUpdateOperationsInput | string
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transcripts?: TranscriptUncheckedUpdateManyWithoutProjectNestedInput
