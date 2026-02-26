@@ -92,5 +92,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('app:notification', handler);
     return () => ipcRenderer.removeListener('app:notification', handler);
   },
+  // F5: Thumbnail generation & SRT export
+  generateThumbnail: (opts)  => ipcRenderer.invoke('thumbnail:generate', opts),
+  exportSrt:         (opts)  => ipcRenderer.invoke('export:srt', opts),
+  // F11: AI insights
+  insightsAnalyze:   (data)  => ipcRenderer.invoke('insights:analyze', data),
+  // F16: Clip Profiles
+  dbGetClipProfiles:    ()       => ipcRenderer.invoke('db:getClipProfiles'),
+  dbCreateClipProfile:  (data)   => ipcRenderer.invoke('db:createClipProfile', data),
+  dbDeleteClipProfile:  (id)     => ipcRenderer.invoke('db:deleteClipProfile', id),
+  // F3: Project tags
+  dbUpdateProjectTags:  (data)   => ipcRenderer.invoke('db:updateProjectTags', data),
+  // F13: Batch render
+  renderBatch:          (jobs)   => ipcRenderer.invoke('render:batch', jobs),
+  // F19: Webhook
+  webhookGetConfig:  ()         => ipcRenderer.invoke('webhook:getConfig'),
+  webhookSetConfig:  (data)     => ipcRenderer.invoke('webhook:setConfig', data),
+  webhookSend:       (data)     => ipcRenderer.invoke('webhook:send', data),
 });
 

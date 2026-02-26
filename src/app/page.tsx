@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2, FolderOpen, Clock, Tag, UploadCloud, X, FileVideo } from "lucide-react";
+import { Loader2, FolderOpen, Clock, Tag, UploadCloud, X, FileVideo, Search } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 // Global window.electronAPI types are declared in src/types/electron.d.ts
 
 interface Project {
@@ -17,6 +18,7 @@ interface Project {
   sourcePath: string;
   durationMs: number;
   status: string;
+  tags?: string;
   createdAt: string;
 }
 
@@ -29,6 +31,9 @@ export default function DashboardPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [projects, setProjects] = useState<Project[]>([]);
   const [fetching, setFetching] = useState(true);
+  const [search, setSearch] = useState("");
+  const [tagFilter, setTagFilter] = useState("");
+  const [projectTags, setProjectTags] = useState("");
 
   // Drag and Drop State
   const [isDragging, setIsDragging] = useState(false);
@@ -107,8 +112,12 @@ export default function DashboardPage() {
       if (!api) throw new Error("Electron API not found");
       const data = await api.dbCreateProject({ title, sourcePath }) as { success: boolean, project?: Project, error?: string };
       if (!data.success) throw new Error(data.error || "Failed to create project");
-
+      // F3: Save tags if any were entered
+      if (projectTags.trim() && data.project?.id) {
+        await (api as unknown as { dbUpdateProjectTags?: (d: { id: string; tags: string }) => Promise<unknown> })?.dbUpdateProjectTags?.({ id: data.project.id, tags: projectTags.trim() });
+      }
       cancelSelection();
+      setProjectTags("");
       fetchProjects();
     } catch (err: unknown) {
       setErrorMsg((err as Error).message);
@@ -125,6 +134,14 @@ export default function DashboardPage() {
   };
 
   const isUploadActive = selectedFile !== null;
+
+  // F3: Filter projects by search + tag
+  const allTags = Array.from(new Set(projects.flatMap(p => (p.tags || "").split(",").map(t => t.trim()).filter(Boolean))));
+  const filteredProjects = projects.filter(p => {
+    const matchSearch = search === "" || p.title.toLowerCase().includes(search.toLowerCase());
+    const matchTag = tagFilter === "" || (p.tags || "").split(",").map(t => t.trim()).includes(tagFilter);
+    return matchSearch && matchTag;
+  });
 
   return (
     <div className="grid gap-8 pb-10">
@@ -239,7 +256,33 @@ export default function DashboardPage() {
 
       {/* ── Project Grid ────────────────────────────── */}
       <div className="space-y-4">
-        <h3 className="text-xl font-semibold tracking-tight">Recent Projects</h3>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <h3 className="text-xl font-semibold tracking-tight">Recent Projects</h3>
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+              <Input
+                className="pl-8 h-8 w-48 text-xs"
+                placeholder="Search projects..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
+            {/* Tag filter chips */}
+            {allTags.map(tag => (
+              <button
+                key={tag}
+                onClick={() => setTagFilter(prev => prev === tag ? "" : tag)}
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  tagFilter === tag ? "bg-primary text-primary-foreground border-primary" : "bg-muted text-muted-foreground border-border hover:border-primary/50"
+                }`}
+              >
+                #{tag}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {fetching ? (
             // Skeleton loading cards
@@ -255,12 +298,12 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             ))
-          ) : projects.length === 0 ? (
+          ) : filteredProjects.length === 0 ? (
             <Card className="col-span-full flex flex-col items-center justify-center py-12 border-dashed bg-muted/20">
               <p className="text-muted-foreground text-sm">No projects created yet. Upload a video above to begin.</p>
             </Card>
           ) : (
-            projects.map((p) => (
+            filteredProjects.map((p) => (
               <Card key={p.id} className="flex flex-col hover:border-primary/50 transition-colors shadow-sm cursor-pointer group">
                 <CardHeader className="pb-3">
                   <CardTitle className="line-clamp-1 text-base group-hover:text-primary transition-colors">{p.title}</CardTitle>
@@ -269,6 +312,14 @@ export default function DashboardPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3 flex-1 flex flex-col justify-end">
+                  {/* Tags */}
+                  {p.tags && (
+                    <div className="flex gap-1 flex-wrap">
+                      {p.tags.split(",").map(t => t.trim()).filter(Boolean).map(tag => (
+                        <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 cursor-pointer" onClick={() => setTagFilter(tag)}>#{tag}</Badge>
+                      ))}
+                    </div>
+                  )}
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />

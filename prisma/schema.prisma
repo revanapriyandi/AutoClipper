@@ -18,6 +18,7 @@ model Project {
   sourcePath  String
   durationMs  Int?
   status      String   @default("DRAFT") // DRAFT, TRANSCRIBING, GENERATING, READY
+  tags        String?  // Comma-separated tags e.g. "podcast,motivation"
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

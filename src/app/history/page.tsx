@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FolderOpen, Film, Clock, Search } from "lucide-react";
-
+import { Badge } from "@/components/ui/badge";
+import { FolderOpen, Film, Clock, Search, Download, DollarSign, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface HistoryClip {
@@ -24,16 +23,28 @@ interface HistoryClip {
 }
 
 const STATUS_BADGE: Record<string, { label: string; class: string }> = {
-  PENDING:    { label: "Pending",    class: "bg-muted text-muted-foreground" },
-  RENDERING:  { label: "Rendering", class: "bg-blue-500/20 text-blue-400" },
-  COMPLETED:  { label: "Rendered",  class: "bg-green-500/20 text-green-400" },
-  POSTED:     { label: "Posted",    class: "bg-violet-500/20 text-violet-400" },
+  PENDING:   { label: "Pending",   class: "bg-muted text-muted-foreground" },
+  RENDERING: { label: "Rendering", class: "bg-blue-500/20 text-blue-400" },
+  COMPLETED: { label: "Rendered",  class: "bg-green-500/20 text-green-400" },
+  POSTED:    { label: "Posted",    class: "bg-violet-500/20 text-violet-400" },
 };
+
+// F17: Estimate API cost based on clip duration
+function estimateApiCost(startMs: number, endMs: number): string {
+  const durationSec = (endMs - startMs) / 1000;
+  // Deepgram: ~$0.0043/min, approximate
+  const transcribeCost = (durationSec / 60) * 0.0043;
+  // LLM scoring: ~$0.001 per clip (gpt-mini estimate)
+  const llmCost = 0.001;
+  const total = transcribeCost + llmCost;
+  return `$${total.toFixed(4)}`;
+}
 
 export default function HistoryPage() {
   const [clips, setClips] = useState<HistoryClip[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     const load = async () => {
@@ -51,132 +62,192 @@ export default function HistoryPage() {
     load();
   }, []);
 
-  const filtered = clips.filter(c =>
-    !search ||
-    c.projectTitle?.toLowerCase().includes(search.toLowerCase()) ||
-    c.caption?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = clips.filter(c => {
+    const matchSearch = !search ||
+      c.projectTitle?.toLowerCase().includes(search.toLowerCase()) ||
+      c.caption?.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === "all" || c.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
 
   const formatDuration = (startMs: number, endMs: number) =>
-    `${Math.round((endMs - startMs) / 1000)}s`;
+    `${((endMs - startMs) / 1000).toFixed(0)}s`;
+
+  const getViralityScore = (scores: string): number | null => {
+    try { return JSON.parse(scores)?.totalScore ?? null; }
+    catch { return null; }
+  };
+
+  // F17: Export CSV
+  const handleExportCSV = () => {
+    const headers = ["Project", "Caption", "Duration", "Status", "Virality Score", "Est. API Cost", "Created At"];
+    const rows = filtered.map(c => [
+      c.projectTitle || "",
+      c.caption || "",
+      formatDuration(c.startMs, c.endMs),
+      c.status,
+      getViralityScore(c.scores) ?? "",
+      estimateApiCost(c.startMs, c.endMs),
+      new Date(c.createdAt).toLocaleString("id-ID"),
+    ]);
+    const csv = [headers, ...rows].map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `clip_history_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const totalCost = clips.reduce((acc, c) => {
+    const durationSec = (c.endMs - c.startMs) / 1000;
+    return acc + (durationSec / 60) * 0.0043 + 0.001;
+  }, 0);
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-6 pb-10">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Clip History</h2>
-          <p className="text-muted-foreground text-sm mt-1">Semua klip yang pernah dibuat di seluruh proyek.</p>
+          <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Film className="h-7 w-7 text-primary" /> Clip History
+          </h2>
+          <p className="text-muted-foreground text-sm mt-1">
+            Semua klip yang pernah dibuat oleh AutoClipper — beserta estimasi biaya API.
+          </p>
         </div>
-        <div className="flex items-center gap-2 w-64">
-          <Search className="h-4 w-4 text-muted-foreground absolute ml-2" />
+        <Button onClick={handleExportCSV} disabled={filtered.length === 0} variant="outline" size="sm" className="gap-2">
+          <Download className="h-4 w-4" /> Export CSV
+        </Button>
+      </div>
+
+      {/* F17: API Cost Summary */}
+      {clips.length > 0 && (
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-4">
+              <span className="text-xs text-muted-foreground font-medium">Total Clips</span>
+              <Film className="h-4 w-4 text-blue-400" />
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <div className="text-2xl font-bold">{clips.length}</div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-4">
+              <span className="text-xs text-muted-foreground font-medium">Posted</span>
+              <Film className="h-4 w-4 text-violet-400" />
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <div className="text-2xl font-bold">{clips.filter(c => c.status === "POSTED").length}</div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-yellow-500/20">
+            <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-4">
+              <span className="text-xs text-muted-foreground font-medium">Est. Total API Cost</span>
+              <DollarSign className="h-4 w-4 text-yellow-400" />
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <div className="text-2xl font-bold text-yellow-400">${totalCost.toFixed(4)}</div>
+              <p className="text-[10px] text-muted-foreground">Deepgram + LLM estimate</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
           <Input
+            className="pl-8 h-9 text-sm"
+            placeholder="Search by project or caption..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Cari klip..."
-            className="pl-8 h-8 text-sm"
           />
+        </div>
+        <div className="flex items-center gap-1">
+          <Filter className="h-3.5 w-3.5 text-muted-foreground" />
+          {["all", "PENDING", "RENDERING", "COMPLETED", "POSTED"].map(s => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${statusFilter === s ? "bg-primary text-primary-foreground border-primary" : "bg-muted text-muted-foreground border-border hover:border-primary/50"}`}
+            >
+              {s === "all" ? "All" : STATUS_BADGE[s]?.label || s}
+            </button>
+          ))}
         </div>
       </div>
 
-      {loading ? (
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i}>
-              <CardHeader><Skeleton className="h-4 w-3/4" /></CardHeader>
-              <CardContent><Skeleton className="h-3 w-1/2" /></CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <Card className="col-span-full flex flex-col items-center justify-center py-16 border-dashed">
-          <Film className="h-12 w-12 text-muted-foreground/40 mb-4" />
-          <p className="text-muted-foreground text-sm">
-            {search ? `Tidak ada klip untuk "${search}"` : "Belum ada klip yang dirender."}
-          </p>
-        </Card>
-      ) : (
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.map(clip => {
-            let scores: Record<string, number> = {};
-            try { scores = JSON.parse(clip.scores); } catch {}
-            const st = STATUS_BADGE[clip.status] || STATUS_BADGE.PENDING;
-            const videoAsset = clip.assets?.find(a => a.kind === "video");
-
-            // Mock approximate max duration calculation for visual timeline
-            // (Assumptions: max duration recorded across clips or defaults to 60s max view)
-            const MAX_PROJECT_DURATION_MS = Math.max(clip.endMs * 1.5, 60000); 
-            const startPct = Math.min((clip.startMs / MAX_PROJECT_DURATION_MS) * 100, 95);
-            const widthPct = Math.min(((clip.endMs - clip.startMs) / MAX_PROJECT_DURATION_MS) * 100, 100 - startPct);
-
-            return (
-              <Card key={clip.id} className="flex flex-col hover:border-primary/40 transition-colors">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm font-medium line-clamp-1">
-                      {clip.projectTitle || `Project ${clip.projectId.slice(0, 8)}`}
-                    </CardTitle>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${st.class}`}>
-                      {st.label}
-                    </span>
+      {/* Clip list */}
+      <Card>
+        <CardHeader className="bg-muted/20 border-b px-4 py-3">
+          <div className="grid grid-cols-[1fr_80px_80px_80px_90px_80px_80px] gap-2 text-xs font-semibold text-muted-foreground">
+            <span>Project / Caption</span>
+            <span>Duration</span>
+            <span>Status</span>
+            <span>Score</span>
+            <span>API Cost Est.</span>
+            <span>Created</span>
+            <span>Actions</span>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0 divide-y divide-border">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="px-4 py-3">
+                <Skeleton className="h-5 w-full" />
+              </div>
+            ))
+          ) : filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+              <Film className="h-10 w-10 mb-3 opacity-20" />
+              <p className="text-sm">No clips found.</p>
+            </div>
+          ) : (
+            filtered.map(c => {
+              const score = getViralityScore(c.scores);
+              const badge = STATUS_BADGE[c.status] || { label: c.status, class: "bg-muted" };
+              const renderedAsset = c.assets?.find(a => a.kind === "video");
+              return (
+                <div key={c.id} className="grid grid-cols-[1fr_80px_80px_80px_90px_80px_80px] gap-2 items-center px-4 py-3 hover:bg-muted/20 transition-colors text-xs">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm truncate">{c.projectTitle || "Unknown Project"}</p>
+                    <p className="text-muted-foreground truncate">{c.caption || "—"}</p>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-3 flex-1">
-                  {/* Mini Visual Timeline */}
-                  <div className="w-full h-1.5 bg-muted rounded-full relative overflow-hidden mt-1 mb-2">
-                    <div 
-                      className="absolute top-0 bottom-0 bg-primary/80 rounded-full min-w-[4px]" 
-                      style={{ left: `${startPct}%`, width: `${Math.max(widthPct, 2)}%` }} 
-                    />
-                  </div>
-                  
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {formatDuration(clip.startMs, clip.endMs)}
-                    </span>
-                    {scores.total !== undefined && (
-                      <span className="flex items-center gap-1">
-                        ⭐ {Math.round(scores.total * 10) / 10}
-                      </span>
-                    )}
-                    <span className="text-muted-foreground/60">
-                      {new Date(clip.createdAt).toLocaleDateString("id-ID")}
-                    </span>
-                  </div>
-                  {clip.caption && (
-                    <div className="bg-muted/30 p-2 rounded border-l-2 border-primary/40 mt-1">
-                      <p className="text-xs text-muted-foreground line-clamp-2 italic">&quot;{clip.caption}&quot;</p>
-                    </div>
-                  )}
-                  <div className="flex gap-2 pt-1">
-                    <Link href={`/projects/detail?id=${clip.projectId}`}>
-                      <Button variant="outline" size="sm" className="text-xs h-7">
-                        <FolderOpen className="h-3 w-3 mr-1" /> Buka Studio
+                  <span className="flex items-center gap-1 text-muted-foreground">
+                    <Clock className="h-3 w-3" />{formatDuration(c.startMs, c.endMs)}
+                  </span>
+                  <Badge className={`text-[10px] px-1.5 py-0 w-fit ${badge.class}`}>{badge.label}</Badge>
+                  <span className={score !== null ? (score >= 80 ? "text-green-400 font-bold" : score >= 60 ? "text-yellow-400 font-bold" : "text-muted-foreground") : "text-muted-foreground"}>
+                    {score !== null ? `${score}/100` : "—"}
+                  </span>
+                  <span className="text-yellow-500 font-mono">{estimateApiCost(c.startMs, c.endMs)}</span>
+                  <span className="text-muted-foreground">{new Date(c.createdAt).toLocaleDateString("id-ID")}</span>
+                  <div className="flex items-center gap-1">
+                    <Link href={`/projects/detail?id=${c.projectId}`}>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" title="Open Project">
+                        <FolderOpen className="h-3 w-3" />
                       </Button>
                     </Link>
-                    {videoAsset && (
+                    {renderedAsset && (
                       <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs h-7"
-                        onClick={() => window.electronAPI?.showItemInFolder(videoAsset.storagePath)}
+                        variant="ghost" size="icon" className="h-6 w-6"
+                        title="Show in Folder"
+                        onClick={() => window.electronAPI?.showItemInFolder(renderedAsset.storagePath)}
                       >
-                        <Film className="h-3 w-3 mr-1" /> File
+                        <Film className="h-3 w-3" />
                       </Button>
                     )}
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
-
-      {!loading && (
-        <p className="text-xs text-muted-foreground text-right">
-          {filtered.length} dari {clips.length} klip ditampilkan
-        </p>
-      )}
+                </div>
+              );
+            })
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

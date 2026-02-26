@@ -57,7 +57,11 @@ require('./handlers/db');
 require('./handlers/db_calendar_addon');
 require('./handlers/db_theme_addon');
 require('./handlers/db_analytics_addon');
+require('./handlers/db_clipprofile_addon');
 require('./handlers/ffmpeg'); // Added FFmpeg static bindings
+require('./handlers/thumbnail'); // F5: Thumbnail generator + SRT export
+require('./handlers/insights');  // F11: AI performance insights
+require('./handlers/webhook');   // F19: Webhook integration
 
 const { startAutopilotPoller } = require('./handlers/autopilot');
 

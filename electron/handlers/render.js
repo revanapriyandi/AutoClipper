@@ -175,4 +175,28 @@ ipcMain.handle('render:clip', async (_, options) => {
   }
 });
 
+ipcMain.handle('render:batch', async (_, jobs) => {
+  if (!Array.isArray(jobs) || jobs.length === 0) {
+    return { success: false, error: 'jobs must be a non-empty array' };
+  }
+  const results = [];
+  for (const options of jobs) {
+    try {
+      const jobId = options.jobId || `render_${Date.now()}`;
+      broadcastProgress(jobId, 0);
+      if (!options.outputPath) {
+        const clipsDir = await getDir('clips');
+        const baseName = path.basename(options.sourcePath || 'clip', path.extname(options.sourcePath || '.mp4'));
+        options.outputPath = path.join(clipsDir, `${baseName}_${jobId}.mp4`);
+      }
+      const outputPath = await runVideoRender(options, jobId);
+      results.push({ success: true, jobId, outputPath });
+    } catch (e) {
+      console.error('[Render:Batch]', e.message);
+      results.push({ success: false, jobId: options.jobId, error: e.message });
+    }
+  }
+  return { success: true, results };
+});
+
 module.exports = { runVideoRender, broadcastProgress, sendNotification };

@@ -8,6 +8,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { OnboardingGuard } from "@/components/onboarding-guard";
+import { NotificationToast } from "@/components/NotificationToast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -51,6 +52,7 @@ export default function RootLayout({
               </SidebarProvider>
             </OnboardingGuard>
           </I18nProvider>
+          <NotificationToast />
         </ThemeProvider>
       </body>
     </html>
