@@ -1,16 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 
-const prismaClientSingleton = () => {
-  return new PrismaClient()
+// Lazy singleton — only instantiated when first called (inside handler), NOT at module import time.
+// This prevents PrismaClient init errors during Next.js build-time page collection.
+let _prisma: PrismaClient | undefined;
+
+export function getPrisma(): PrismaClient {
+  if (!_prisma) {
+    _prisma = new PrismaClient();
+  }
+  return _prisma;
 }
 
-declare global {
-  // eslint-disable-next-line no-var
-  var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>
-}
-
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
-
-export default prisma
-
-if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma
+export default getPrisma;
