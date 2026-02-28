@@ -207,10 +207,12 @@ ${hookText ? `Dialogue: 1,0:00:00.00,0:00:03.00,Hook,,0,0,0,,${hookText}\n` : ''
     vOut = '[vzoom]';
   }
 
+  let inputCount = 1; // 1-based since 0 is source video
+
   // B-Roll Overlays
   const brolls = options.brollLayers || [];
   for (let i = 0; i < brolls.length; i++) {
-    const idx = i + 1; // 1-based since 0 is source video
+    const idx = inputCount++;
     const broll = brolls[i];
     const bStart = broll.startMs / 1000;
     const bEnd = broll.endMs / 1000;
@@ -235,7 +237,7 @@ ${hookText ? `Dialogue: 1,0:00:00.00,0:00:03.00,Hook,,0,0,0,,${hookText}\n` : ''
                     options.format === '1:1' ? 1080 : 
                     options.format === '4:5' ? 1350 : 1920;
 
-    const idx = 1 + brolls.length + i; // 0 is source video
+    const idx = inputCount++;
     const sStart = stk.startMs / 1000;
     const sEnd = stk.endMs / 1000;
 
@@ -276,8 +278,13 @@ ${hookText ? `Dialogue: 1,0:00:00.00,0:00:03.00,Hook,,0,0,0,,${hookText}\n` : ''
   const vcodec = await getBestH264Encoder();
   let videoOutputOptions = [`-c:v ${vcodec}`, '-preset fast', '-crf 23'];
   
+  if (options.quality === 'high') videoOutputOptions = [`-c:v ${vcodec}`, '-preset slow', '-crf 18'];
+  if (options.quality === 'fast') videoOutputOptions = [`-c:v ${vcodec}`, '-preset ultrafast', '-crf 28'];
+
   if (vcodec === 'h264_nvenc') {
      videoOutputOptions = [`-c:v ${vcodec}`, '-preset p4', '-cq 23', '-b:v 0'];
+     if (options.quality === 'high') videoOutputOptions = [`-c:v ${vcodec}`, '-preset p7', '-cq 18', '-b:v 0'];
+     if (options.quality === 'fast') videoOutputOptions = [`-c:v ${vcodec}`, '-preset p1', '-cq 28', '-b:v 0'];
   }
 
   try {
@@ -292,28 +299,31 @@ ${hookText ? `Dialogue: 1,0:00:00.00,0:00:03.00,Hook,,0,0,0,,${hookText}\n` : ''
         if (stk.localPath) command.input(stk.localPath);
       }
 
-      let aOut = '0:a';
+      let aOut = '[0:a]';
 
       // 1. Audio Enhancement or Muting
       if (options.muteOriginal) {
-        filterChain.push(`[${aOut}]volume=0[Amute]`);
+        filterChain.push(`${aOut}volume=0[Amute]`);
         aOut = '[Amute]';
       } else {
         const vidVol = options.videoVolume ?? 1.0;
         if (vidVol !== 1.0) {
-          filterChain.push(`[${aOut}]volume=${vidVol}[Avol]`);
+          filterChain.push(`${aOut}volume=${vidVol}[Avol]`);
           aOut = '[Avol]';
         }
         if (options.enhanceAudio) {
-          filterChain.push(`[${aOut}]afftdn=nf=-25,dynaudnorm=f=75:g=15[Aenh]`);
+          filterChain.push(`${aOut}afftdn=nf=-25,dynaudnorm=f=75:g=15[Aenh]`);
           aOut = '[Aenh]';
         }
       }
 
       // 2. Background Music with Auto-Ducking
       if (bgMusicPath && fs.existsSync(bgMusicPath)) {
-        command.input(bgMusicPath).inputOptions(['-stream_loop', '-1']);
-        const bgIdx = brolls.length + 1;
+        const bgCmd = command.input(bgMusicPath);
+        if (options.bgMusicOptions?.trimStartSec > 0) bgCmd.seekInput(options.bgMusicOptions.trimStartSec);
+        bgCmd.inputOptions(['-stream_loop', '-1']);
+        
+        const bgIdx = inputCount++;
         
         let bgVol = options.bgMusicOptions?.volume ?? 0.1;
         filterChain.push(`[${bgIdx}:a]volume=${bgVol}[bgvol]`);
@@ -330,11 +340,11 @@ ${hookText ? `Dialogue: 1,0:00:00.00,0:00:03.00,Hook,,0,0,0,,${hookText}\n` : ''
         }
         
         if (options.audioDucking) {
-          filterChain.push(`[${aOut}]asplit=2[sc_main][sc_ref]`);
+          filterChain.push(`${aOut}asplit=2[sc_main][sc_ref]`);
           filterChain.push(`${bgOut}[sc_ref]sidechaincompress=threshold=0.08:ratio=4:attack=5:release=100[Aduck]`);
           filterChain.push(`[sc_main][Aduck]amix=inputs=2:duration=first:weights=1 1[Abg]`);
         } else {
-          filterChain.push(`[${aOut}]${bgOut}amix=inputs=2:duration=first:weights=1 1[Abg]`);
+          filterChain.push(`${aOut}${bgOut}amix=inputs=2:duration=first:weights=1 1[Abg]`);
         }
         
         aOut = '[Abg]';
@@ -347,7 +357,7 @@ ${hookText ? `Dialogue: 1,0:00:00.00,0:00:03.00,Hook,,0,0,0,,${hookText}\n` : ''
           const pops = options.textLayers.filter(t => t.startMs > 0 && t.startMs < durationSec * 1000).slice(0, 10);
           if (pops.length > 0) {
             command.input(popPath);
-            const popIdx = brolls.length + (bgMusicPath && fs.existsSync(bgMusicPath) ? 2 : 1);
+            const popIdx = inputCount++;
             
             let sfxGraph = `[${popIdx}:a]asplit=${pops.length}`;
             for (let i = 0; i < pops.length; i++) sfxGraph += `[pop${i}]`;
@@ -359,7 +369,7 @@ ${hookText ? `Dialogue: 1,0:00:00.00,0:00:03.00,Hook,,0,0,0,,${hookText}\n` : ''
               delayOuts.push(`[dpop${i}]`);
             }
             
-            filterChain.push(`[${aOut}]${delayOuts.join('')}amix=inputs=${pops.length + 1}:duration=first[Asfx]`);
+            filterChain.push(`${aOut}${delayOuts.join('')}amix=inputs=${pops.length + 1}:duration=first[Asfx]`);
             aOut = '[Asfx]';
           }
         }

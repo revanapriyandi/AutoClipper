@@ -1,6 +1,7 @@
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Music, Volume2, Trash2, Plus } from 'lucide-react';
 import { EditState } from '../types';
 
@@ -99,6 +100,16 @@ export function AudioPanel({ edit, setEdit, api }: AudioPanelProps) {
                   className="accent-primary" />
                 <span className="text-xs text-white/60">Fade Out</span>
               </label>
+            </div>
+            
+            <div className="border-t border-white/10 pt-3 mt-1 flex items-center justify-between">
+              <span className="text-xs text-white/60">Start Offset (s)</span>
+              <Input 
+                type="number" min="0" step="0.1" 
+                value={edit.audioTrack.trimStartSec || 0}
+                onChange={e => setEdit(p => ({ ...p, audioTrack: p.audioTrack ? { ...p.audioTrack, trimStartSec: Number(e.target.value) || 0 } : null }))}
+                className="w-16 h-6 text-xs bg-black/50 border-white/10 px-1 text-center" 
+              />
             </div>
           </div>
         ) : (

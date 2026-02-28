@@ -21,6 +21,7 @@ export interface AudioTrack {
   volume: number; // 0-1
   fadeIn: boolean;
   fadeOut: boolean;
+  trimStartSec?: number;
 }
 
 export interface BRollLayer {

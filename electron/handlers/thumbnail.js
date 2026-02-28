@@ -158,10 +158,11 @@ async function overlayTextOnFrame(inputPath, outputPath, text, options = {}) {
   const outline = options.outlineColor || 'black';
   
   // Note: For native Windows compatibility when passing custom fonts, we assume Arial fallback if not absolute path
-  let fontPath = '/Windows/Fonts/arialbd.ttf';
+  let fontPath = 'C:\\Windows\\Fonts\\arial.ttf';
   if (options.fontFamily && fs.existsSync(options.fontFamily)) {
-     fontPath = options.fontFamily.replace(/\\/g, '/'); // FFmpeg needs forward slashes even on Windows
+     fontPath = options.fontFamily;
   }
+  const escapedFontPath = fontPath.replace(/\\/g, '/').replace(/:/g, '\\:');
 
   await new Promise((resolve, reject) => {
     ffmpeg(inputPath)
@@ -172,7 +173,7 @@ async function overlayTextOnFrame(inputPath, outputPath, text, options = {}) {
         `fontsize=52:fontcolor=${color}:` +
         `shadowcolor=${outline}:shadowx=3:shadowy=3:` +
         `x=(w-text_w)/2:y=h-th-40:` +
-        `fontfile='${fontPath}'`,
+        `fontfile='${escapedFontPath}'`,
         '-frames:v', '1',
         '-q:v', '2',
       ])
@@ -249,10 +250,10 @@ ipcMain.handle('thumbnail:generateAI', async (_, { sourcePath, startMs, endMs, c
             });
             const cleanBuf = fs.readFileSync(cleanPath);
             const textBuf = fs.readFileSync(textPath);
-            
             variants.push({
                 cleanDataUrl: `data:image/jpeg;base64,${cleanBuf.toString('base64')}`,
                 textDataUrl: `data:image/jpeg;base64,${textBuf.toString('base64')}`,
+                dataUrl: `data:image/jpeg;base64,${textBuf.toString('base64')}` // Provide dataUrl for frontend
             });
         } catch (e) {
             console.warn("Text overlay failed for frame", i, e.message);
@@ -260,6 +261,7 @@ ipcMain.handle('thumbnail:generateAI', async (_, { sourcePath, startMs, endMs, c
             variants.push({
                 cleanDataUrl: `data:image/jpeg;base64,${cleanBuf.toString('base64')}`,
                 textDataUrl: "", // Failed text composite
+                dataUrl: ""
             });
         }
     }

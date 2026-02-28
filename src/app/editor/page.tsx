@@ -52,6 +52,7 @@ function EditorInner() {
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState('');
+  const [exportQuality, setExportQuality] = useState<'high' | 'medium' | 'fast'>('medium');
   const [showMultiExport, setShowMultiExport] = useState(false);
   const [showThumbnail, setShowThumbnail] = useState(false);
   const [waveformUrl, setWaveformUrl] = useState<string | null>(null);
@@ -340,6 +341,7 @@ function EditorInner() {
       style: { font: 'Arial', primaryColor: '&H00FFFFFF', outlineColor: '&H00000000', alignment: 2, marginV: 120 },
       brandKit: defaultKit,
       stickers: edit.stickers,
+      quality: exportQuality,
     };
 
     const res = await api.enqueueJob('RENDER', payload);
@@ -393,6 +395,7 @@ function EditorInner() {
       style: { font: 'Arial', primaryColor: '&H00FFFFFF', outlineColor: '&H00000000', alignment: 2, marginV: 120 },
       brandKit: defaultKit,
       stickers: edit.stickers,
+      quality: exportQuality,
     };
 
     const res = await api.enqueueJob('RENDER_MULTILINGUAL', { basePayload, targetLanguages, enableDubbing });
@@ -440,8 +443,17 @@ function EditorInner() {
             </Button>
           ))}
           <div className="h-4 w-px bg-white/20 mx-1" />
+          <select 
+            className="text-xs bg-[#1c1c1c] border border-white/20 rounded-md px-2 py-1 outline-none focus:border-primary/50 text-white/80 h-8"
+            value={exportQuality}
+            onChange={e => setExportQuality(e.target.value as 'high'|'medium'|'fast')}
+          >
+            <option value="high">High Quality</option>
+            <option value="medium">Medium</option>
+            <option value="fast">Fast (Proxy)</option>
+          </select>
           <Button
-            size="sm" className="bg-amber-600 hover:bg-amber-500 gap-1.5"
+            size="sm" className="bg-amber-600 hover:bg-amber-500 gap-1.5 ml-1"
             onClick={() => setShowMultiExport(true)} disabled={exporting}
           >
             <Globe className="h-4 w-4" />
