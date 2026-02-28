@@ -10,23 +10,19 @@
 import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
 import {
-  ArrowLeft, Play, Pause, SkipBack, SkipForward, Scissors, Volume2,
-  VolumeX, Type, Music, Palette, Layers, Zap, FlipHorizontal,
-  FlipVertical, RotateCcw, Undo2, Redo2, Download, Clapperboard, Globe, Image as ImageIcon
+  ArrowLeft, Play, Pause, SkipBack, SkipForward, Palette, Zap, FlipHorizontal,
+  FlipVertical, RotateCcw, Undo2, Redo2, Download, Clapperboard, Globe
 } from 'lucide-react';
 
-import { TextPanel } from './components/TextPanel';
-import { ColorPanel } from './components/ColorPanel';
-import { AudioPanel } from './components/AudioPanel';
-import { EffectsPanel } from './components/EffectsPanel';
-import { TransitionsPanel } from './components/TransitionsPanel';
-import { KeyframePanel } from './components/KeyframePanel';
-import { ImagePanel } from './components/ImagePanel';
 import { MultiExportModal } from './components/MultiExportModal';
 import { ThumbnailModal } from './components/ThumbnailModal';
-import { EditState, ColorFilter, DEFAULT_COLOR, generateId, msToTime } from './types';
+import { EditState, ColorFilter, DEFAULT_COLOR, generateId, msToTime, TimelineData, Track, VideoClip } from './types';
+import { ResizablePanelGroup } from './components/ResizablePanel';
+import { PreviewEngine } from './components/PreviewEngine';
+import { MultiTrackTimeline } from './components/MultiTrackTimeline';
+import { AIToolsPanel } from './components/AIToolsPanel';
+import { TrackPropertiesPanel } from './components/TrackPropertiesPanel';
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
@@ -43,10 +39,8 @@ function EditorInner() {
   const initEnd    = parseInt(params.get('endMs')   || '60000', 10);
 
   const videoRef   = useRef<HTMLVideoElement>(null);
-  const audioRef   = useRef<HTMLAudioElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const [videoUrl, setVideoUrl] = useState<string>('');
-  const [audioUrl, setAudioUrl] = useState<string>('');
   const [currentTime, setCurrentTime] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -55,15 +49,51 @@ function EditorInner() {
   const [exportQuality, setExportQuality] = useState<'high' | 'medium' | 'fast'>('medium');
   const [showMultiExport, setShowMultiExport] = useState(false);
   const [showThumbnail, setShowThumbnail] = useState(false);
-  const [waveformUrl, setWaveformUrl] = useState<string | null>(null);
-  const [activePanel, setActivePanel] = useState<'text' | 'audio' | 'color' | 'effects' | 'transitions' | 'keyframes' | 'image' | null>('color');
+  const [activePanel, setActivePanel] = useState<'ai' | 'text' | 'audio' | 'color' | 'effects' | 'transitions' | 'keyframes' | 'image' | null>('color');
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
-  const [draggingHandle, setDraggingHandle] = useState<'in' | 'out' | null>(null);
 
   // Undo/Redo history
   const historyRef = useRef<EditState[]>([]);
   const historyIndexRef = useRef(-1);
 
+  const [timeline, setTimeline] = useState<TimelineData>(() => {
+    // Basic migration from old EditState to new TimelineData
+    const duration = initEnd - initStart;
+
+    const initialVideoClip: VideoClip = {
+      id: `clip_${generateId()}`,
+      type: 'video',
+      trackId: `trk_${generateId()}`,
+      timelineStartMs: 0,
+      timelineEndMs: duration,
+      mediaStartMs: initStart,
+      mediaEndMs: initEnd,
+      sourcePath: sourcePath,
+      name: 'Main Video',
+      scale: 1.0,
+      x: 50, y: 50, rotation: 0, flipH: false, flipV: false,
+      speed: 1, volume: 1, muted: false,
+      colorFilter: { ...DEFAULT_COLOR },
+      keyframes: [], transition: 'none'
+    };
+
+    const videoTrack: Track = {
+      id: initialVideoClip.trackId,
+      type: 'video',
+      name: 'Video 1',
+      clips: [initialVideoClip],
+      locked: false, muted: false, hidden: false
+    };
+
+    return {
+      id: generateId(),
+      durationMs: duration || 60000,
+      tracks: [videoTrack],
+      format: '9:16'
+    };
+  });
+
+  // Keep old edit state around for legacy panels until they are migrated
   const [edit, setEditRaw] = useState<EditState>({
     startMs: initStart,
     endMs:   initEnd,
@@ -111,20 +141,19 @@ function EditorInner() {
 
   // ── Load video ────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!sourcePath || !api) { setLoading(false); return; }
+    if (!api) {
+        // Fallback for web environment when testing without Electron API
+        setVideoUrl('');
+        setLoading(false);
+        return;
+    }
+    if (!sourcePath) { setLoading(false); return; }
     api.readVideoAsDataUrl(sourcePath).then(res => {
       if (res?.success && res.dataUrl) {
         setVideoUrl(res.dataUrl);
       }
       setLoading(false);
-    });
-    
-    // Fetch Waveform
-    if (api.getWaveform) {
-      api.getWaveform(sourcePath, 800, 100).then((res: { success: boolean; dataUrl?: string }) => {
-        if (res?.success && res.dataUrl) setWaveformUrl(res.dataUrl);
-      }).catch((e: Error) => console.error("Waveform error:", e));
-    }
+    }).catch(() => setLoading(false));
   }, [sourcePath, api]);
 
   useEffect(() => {
@@ -134,150 +163,45 @@ function EditorInner() {
     }
   }, [videoUrl, initStart]);
 
-  // Load bg audio
   useEffect(() => {
-    if (edit.audioTrack?.path && api?.readVideoAsDataUrl) {
-      api.readVideoAsDataUrl(edit.audioTrack.path).then(res => {
-         if (res?.success && res.dataUrl) setAudioUrl(res.dataUrl);
-      });
-    } else {
-      setAudioUrl('');
-    }
-  }, [edit.audioTrack?.path, api]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const handleClipSelected = (e: any) => setSelectedLayerId(e.detail.id);
+      window.addEventListener('editor-clip-selected', handleClipSelected);
+      return () => window.removeEventListener('editor-clip-selected', handleClipSelected);
+  }, []);
 
   // Sync playback
   useEffect(() => {
-    const v = videoRef.current; if (!v) return;
-    const onTime = () => {
-      const absMs = v.currentTime * 1000;
-      const relMs = absMs - edit.startMs;
-      setCurrentTime(Math.max(0, relMs));
-      
-      const a = audioRef.current;
-      if (a && !a.paused && Math.abs(a.currentTime - v.currentTime) > 0.3) {
-          a.currentTime = v.currentTime;
-      }
+    let animationFrameId: number;
+    let lastTime = performance.now();
 
-      if (absMs >= edit.endMs / edit.speed) {
-        v.pause(); if (a) a.pause();
-        setPlaying(false);
-        v.currentTime = edit.startMs / 1000;
-        if (a) a.currentTime = edit.startMs / 1000;
-        setCurrentTime(0);
-      }
+    const loop = (now: number) => {
+        if (playing) {
+            const deltaMs = now - lastTime;
+            setCurrentTime(prev => {
+                const nextTime = prev + deltaMs;
+                if (nextTime >= timeline.durationMs) {
+                    setPlaying(false);
+                    return 0; // Loop or stop
+                }
+                return nextTime;
+            });
+        }
+        lastTime = now;
+        animationFrameId = requestAnimationFrame(loop);
     };
-    v.addEventListener('timeupdate', onTime);
-    return () => { v.removeEventListener('timeupdate', onTime); };
-  }, [edit.startMs, edit.endMs, edit.speed]);
 
-  // Apply playback speed
-  useEffect(() => {
-    if (videoRef.current) videoRef.current.playbackRate = edit.speed;
-    if (audioRef.current) audioRef.current.playbackRate = edit.speed;
-  }, [edit.speed]);
+    animationFrameId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [playing, timeline.durationMs]);
 
-  // Apply video volume & muteOriginal
-  useEffect(() => {
-    if (videoRef.current) {
-        videoRef.current.volume = edit.muteOriginal ? 0 : edit.videoVolume;
-    }
-  }, [edit.videoVolume, edit.muteOriginal]);
+  const togglePlay = () => setPlaying(prev => !prev);
+  const seekTo = (ms: number) => setCurrentTime(ms);
 
-  // Apply audio track volume
-  useEffect(() => {
-    if (audioRef.current && edit.audioTrack) {
-        audioRef.current.volume = edit.audioTrack.volume;
-    }
-  }, [edit.audioTrack, edit.audioTrack?.volume]);
-
-  const togglePlay = () => {
-    const v = videoRef.current; if (!v) return;
-    const a = audioRef.current;
-    if (playing) { 
-        v.pause(); if (a) a.pause();
-        setPlaying(false); 
-    }
-    else { 
-        v.play(); if (a) a.play();
-        setPlaying(true); 
-    }
-  };
-
-  const seekTo = (ms: number) => {
-    const v = videoRef.current; if (!v) return;
-    v.currentTime = (edit.startMs + ms) / 1000;
-    if (audioRef.current) audioRef.current.currentTime = (edit.startMs + ms) / 1000;
-    setCurrentTime(ms);
-  };
-
-  // ── Timeline drag ─────────────────────────────────────────────────────────
-
-  const handleTimelineDrag = useCallback((e: React.MouseEvent | React.PointerEvent) => {
-    const tl = timelineRef.current; if (!tl || !draggingHandle) return;
-    e.preventDefault();
-    const rect = tl.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const rawMs = initStart + ratio * (initEnd - initStart);
-    setEditRaw(prev => {
-      if (draggingHandle === 'in') {
-        return { ...prev, startMs: Math.min(rawMs, prev.endMs - 500) };
-      } else {
-        return { ...prev, endMs: Math.max(rawMs, prev.startMs + 500) };
-      }
-    });
-  }, [draggingHandle, initStart, initEnd]);
-
-  const stopDrag = useCallback(() => {
-    if (draggingHandle) {
-      setEdit(prev => ({ ...prev })); // commit to history
-      setDraggingHandle(null);
-    }
-  }, [draggingHandle, setEdit]);
-
-
-  const previewFilter = (() => {
-    const c = edit.colorFilter;
-    const b = 1 + c.brightness;
-    const con = 1 + c.contrast;
-    const sat = 1 + c.saturation;
-    const temp = c.temperature;
-    const sepiaAmount = temp > 0 ? temp / 200 : 0;
-    return `brightness(${b}) contrast(${con}) saturate(${sat}) hue-rotate(${c.hue}deg) sepia(${sepiaAmount * 0.3})`;
-  })();
-
-  const previewTransform = (() => {
-    const parts: string[] = [];
-    if (edit.flipH) parts.push('scaleX(-1)');
-    if (edit.flipV) parts.push('scaleY(-1)');
-    if (edit.rotate) parts.push(`rotate(${edit.rotate}deg)`);
-
-    // Keyframes interpolation
-    let currentZoom = 1;
-    let currentPanX = 0;
-    let currentPanY = 0;
-
-    for (const kf of edit.keyframes) {
-      if (currentTime >= kf.startMs && currentTime <= kf.endMs) {
-        const progress = (currentTime - kf.startMs) / (kf.endMs - kf.startMs);
-        currentZoom = kf.zoomBase + progress * (kf.zoomTarget - kf.zoomBase);
-        currentPanX = kf.panX; // currently static pan in FFmpeg setup
-        currentPanY = kf.panY;
-        break; // apply first matching
-      } else if (currentTime > kf.endMs) {
-         currentZoom = kf.zoomTarget; // hold last frame if past it
-      }
-    }
-
-    if (currentZoom !== 1 || currentPanX !== 0 || currentPanY !== 0) {
-       parts.push(`translate(${currentPanX}%, ${currentPanY}%)`);
-       parts.push(`scale(${currentZoom})`);
-    }
-
-    return parts.join(' ') || 'none';
-  })();
-
-  // ── Active text layer ─────────────────────────────────────────────────────
-  const visibleLayers = edit.textLayers.filter(l => l.visible && currentTime >= l.startMs && currentTime <= l.endMs);
+  // Suppress warnings: Legacy state variables not used by multi-track timeline right now,
+  // but kept for future migration reference
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _tlRef = timelineRef;
 
   // ── Build FFmpeg color filter string ─────────────────────────────────────
   function buildFfmpegColorFilter(c: ColorFilter): string {
@@ -300,49 +224,64 @@ function EditorInner() {
   }
 
   // ── Export ────────────────────────────────────────────────────────────────
+  const prepareExportPayload = async () => {
+    if (!api) return null;
+    const wsRes = await api.dbGetWorkspaces();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const defaultKit = (wsRes?.workspaces as any[])?.[0]?.kits?.[0];
+
+    // Extract text clips for the old payload structure (backward compatibility for rendering)
+    const textClips = timeline.tracks.filter(t => t.type === 'text').flatMap(t => t.clips) as import('./types').TextClip[];
+    const segments = textClips.map(l => ({
+      start: l.timelineStartMs / 1000,
+      end:   l.timelineEndMs / 1000,
+      text:  l.text,
+      words: [],
+    }));
+
+    // Find main video clip to drive legacy backend parameters
+    const videoTracks = timeline.tracks.filter(t => t.type === 'video');
+    const firstVideoClip = videoTracks[0]?.clips[0] as VideoClip | undefined;
+
+    return {
+      jobId: `editor_${generateId()}`,
+      sourcePath: firstVideoClip?.sourcePath || sourcePath,
+      startMs: firstVideoClip?.mediaStartMs || 0,
+      endMs:   firstVideoClip?.mediaEndMs || timeline.durationMs,
+      timeline: timeline, // Pass full multi-track timeline for advanced rendering
+      segments, // Legacy support
+      format: timeline.format,
+      isVerticalTarget: timeline.format === '9:16' || timeline.format === '4:5',
+      speed: firstVideoClip?.speed || 1,
+      flipH: firstVideoClip?.flipH || false,
+      flipV: firstVideoClip?.flipV || false,
+      rotate: firstVideoClip?.rotation || 0,
+      colorFilterString: firstVideoClip ? buildFfmpegColorFilter(firstVideoClip.colorFilter) : '',
+      videoVolume: firstVideoClip?.volume ?? 1,
+      muteOriginal: firstVideoClip?.muted ?? false,
+      brandKit: defaultKit,
+      quality: exportQuality,
+
+      // Fallbacks for legacy payload shape
+      bgMusicPath: null,
+      bgMusicOptions: null,
+      sfxEnabled: false,
+      enhanceAudio: false,
+      audioDucking: true,
+      keyframes: firstVideoClip?.keyframes || [],
+      brollLayers: [],
+      stickers: timeline.tracks.filter(t => t.type === 'sticker').flatMap(t => t.clips),
+      style: { font: 'Arial', primaryColor: '&H00FFFFFF', outlineColor: '&H00000000', alignment: 2, marginV: 120 },
+    };
+  };
+
   const handleExport = async () => {
     if (!api?.enqueueJob) return;
     setExporting(true);
     setExportStatus('⏳ Mengirim ke antrian render...');
 
-    const segments = edit.textLayers.map(l => ({
-      start: (edit.startMs + l.startMs) / 1000,
-      end:   (edit.startMs + l.endMs)   / 1000,
-      text:  l.text,
-      words: [],
-    }));
-
-    const wsRes = await api.dbGetWorkspaces();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const defaultKit = (wsRes?.workspaces as any[])?.[0]?.kits?.[0]; // Auto-apply first found brand kit globally 
-
-    const payload = {
-      jobId: `editor_${generateId()}`,
-      sourcePath,
-      startMs: edit.startMs,
-      endMs:   edit.endMs,
-      segments,
-      format: edit.format,
-      isVerticalTarget: edit.format === '9:16' || edit.format === '4:5',
-      bgMusicPath: edit.audioTrack?.path || null,
-      bgMusicOptions: edit.audioTrack || null,
-      speed: edit.speed,
-      flipH: edit.flipH,
-      flipV: edit.flipV,
-      rotate: edit.rotate,
-      colorFilterString: buildFfmpegColorFilter(edit.colorFilter),
-      videoVolume: edit.videoVolume,
-      muteOriginal: edit.muteOriginal,
-      sfxEnabled: edit.sfxEnabled,
-      enhanceAudio: edit.enhanceAudio,
-      audioDucking: edit.audioDucking,
-      keyframes: edit.keyframes,
-      brollLayers: edit.brollLayers,
-      style: { font: 'Arial', primaryColor: '&H00FFFFFF', outlineColor: '&H00000000', alignment: 2, marginV: 120 },
-      brandKit: defaultKit,
-      stickers: edit.stickers,
-      quality: exportQuality,
-    };
+    const payload = await prepareExportPayload();
+    if (!payload) return;
 
     const res = await api.enqueueJob('RENDER', payload);
     if (res?.success) {
@@ -359,44 +298,8 @@ function EditorInner() {
     setShowMultiExport(false);
     setExportStatus(`⏳ Mengirim tugas Multi-Bahasa (${targetLanguages.length} bahasa) ke antrian...`);
 
-    const segments = edit.textLayers.map(l => ({
-      start: (edit.startMs + l.startMs) / 1000,
-      end:   (edit.startMs + l.endMs)   / 1000,
-      text:  l.text,
-      words: [],
-    }));
-
-    const wsRes = await api.dbGetWorkspaces();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const defaultKit = (wsRes?.workspaces as any[])?.[0]?.kits?.[0];
-
-    const basePayload = {
-      jobId: `editor_m_${generateId()}`,
-      sourcePath,
-      startMs: edit.startMs,
-      endMs: edit.endMs,
-      segments,
-      format: edit.format,
-      isVerticalTarget: edit.format === '9:16' || edit.format === '4:5',
-      bgMusicPath: edit.audioTrack?.path || null,
-      bgMusicOptions: edit.audioTrack || null,
-      speed: edit.speed,
-      flipH: edit.flipH,
-      flipV: edit.flipV,
-      rotate: edit.rotate,
-      colorFilterString: buildFfmpegColorFilter(edit.colorFilter),
-      videoVolume: edit.videoVolume,
-      muteOriginal: edit.muteOriginal,
-      sfxEnabled: edit.sfxEnabled,
-      enhanceAudio: edit.enhanceAudio,
-      audioDucking: edit.audioDucking,
-      keyframes: edit.keyframes,
-      brollLayers: edit.brollLayers,
-      style: { font: 'Arial', primaryColor: '&H00FFFFFF', outlineColor: '&H00000000', alignment: 2, marginV: 120 },
-      brandKit: defaultKit,
-      stickers: edit.stickers,
-      quality: exportQuality,
-    };
+    const basePayload = await prepareExportPayload();
+    if (!basePayload) return;
 
     const res = await api.enqueueJob('RENDER_MULTILINGUAL', { basePayload, targetLanguages, enableDubbing });
     if (res?.success) {
@@ -503,20 +406,17 @@ function EditorInner() {
 
       {/* ── BODY ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
+        <ResizablePanelGroup direction="horizontal" initialSizes={[7, 73, 20]}>
 
         {/* LEFT TOOL SIDEBAR */}
-        <aside className="w-14 bg-[#1c1c1c] border-r border-white/10 flex flex-col items-center py-3 gap-1 shrink-0">
+        <aside className="w-full h-full bg-[#1c1c1c] border-r border-white/10 flex flex-col items-center py-3 gap-1 shrink-0 overflow-y-auto overflow-x-hidden">
           {([
-            { icon: <Palette />,     panel: 'color',       label: 'Color' },
-            { icon: <ImageIcon />,   panel: 'image',       label: 'AI Image' },
-            { icon: <Type />,        panel: 'text',        label: 'Text' },
-            { icon: <Music />,       panel: 'audio',       label: 'Audio' },
-            { icon: <Layers />,      panel: 'effects',     label: 'Effects' },
-            { icon: <Zap />,         panel: 'transitions', label: 'Transitions' },
+            { icon: <Zap />,         panel: 'ai',          label: 'AI Tools' },
+            { icon: <Palette />,     panel: 'color',       label: 'Properties' },
           ] as const).map(({ icon, panel, label }) => (
             <button
               key={panel}
-              onClick={() => setActivePanel(activePanel === panel ? null : panel)}
+              onClick={() => setActivePanel(activePanel === panel ? null : (panel as typeof activePanel))}
               className={`flex flex-col items-center gap-0.5 p-2 rounded-lg w-10 text-[10px] transition-colors
                 ${activePanel === panel ? 'bg-primary/20 text-primary' : 'text-white/40 hover:text-white hover:bg-white/10'}`}
               title={label}
@@ -526,7 +426,8 @@ function EditorInner() {
             </button>
           ))}
 
-          <div className="mt-auto flex flex-col gap-1">
+          {/* Legacy buttons disabled/hidden for now until migrated to TimelineData */}
+          <div className="mt-auto flex flex-col gap-1 opacity-20 pointer-events-none" title="Migrating to multi-track...">
             <button
               onClick={() => setEdit(p => ({ ...p, flipH: !p.flipH }))}
               className={`p-2 rounded-lg text-[10px] flex flex-col items-center gap-0.5 
@@ -564,95 +465,23 @@ function EditorInner() {
         </aside>
 
         {/* CENTER: PREVIEW + TIMELINE */}
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 flex flex-col overflow-hidden h-full">
+         <ResizablePanelGroup direction="vertical" initialSizes={[60, 40]}>
+
+          <div className="flex flex-col flex-1 overflow-hidden">
 
           {/* VIDEO PREVIEW AREA */}
           <div className="flex-1 flex items-center justify-center bg-[#0d0d0d] p-4 overflow-hidden relative">
-            {loading && (
-              <div className="absolute inset-0 flex items-center justify-center text-white/40">
-                <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
-              </div>
-            )}
+             <PreviewEngine
+                timeline={timeline}
+                currentTime={currentTime}
+                playing={playing}
+                format={timeline.format}
+                onEnded={() => setPlaying(false)}
+             />
 
-            {/* Aspect-ratio frame */}
-            <div
-              className="relative bg-black overflow-hidden shadow-2xl"
-              style={{
-                height: '100%',
-                aspectRatio: edit.format === '9:16' ? '9/16' :
-                             edit.format === '1:1'  ? '1/1' :
-                             edit.format === '4:5'  ? '4/5' : '16/9',
-                maxWidth: '100%',
-                maxHeight: '100%',
-              }}
-            >
-              {/* Vignette overlay */}
-              {edit.colorFilter.vignette > 0 && (
-                <div
-                  className="absolute inset-0 z-10 pointer-events-none"
-                  style={{ background: `radial-gradient(ellipse at center, transparent ${50 - edit.colorFilter.vignette * 40}%, rgba(0,0,0,${edit.colorFilter.vignette * 0.8}) 100%)` }}
-                />
-              )}
-
-              <video
-                ref={videoRef}
-                className="w-full h-full object-cover"
-                style={{ filter: previewFilter, transform: previewTransform }}
-                muted={edit.muteOriginal}
-                playsInline
-              />
-
-              {audioUrl && (
-                  <audio ref={audioRef} src={audioUrl} loop={false} />
-              )}
-
-              {/* Text overlays preview */}
-              {visibleLayers.map(l => (
-                <div
-                  key={l.id}
-                  className="absolute pointer-events-none"
-                  style={{
-                    left: `${l.x}%`, top: `${l.y}%`,
-                    transform: 'translate(-50%, -50%)',
-                    fontSize: `${l.fontSize / 10}cqw`,
-                    color: l.color,
-                    backgroundColor: l.bgColor === 'transparent' ? 'transparent' : l.bgColor,
-                    fontFamily: l.fontFamily,
-                    fontWeight: l.bold ? 'bold' : 'normal',
-                    fontStyle: l.italic ? 'italic' : 'normal',
-                    textAlign: l.align,
-                    textShadow: '0 2px 8px rgba(0,0,0,0.8)',
-                    maxWidth: '90%',
-                    whiteSpace: 'pre-wrap',
-                    padding: l.bgColor !== 'transparent' ? '4px 8px' : '0',
-                    borderRadius: l.bgColor !== 'transparent' ? '4px' : '0',
-                  }}
-                >
-                  {l.text}
-                </div>
-              ))}
-
-              {/* Sticker overlays preview */}
-              {(edit.stickers || []).filter(s => {
-                const absTime = edit.startMs + currentTime;
-                return absTime >= s.startMs && absTime <= s.endMs;
-              }).map(stk => (
-                <div
-                  key={stk.id}
-                  className="absolute pointer-events-none"
-                  style={{
-                    left: `${stk.x}%`, top: `${stk.y}%`,
-                    transform: `translate(-50%, -50%) scale(${stk.scale})`,
-                    width: '30%', // Default relative width
-                  }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={stk.src} alt="Sticker" className="w-full h-auto object-contain drop-shadow-2xl" />
-                </div>
-              ))}
-
-              {/* Click-to-play overlay */}
-              {!playing && !loading && (
+             {/* Click-to-play overlay */}
+             {!playing && !loading && (
                 <button
                   onClick={togglePlay}
                   className="absolute inset-0 flex items-center justify-center z-20 cursor-pointer"
@@ -661,8 +490,7 @@ function EditorInner() {
                     <Play className="h-7 w-7 text-white fill-white" />
                   </div>
                 </button>
-              )}
-            </div>
+             )}
           </div>
 
           {/* PLAYBACK CONTROLS */}
@@ -673,171 +501,42 @@ function EditorInner() {
             <Button variant="ghost" size="icon" className="text-white" onClick={togglePlay}>
               {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
             </Button>
-            <Button variant="ghost" size="icon" className="text-white/70" onClick={() => seekTo(edit.endMs - edit.startMs)}>
+            <Button variant="ghost" size="icon" className="text-white/70" onClick={() => seekTo(timeline.durationMs)}>
               <SkipForward className="h-4 w-4" />
             </Button>
 
             <span className="text-xs font-mono text-white/60 min-w-[90px]">
-              {msToTime(currentTime)} / {msToTime(edit.endMs - edit.startMs)}
+              {msToTime(currentTime)} / {msToTime(timeline.durationMs)}
             </span>
+          </div>
 
-            {/* Speed */}
-            <div className="flex items-center gap-1.5 ml-2">
-              {[0.25, 0.5, 1, 1.5, 2, 4].map(s => (
-                <button key={s}
-                  onClick={() => setEdit(p => ({ ...p, speed: s }))}
-                  className={`px-1.5 py-0.5 rounded text-xs font-mono
-                    ${edit.speed === s ? 'bg-primary text-white' : 'text-white/40 hover:text-white'}`}
-                >
-                  {s}×
-                </button>
-              ))}
-            </div>
-
-            {/* Video Volume */}
-            <div className="flex items-center gap-1.5 ml-2 min-w-[100px]">
-              <button onClick={() => setEdit(p => ({ ...p, videoVolume: p.videoVolume > 0 ? 0 : 1 }))}>
-                {edit.videoVolume === 0 ? <VolumeX className="h-4 w-4 text-white/40" /> : <Volume2 className="h-4 w-4 text-white/60" />}
-              </button>
-              <Slider
-                value={[edit.videoVolume * 100]}
-                onValueChange={([v]) => setEdit(p => ({ ...p, videoVolume: v / 100 }))}
-                max={100} step={1} className="w-20"
-              />
-            </div>
           </div>
 
           {/* TIMELINE */}
-          <div className="bg-[#161616] border-t border-white/10 px-4 pt-3 pb-4 shrink-0">
-            <div className="text-xs text-white/30 mb-2 flex items-center gap-2">
-              <Scissors className="h-3 w-3" /> Timeline — drag handles to trim
-            </div>
-
-            {/* Main video clip bar */}
-            <div
-              ref={timelineRef}
-              className="relative h-10 bg-white/5 rounded-lg cursor-pointer overflow-visible"
-              onPointerMove={handleTimelineDrag}
-              onPointerUp={stopDrag}
-              onPointerLeave={stopDrag}
-              onClick={e => {
-                if (draggingHandle) return;
-                const rect = timelineRef.current!.getBoundingClientRect();
-                const ratio = (e.clientX - rect.left) / rect.width;
-                seekTo(ratio * (edit.endMs - edit.startMs));
-              }}
-            >
-              {/* Clip region */}
-              <div
-                className="absolute top-0 h-full bg-primary/30 border border-primary/50 rounded-lg"
-                style={{
-                  left:  `${((edit.startMs - initStart) / (initEnd - initStart)) * 100}%`,
-                  right: `${((initEnd - edit.endMs)    / (initEnd - initStart)) * 100}%`,
-                }}
-              />
-
-              {/* IN handle */}
-              <div
-                className="absolute top-0 -translate-x-1/2 h-full w-3 bg-primary cursor-ew-resize rounded-l-lg flex items-center justify-center z-10"
-                style={{ left: `${((edit.startMs - initStart) / (initEnd - initStart)) * 100}%` }}
-                onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); setDraggingHandle('in'); }}
-              >
-                <div className="w-0.5 h-4 bg-white/70 rounded" />
-              </div>
-
-              {/* OUT handle */}
-              <div
-                className="absolute top-0 translate-x-1/2 h-full w-3 bg-primary cursor-ew-resize rounded-r-lg flex items-center justify-center z-10"
-                style={{ right: `${((initEnd - edit.endMs) / (initEnd - initStart)) * 100}%` }}
-                onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); setDraggingHandle('out'); }}
-              >
-                <div className="w-0.5 h-4 bg-white/70 rounded" />
-              </div>
-
-              {/* Waveform Background Overlay */}
-              {waveformUrl && (
-                <div
-                  className="absolute inset-x-0 bottom-0 h-10 opacity-30 pointer-events-none"
-                  style={{
-                     backgroundImage: `url(${waveformUrl})`,
-                     backgroundSize: '100% 100%',
-                     backgroundRepeat: 'no-repeat',
-                     mixBlendMode: 'screen'
-                  }}
-                />
-              )}
-
-              {/* Playhead */}
-              <div
-                className="absolute top-0 h-full w-0.5 bg-red-500 z-20 pointer-events-none"
-                style={{ left: `${(currentTime / Math.max(1, edit.endMs - edit.startMs)) * 100}%`, boxShadow: '0 0 4px red' }}
-              />
-
-              {/* Text layer markers */}
-              {edit.textLayers.map(l => (
-                <div
-                  key={l.id}
-                  className="absolute top-1/2 -translate-y-1/2 h-2 rounded bg-yellow-400/70"
-                  style={{
-                    left:  `${(l.startMs / Math.max(1, edit.endMs - edit.startMs)) * 100}%`,
-                    width: `${((l.endMs - l.startMs) / Math.max(1, edit.endMs - edit.startMs)) * 100}%`,
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Duration labels */}
-            <div className="flex justify-between text-[10px] text-white/20 mt-1">
-              <span>{msToTime(initStart)}</span>
-              <span>{msToTime(initEnd)}</span>
-            </div>
-
-            {/* Audio Track Indication */}
-            {edit.audioTrack && (
-              <div className="relative h-6 mt-2 bg-primary/10 rounded overflow-hidden border border-primary/20 flex items-center shrink-0">
-                <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, var(--primary) 4px, var(--primary) 8px)' }}></div>
-                <div className="px-2 text-[10px] text-primary/80 font-mono truncate z-10 flex items-center gap-1.5 w-full">
-                  <Music className="w-3 h-3 shrink-0" />
-                  <span className="truncate">{edit.audioTrack.path.split(/[\\/]/).pop()}</span>
-                </div>
-              </div>
-            )}
+          <div className="bg-[#161616] border-t border-white/10 flex-1 overflow-y-auto">
+             <MultiTrackTimeline
+                timeline={timeline}
+                setTimeline={setTimeline}
+                currentTime={currentTime}
+                seekTo={seekTo}
+             />
           </div>
+         </ResizablePanelGroup>
         </main>
 
         {/* RIGHT PANEL */}
-        {activePanel && (
-          <aside className="w-72 bg-[#1c1c1c] border-l border-white/10 flex flex-col overflow-y-auto shrink-0">
-            {/* ── COLOR GRADING ─────────────────────────────────────────── */}
-            {activePanel === 'color' && <ColorPanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} />}
+        {activePanel ? (
+          <aside className="w-full h-full bg-[#1c1c1c] border-l border-white/10 flex flex-col overflow-y-auto shrink-0">
+            {/* ── TRACK PROPERTIES (Replaces old individual panels) ──────── */}
+            {activePanel === 'color' && <TrackPropertiesPanel timeline={timeline} setTimeline={setTimeline} selectedClipId={selectedLayerId} />}
 
-            {/* ── TEXT LAYERS ───────────────────────────────────────────── */}
-            {activePanel === 'text' && (
-              <TextPanel
-                edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>}
-                currentTime={currentTime}
-                selectedLayerId={selectedLayerId} setSelectedLayerId={setSelectedLayerId}
-              />
-            )}
+            {/* ── AI TOOLS ──────────────────────────────────────────────── */}
+            {activePanel === 'ai' && <AIToolsPanel timeline={timeline} setTimeline={setTimeline} sourcePath={sourcePath} />}
 
-            {/* ── AUDIO ─────────────────────────────────────────────────── */}
-            {activePanel === 'audio' && <AudioPanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} api={api || null} />}
-
-            {/* ── EFFECTS ───────────────────────────────────────────────── */}
-            {activePanel === 'effects' && <EffectsPanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} />}
-
-            {/* ── TRANSITIONS ───────────────────────────────────────────── */}
-            {activePanel === 'transitions' && (
-              <TransitionsPanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} handleExport={handleExport} exporting={exporting} />
-            )}
-
-            {/* ── KEYFRAMES ─────────────────────────────────────────────── */}
-            {activePanel === 'keyframes' && <KeyframePanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} currentTime={currentTime} />}
-
-            {/* ── AI IMAGE ──────────────────────────────────────────────── */}
-            {activePanel === 'image' && <ImagePanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} />}
+            {/* Legacy panels intentionally removed from render to avoid interacting with orphaned state. */}
           </aside>
-        )}
+        ) : <div />}
+        </ResizablePanelGroup>
       </div>
     </div>
   );

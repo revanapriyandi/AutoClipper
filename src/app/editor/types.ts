@@ -1,3 +1,89 @@
+export type TrackType = 'video' | 'audio' | 'text' | 'sticker' | 'effect';
+
+export interface BaseClip {
+  id: string;
+  type: TrackType;
+  trackId: string;
+
+  // Timeline positioning
+  timelineStartMs: number;
+  timelineEndMs: number;
+
+  // Used for Video/Audio clips (trimming the source media)
+  mediaStartMs?: number;
+  mediaEndMs?: number;
+
+  // Base properties
+  name?: string;
+  sourcePath?: string;
+  locked?: boolean;
+}
+
+export interface VideoClip extends BaseClip {
+  type: 'video';
+  // Visual transformations
+  scale: number;    // 1.0 = 100%
+  x: number;        // 0-100%
+  y: number;        // 0-100%
+  rotation: number;
+  flipH: boolean;
+  flipV: boolean;
+
+  // Playback
+  speed: number;
+  volume: number;   // 0-1
+  muted: boolean;
+
+  // Coloring
+  colorFilter: ColorFilter;
+
+  // Animation/Effects
+  keyframes: KeyframeData[];
+  transition: 'none' | 'fade' | 'wipe' | 'zoom';
+}
+
+export interface AudioClip extends BaseClip {
+  type: 'audio';
+  volume: number;   // 0-1
+  speed: number;
+  fadeInMs: number;
+  fadeOutMs: number;
+  muted: boolean;
+}
+
+export interface TextClip extends BaseClip {
+  type: 'text';
+  text: string;
+  fontSize: number;
+  color: string;
+  bgColor: string;
+  fontFamily: string;
+  bold: boolean;
+  italic: boolean;
+  align: 'left' | 'center' | 'right';
+  x: number; // 0-100%
+  y: number; // 0-100%
+  animation: 'none' | 'fade' | 'slide_up' | 'typewriter';
+}
+
+export interface StickerClip extends BaseClip {
+  type: 'sticker';
+  src: string;
+  scale: number;
+  x: number; // 0-100%
+  y: number; // 0-100%
+}
+
+export interface StickerLayer {
+  id: string;
+  src: string;
+  x: number; // 0-100%
+  y: number; // 0-100%
+  scale: number; // 1.0 = 100%
+  startMs: number;
+  endMs: number;
+}
+
 export interface TextLayer {
   id: string;
   text: string;
@@ -16,14 +102,6 @@ export interface TextLayer {
   animation: 'none' | 'fade' | 'slide_up' | 'typewriter';
 }
 
-export interface AudioTrack {
-  path: string;
-  volume: number; // 0-1
-  fadeIn: boolean;
-  fadeOut: boolean;
-  trimStartSec?: number;
-}
-
 export interface BRollLayer {
   id: string;
   path: string;
@@ -33,14 +111,31 @@ export interface BRollLayer {
   transition: 'none' | 'fade';
 }
 
-export interface StickerLayer {
+export interface AudioTrack {
+  path: string;
+  volume: number; // 0-1
+  fadeIn: boolean;
+  fadeOut: boolean;
+  trimStartSec?: number;
+}
+
+export type Clip = VideoClip | AudioClip | TextClip | StickerClip;
+
+export interface Track {
   id: string;
-  src: string;
-  x: number; // 0-100%
-  y: number; // 0-100%
-  scale: number; // 1.0 = 100%
-  startMs: number;
-  endMs: number;
+  type: TrackType;
+  name: string;
+  clips: Clip[];
+  locked: boolean;
+  muted: boolean;
+  hidden: boolean;
+}
+
+export interface TimelineData {
+  id: string;
+  durationMs: number; // Total length of the timeline
+  tracks: Track[];
+  format: '9:16' | '16:9' | '1:1' | '4:5';
 }
 
 export interface ColorFilter {
@@ -62,6 +157,7 @@ export interface KeyframeData {
   panY: number; // 0 to 100% of visible area
 }
 
+// Deprecated (Keep for legacy migration if needed)
 export interface EditState {
   startMs: number;
   endMs: number;

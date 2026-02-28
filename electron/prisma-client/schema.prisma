@@ -160,6 +160,15 @@ model Settings {
   value String
 }
 
+model SystemLog {
+  id        String   @id @default(uuid())
+  level     String // "info" | "warn" | "error"
+  category  String // "ASR" | "Score" | "Render" | "Thumbnail" | "DB" | "App"
+  message   String
+  details   String? // Optional JSON blob
+  createdAt DateTime @default(now())
+}
+
 model AutopilotConfig {
   id                String   @id @default(uuid())
   keywords          String // e.g., "podcast clips, motivation"

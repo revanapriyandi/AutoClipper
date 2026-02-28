@@ -237,6 +237,15 @@ exports.Prisma.SettingsScalarFieldEnum = {
   value: 'value'
 };
 
+exports.Prisma.SystemLogScalarFieldEnum = {
+  id: 'id',
+  level: 'level',
+  category: 'category',
+  message: 'message',
+  details: 'details',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.AutopilotConfigScalarFieldEnum = {
   id: 'id',
   keywords: 'keywords',
@@ -296,6 +305,7 @@ exports.Prisma.ModelName = {
   ThemePreset: 'ThemePreset',
   Analytics: 'Analytics',
   Settings: 'Settings',
+  SystemLog: 'SystemLog',
   AutopilotConfig: 'AutopilotConfig',
   AutopilotHistory: 'AutopilotHistory',
   ReviewLink: 'ReviewLink'
