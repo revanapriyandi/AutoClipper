@@ -51,7 +51,7 @@ export default function HistoryPage() {
     const load = async () => {
       try {
         const api = window.electronAPI;
-        if (!api) throw new Error("Electron API not found");
+        if (!api) { console.warn("Electron API not found (Web mode)"); return; }
         const data = await api.dbGetClipHistory();
         if (data.success && data.clips) setClips(data.clips as HistoryClip[]);
       } catch (e) {

@@ -43,7 +43,7 @@ export default function DashboardPage() {
   const fetchProjects = async () => {
     try {
       const api = window.electronAPI;
-      if (!api) throw new Error("Electron API not found");
+      if (!api) { console.warn("Electron API not found (Web mode)"); return; }
       const data = await api.dbGetProjects();
       if (data.success && data.projects) setProjects(data.projects as Project[]);
     } catch (err) {
@@ -124,7 +124,7 @@ export default function DashboardPage() {
     setLoading(true); setErrorMsg("");
     try {
       const api = window.electronAPI;
-      if (!api) throw new Error("Electron API not found");
+      if (!api) { console.warn("Electron API not found (Web mode)"); return; }
       const data = await api.dbCreateProject(title, sourcePath) as { success: boolean; project?: Project; error?: string };
       if (!data.success) throw new Error(data.error || "Failed to create project");
       if (projectTags.trim() && data.project?.id) {

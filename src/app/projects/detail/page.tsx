@@ -74,7 +74,7 @@ function ProjectDetailsContent() {
     async function loadProject() {
       try {
         const api = window.electronAPI;
-        if (!api) throw new Error("Electron API not found");
+        if (!api) { console.warn("Electron API not found (Web mode)"); return; }
         if (!id) throw new Error("No Project ID provided in URL");
         const data = await api.dbGetProject(id) as { success: boolean; project?: ProjectRecord; error?: string };
         if (data.success && data.project) {
