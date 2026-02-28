@@ -11,19 +11,50 @@ datasource db {
   provider = "sqlite"
 }
 
+model Workspace {
+  id        String   @id @default(uuid())
+  name      String   @default("Default Workspace")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String? // Cloud Synchronization Tenant Identifier
+
+  kits     BrandKit[]
+  projects Project[]
+}
+
+model BrandKit {
+  id            String   @id @default(uuid())
+  workspaceId   String
+  name          String
+  fontFamily    String   @default("Arial")
+  primaryColor  String   @default("&H00FFFFFF")
+  watermarkPath String?
+  logoPath      String?
+  createdAt     DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  projects  Project[]
+}
+
 model Project {
-  id         String   @id @default(uuid())
-  title      String
-  sourcePath String
-  durationMs Int?
-  status     String   @default("DRAFT") // DRAFT, TRANSCRIBING, GENERATING, READY
-  tags       String? // Comma-separated tags e.g. "podcast,motivation"
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String   @id @default(uuid())
+  title       String
+  sourcePath  String
+  durationMs  Int?
+  status      String   @default("DRAFT") // DRAFT, TRANSCRIBING, GENERATING, READY
+  tags        String? // Comma-separated tags e.g. "podcast,motivation"
+  workspaceId String?
+  brandKitId  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
+  brandKit  BrandKit?  @relation(fields: [brandKitId], references: [id])
 
   transcripts Transcript[]
   candidates  ClipCandidate[]
   clips       Clip[]
+  reviewLinks ReviewLink[]
 }
 
 model ClipProfile {
@@ -67,9 +98,10 @@ model Clip {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  assets    Asset[]
-  analytics Analytics[]
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assets      Asset[]
+  analytics   Analytics[]
+  reviewLinks ReviewLink[]
 }
 
 model Asset {
@@ -150,4 +182,19 @@ model AutopilotHistory {
   title     String
   projectId String? // Reference to created project
   createdAt DateTime @default(now())
+}
+
+model ReviewLink {
+  id        String    @id @default(uuid())
+  projectId String
+  clipId    String?
+  cloudUrl  String // Link to Supabase bucket object
+  status    String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  comments  String?
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clip    Clip?   @relation(fields: [clipId], references: [id], onDelete: Cascade)
 }

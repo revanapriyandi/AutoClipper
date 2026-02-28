@@ -23,8 +23,8 @@ export interface CandidateGenerationOptions {
  * Finds natural boundaries (punctuation or long silences) to snap the clip cleanly.
  */
 function isBoundaryWord(word: TranscriptWord, nextWord?: TranscriptWord): boolean {
-  // Punctuation check
-  const hasPunctuation = /[.!?]/.test(word.punctuated_word);
+  // Punctuation check (including Japanese/Chinese full width punctuation)
+  const hasPunctuation = /[.!?。！？]/.test(word.punctuated_word);
   
   // Silence check (if gap between this word and next is > 0.8 seconds)
   const isSilence = nextWord ? (nextWord.start - word.end) > 0.8 : true;
@@ -62,8 +62,10 @@ export function generateCandidates(
       const endWord = allWords[endIdx];
       const durationMs = (endWord.end - startWord.start) * 1000;
 
-      if (durationMs >= minMs && durationMs <= maxMs) {
-        if (isBoundaryWord(endWord, allWords[endIdx + 1])) {
+      const isAtMaxDuration = durationMs >= maxMs;
+      const isNaturalBoundary = durationMs >= minMs && isBoundaryWord(endWord, allWords[endIdx + 1]);
+
+      if (isNaturalBoundary || isAtMaxDuration) {
           const slice = allWords.slice(currentStartIdx, endIdx + 1);
           
           // Chunk words into subtitle lines (e.g. max 5 words or 30 chars)
@@ -109,7 +111,6 @@ export function generateCandidates(
             chunks,
           });
           break; // Found a valid end for this start point
-        }
       }
 
       if (durationMs > maxMs) {

@@ -11,95 +11,24 @@ import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   ArrowLeft, Play, Pause, SkipBack, SkipForward, Scissors, Volume2,
   VolumeX, Type, Music, Palette, Layers, Zap, FlipHorizontal,
-  FlipVertical, RotateCcw, Undo2, Redo2, Download,
-  Plus, Trash2, Eye, EyeOff, AlignLeft, AlignCenter, AlignRight,
-  Clapperboard, Sparkles,
+  FlipVertical, RotateCcw, Undo2, Redo2, Download, Clapperboard, Globe, Image as ImageIcon
 } from 'lucide-react';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface TextLayer {
-  id: string;
-  text: string;
-  startMs: number;
-  endMs: number;
-  x: number; // 0-100%
-  y: number; // 0-100%
-  fontSize: number;
-  color: string;
-  bgColor: string;
-  fontFamily: string;
-  bold: boolean;
-  italic: boolean;
-  align: 'left' | 'center' | 'right';
-  visible: boolean;
-  animation: 'none' | 'fade' | 'slide_up' | 'typewriter';
-}
-
-interface AudioTrack {
-  path: string;
-  volume: number; // 0-1
-  fadeIn: boolean;
-  fadeOut: boolean;
-}
-
-interface ColorFilter {
-  brightness: number;  // -1 to 1
-  contrast: number;    // -1 to 1
-  saturation: number;  // -1 to 1
-  hue: number;         // -180 to 180
-  vignette: number;    // 0 to 1
-  temperature: number; // -100 to 100 (warm/cool)
-}
-
-interface EditState {
-  startMs: number;
-  endMs: number;
-  speed: number;
-  flipH: boolean;
-  flipV: boolean;
-  rotate: number;
-  format: '9:16' | '16:9' | '1:1' | '4:5';
-  textLayers: TextLayer[];
-  audioTrack: AudioTrack | null;
-  colorFilter: ColorFilter;
-  videoVolume: number;
-  transition: 'none' | 'fade' | 'wipe' | 'zoom';
-}
-
-const DEFAULT_COLOR: ColorFilter = {
-  brightness: 0, contrast: 0, saturation: 0, hue: 0, vignette: 0, temperature: 0,
-};
-
-const FONTS = ['Arial', 'Roboto', 'Impact', 'Georgia', 'Courier New', 'Pacifico', 'Oswald'];
-
-const PRESETS = [
-  { name: 'Original',  color: DEFAULT_COLOR },
-  { name: 'Vivid',     color: { ...DEFAULT_COLOR, saturation: 0.4, contrast: 0.2 } },
-  { name: 'Matte',     color: { ...DEFAULT_COLOR, brightness: -0.05, contrast: -0.15, saturation: -0.1 } },
-  { name: 'Cold',      color: { ...DEFAULT_COLOR, temperature: -60, saturation: 0.1 } },
-  { name: 'Warm',      color: { ...DEFAULT_COLOR, temperature: 60, brightness: 0.05 } },
-  { name: 'B&W',       color: { ...DEFAULT_COLOR, saturation: -1 } },
-  { name: 'Cinematic', color: { ...DEFAULT_COLOR, contrast: 0.25, saturation: -0.1, vignette: 0.4, temperature: -20 } },
-  { name: 'Drama',     color: { ...DEFAULT_COLOR, contrast: 0.4, brightness: -0.1, saturation: 0.2, vignette: 0.6 } },
-];
+import { TextPanel } from './components/TextPanel';
+import { ColorPanel } from './components/ColorPanel';
+import { AudioPanel } from './components/AudioPanel';
+import { EffectsPanel } from './components/EffectsPanel';
+import { TransitionsPanel } from './components/TransitionsPanel';
+import { KeyframePanel } from './components/KeyframePanel';
+import { ImagePanel } from './components/ImagePanel';
+import { MultiExportModal } from './components/MultiExportModal';
+import { ThumbnailModal } from './components/ThumbnailModal';
+import { EditState, ColorFilter, DEFAULT_COLOR, generateId, msToTime } from './types';
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
-
-function msToTime(ms: number) {
-  const s = Math.floor(ms / 1000);
-  const m = Math.floor(s / 60);
-  const sec = s % 60;
-  const cs = Math.floor((ms % 1000) / 10);
-  return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
-}
-
-function generateId() { return Math.random().toString(36).slice(2, 9); }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -114,14 +43,19 @@ function EditorInner() {
   const initEnd    = parseInt(params.get('endMs')   || '60000', 10);
 
   const videoRef   = useRef<HTMLVideoElement>(null);
+  const audioRef   = useRef<HTMLAudioElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const [videoUrl, setVideoUrl] = useState<string>('');
+  const [audioUrl, setAudioUrl] = useState<string>('');
   const [currentTime, setCurrentTime] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState('');
-  const [activePanel, setActivePanel] = useState<'text' | 'audio' | 'color' | 'effects' | 'transitions' | null>('color');
+  const [showMultiExport, setShowMultiExport] = useState(false);
+  const [showThumbnail, setShowThumbnail] = useState(false);
+  const [waveformUrl, setWaveformUrl] = useState<string | null>(null);
+  const [activePanel, setActivePanel] = useState<'text' | 'audio' | 'color' | 'effects' | 'transitions' | 'keyframes' | 'image' | null>('color');
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   const [draggingHandle, setDraggingHandle] = useState<'in' | 'out' | null>(null);
 
@@ -136,10 +70,16 @@ function EditorInner() {
     flipH: false, flipV: false, rotate: 0,
     format: '9:16',
     textLayers: [],
+    brollLayers: [],
     audioTrack: null,
     colorFilter: { ...DEFAULT_COLOR },
     videoVolume: 1,
+    muteOriginal: false,
     transition: 'none',
+    sfxEnabled: false,
+    enhanceAudio: false,
+    audioDucking: true,
+    keyframes: [],
   });
 
   // Push state to undo history
@@ -177,6 +117,13 @@ function EditorInner() {
       }
       setLoading(false);
     });
+    
+    // Fetch Waveform
+    if (api.getWaveform) {
+      api.getWaveform(sourcePath, 800, 100).then((res: { success: boolean; dataUrl?: string }) => {
+        if (res?.success && res.dataUrl) setWaveformUrl(res.dataUrl);
+      }).catch((e: Error) => console.error("Waveform error:", e));
+    }
   }, [sourcePath, api]);
 
   useEffect(() => {
@@ -186,6 +133,17 @@ function EditorInner() {
     }
   }, [videoUrl, initStart]);
 
+  // Load bg audio
+  useEffect(() => {
+    if (edit.audioTrack?.path && api?.readVideoAsDataUrl) {
+      api.readVideoAsDataUrl(edit.audioTrack.path).then(res => {
+         if (res?.success && res.dataUrl) setAudioUrl(res.dataUrl);
+      });
+    } else {
+      setAudioUrl('');
+    }
+  }, [edit.audioTrack?.path, api]);
+
   // Sync playback
   useEffect(() => {
     const v = videoRef.current; if (!v) return;
@@ -193,9 +151,17 @@ function EditorInner() {
       const absMs = v.currentTime * 1000;
       const relMs = absMs - edit.startMs;
       setCurrentTime(Math.max(0, relMs));
+      
+      const a = audioRef.current;
+      if (a && !a.paused && Math.abs(a.currentTime - v.currentTime) > 0.3) {
+          a.currentTime = v.currentTime;
+      }
+
       if (absMs >= edit.endMs / edit.speed) {
-        v.pause(); setPlaying(false);
+        v.pause(); if (a) a.pause();
+        setPlaying(false);
         v.currentTime = edit.startMs / 1000;
+        if (a) a.currentTime = edit.startMs / 1000;
         setCurrentTime(0);
       }
     };
@@ -206,22 +172,40 @@ function EditorInner() {
   // Apply playback speed
   useEffect(() => {
     if (videoRef.current) videoRef.current.playbackRate = edit.speed;
+    if (audioRef.current) audioRef.current.playbackRate = edit.speed;
   }, [edit.speed]);
 
-  // Apply video volume
+  // Apply video volume & muteOriginal
   useEffect(() => {
-    if (videoRef.current) videoRef.current.volume = edit.videoVolume;
-  }, [edit.videoVolume]);
+    if (videoRef.current) {
+        videoRef.current.volume = edit.muteOriginal ? 0 : edit.videoVolume;
+    }
+  }, [edit.videoVolume, edit.muteOriginal]);
+
+  // Apply audio track volume
+  useEffect(() => {
+    if (audioRef.current && edit.audioTrack) {
+        audioRef.current.volume = edit.audioTrack.volume;
+    }
+  }, [edit.audioTrack, edit.audioTrack?.volume]);
 
   const togglePlay = () => {
     const v = videoRef.current; if (!v) return;
-    if (playing) { v.pause(); setPlaying(false); }
-    else { v.play(); setPlaying(true); }
+    const a = audioRef.current;
+    if (playing) { 
+        v.pause(); if (a) a.pause();
+        setPlaying(false); 
+    }
+    else { 
+        v.play(); if (a) a.play();
+        setPlaying(true); 
+    }
   };
 
   const seekTo = (ms: number) => {
     const v = videoRef.current; if (!v) return;
     v.currentTime = (edit.startMs + ms) / 1000;
+    if (audioRef.current) audioRef.current.currentTime = (edit.startMs + ms) / 1000;
     setCurrentTime(ms);
   };
 
@@ -249,36 +233,7 @@ function EditorInner() {
     }
   }, [draggingHandle, setEdit]);
 
-  // ── Text layers ───────────────────────────────────────────────────────────
-  const addTextLayer = () => {
-    const layer: TextLayer = {
-      id: generateId(), text: 'Text', startMs: currentTime, endMs: currentTime + 3000,
-      x: 50, y: 80, fontSize: 48, color: '#FFFFFF', bgColor: 'transparent',
-      fontFamily: 'Arial', bold: true, italic: false, align: 'center',
-      visible: true, animation: 'fade',
-    };
-    setEdit(prev => ({ ...prev, textLayers: [...prev.textLayers, layer] }));
-    setSelectedLayerId(layer.id);
-  };
 
-  const updateLayer = (id: string, patch: Partial<TextLayer>) => {
-    setEdit(prev => ({
-      ...prev,
-      textLayers: prev.textLayers.map(l => l.id === id ? { ...l, ...patch } : l),
-    }));
-  };
-
-  const deleteLayer = (id: string) => {
-    setEdit(prev => ({ ...prev, textLayers: prev.textLayers.filter(l => l.id !== id) }));
-    setSelectedLayerId(null);
-  };
-
-  // ── Color filter helper ───────────────────────────────────────────────────
-  const updateColor = (key: keyof ColorFilter, val: number) => {
-    setEdit(prev => ({ ...prev, colorFilter: { ...prev.colorFilter, [key]: val } }));
-  };
-
-  // ── Preview CSS filter ────────────────────────────────────────────────────
   const previewFilter = (() => {
     const c = edit.colorFilter;
     const b = 1 + c.brightness;
@@ -294,11 +249,33 @@ function EditorInner() {
     if (edit.flipH) parts.push('scaleX(-1)');
     if (edit.flipV) parts.push('scaleY(-1)');
     if (edit.rotate) parts.push(`rotate(${edit.rotate}deg)`);
+
+    // Keyframes interpolation
+    let currentZoom = 1;
+    let currentPanX = 0;
+    let currentPanY = 0;
+
+    for (const kf of edit.keyframes) {
+      if (currentTime >= kf.startMs && currentTime <= kf.endMs) {
+        const progress = (currentTime - kf.startMs) / (kf.endMs - kf.startMs);
+        currentZoom = kf.zoomBase + progress * (kf.zoomTarget - kf.zoomBase);
+        currentPanX = kf.panX; // currently static pan in FFmpeg setup
+        currentPanY = kf.panY;
+        break; // apply first matching
+      } else if (currentTime > kf.endMs) {
+         currentZoom = kf.zoomTarget; // hold last frame if past it
+      }
+    }
+
+    if (currentZoom !== 1 || currentPanX !== 0 || currentPanY !== 0) {
+       parts.push(`translate(${currentPanX}%, ${currentPanY}%)`);
+       parts.push(`scale(${currentZoom})`);
+    }
+
     return parts.join(' ') || 'none';
   })();
 
   // ── Active text layer ─────────────────────────────────────────────────────
-  const selectedLayer = edit.textLayers.find(l => l.id === selectedLayerId) ?? null;
   const visibleLayers = edit.textLayers.filter(l => l.visible && currentTime >= l.startMs && currentTime <= l.endMs);
 
   // ── Build FFmpeg color filter string ─────────────────────────────────────
@@ -334,6 +311,10 @@ function EditorInner() {
       words: [],
     }));
 
+    const wsRes = await api.dbGetWorkspaces();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const defaultKit = (wsRes?.workspaces as any[])?.[0]?.kits?.[0]; // Auto-apply first found brand kit globally 
+
     const payload = {
       jobId: `editor_${generateId()}`,
       sourcePath,
@@ -343,18 +324,80 @@ function EditorInner() {
       format: edit.format,
       isVerticalTarget: edit.format === '9:16' || edit.format === '4:5',
       bgMusicPath: edit.audioTrack?.path || null,
+      bgMusicOptions: edit.audioTrack || null,
       speed: edit.speed,
       flipH: edit.flipH,
       flipV: edit.flipV,
       rotate: edit.rotate,
       colorFilterString: buildFfmpegColorFilter(edit.colorFilter),
       videoVolume: edit.videoVolume,
+      muteOriginal: edit.muteOriginal,
+      sfxEnabled: edit.sfxEnabled,
+      enhanceAudio: edit.enhanceAudio,
+      audioDucking: edit.audioDucking,
+      keyframes: edit.keyframes,
+      brollLayers: edit.brollLayers,
       style: { font: 'Arial', primaryColor: '&H00FFFFFF', outlineColor: '&H00000000', alignment: 2, marginV: 120 },
+      brandKit: defaultKit,
+      stickers: edit.stickers,
     };
 
     const res = await api.enqueueJob('RENDER', payload);
     if (res?.success) {
       setExportStatus('✅ Berhasil! Klip sedang dirender di latar belakang.');
+    } else {
+      setExportStatus('❌ Gagal: ' + (res?.error || 'Unknown error'));
+    }
+    setTimeout(() => { setExporting(false); setExportStatus(''); }, 4000);
+  };
+
+  const handleMultiExport = async (targetLanguages: string[], enableDubbing: boolean) => {
+    if (!api?.enqueueJob) return;
+    setExporting(true);
+    setShowMultiExport(false);
+    setExportStatus(`⏳ Mengirim tugas Multi-Bahasa (${targetLanguages.length} bahasa) ke antrian...`);
+
+    const segments = edit.textLayers.map(l => ({
+      start: (edit.startMs + l.startMs) / 1000,
+      end:   (edit.startMs + l.endMs)   / 1000,
+      text:  l.text,
+      words: [],
+    }));
+
+    const wsRes = await api.dbGetWorkspaces();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const defaultKit = (wsRes?.workspaces as any[])?.[0]?.kits?.[0];
+
+    const basePayload = {
+      jobId: `editor_m_${generateId()}`,
+      sourcePath,
+      startMs: edit.startMs,
+      endMs: edit.endMs,
+      segments,
+      format: edit.format,
+      isVerticalTarget: edit.format === '9:16' || edit.format === '4:5',
+      bgMusicPath: edit.audioTrack?.path || null,
+      bgMusicOptions: edit.audioTrack || null,
+      speed: edit.speed,
+      flipH: edit.flipH,
+      flipV: edit.flipV,
+      rotate: edit.rotate,
+      colorFilterString: buildFfmpegColorFilter(edit.colorFilter),
+      videoVolume: edit.videoVolume,
+      muteOriginal: edit.muteOriginal,
+      sfxEnabled: edit.sfxEnabled,
+      enhanceAudio: edit.enhanceAudio,
+      audioDucking: edit.audioDucking,
+      keyframes: edit.keyframes,
+      brollLayers: edit.brollLayers,
+      style: { font: 'Arial', primaryColor: '&H00FFFFFF', outlineColor: '&H00000000', alignment: 2, marginV: 120 },
+      brandKit: defaultKit,
+      stickers: edit.stickers,
+    };
+
+    const res = await api.enqueueJob('RENDER_MULTILINGUAL', { basePayload, targetLanguages, enableDubbing });
+    if (res?.success) {
+      setExportStatus('✅ Berhasil! Tugas Multi-Bahasa ditambahkan ke antrian.');
     } else {
       setExportStatus('❌ Gagal: ' + (res?.error || 'Unknown error'));
     }
@@ -398,6 +441,20 @@ function EditorInner() {
           ))}
           <div className="h-4 w-px bg-white/20 mx-1" />
           <Button
+            size="sm" className="bg-amber-600 hover:bg-amber-500 gap-1.5"
+            onClick={() => setShowMultiExport(true)} disabled={exporting}
+          >
+            <Globe className="h-4 w-4" />
+            Batch AI
+          </Button>
+          <Button
+            variant="outline"
+            size="sm" className="bg-indigo-600 text-white border-transparent hover:bg-indigo-500 hover:text-white"
+            onClick={() => setShowThumbnail(true)}
+          >
+             Thumbnail
+          </Button>
+          <Button
             size="sm" className="bg-primary hover:bg-primary/90 gap-1.5"
             onClick={handleExport} disabled={exporting}
           >
@@ -413,6 +470,25 @@ function EditorInner() {
         </div>
       )}
 
+      {showMultiExport && (
+         <MultiExportModal 
+            open={showMultiExport} 
+            onOpenChange={setShowMultiExport} 
+            onExport={(langs, dub) => handleMultiExport(langs, dub)} 
+         />
+      )}
+
+      {showThumbnail && (
+         <ThumbnailModal 
+            open={showThumbnail} 
+            onOpenChange={setShowThumbnail} 
+            sourcePath={sourcePath} 
+            startMs={edit.startMs} 
+            endMs={edit.endMs} 
+            clipId={`editor_${clipIndex}`} 
+         />
+      )}
+
       {/* ── BODY ─────────────────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
 
@@ -420,6 +496,7 @@ function EditorInner() {
         <aside className="w-14 bg-[#1c1c1c] border-r border-white/10 flex flex-col items-center py-3 gap-1 shrink-0">
           {([
             { icon: <Palette />,     panel: 'color',       label: 'Color' },
+            { icon: <ImageIcon />,   panel: 'image',       label: 'AI Image' },
             { icon: <Type />,        panel: 'text',        label: 'Text' },
             { icon: <Music />,       panel: 'audio',       label: 'Audio' },
             { icon: <Layers />,      panel: 'effects',     label: 'Effects' },
@@ -449,7 +526,7 @@ function EditorInner() {
             </button>
             <button
               onClick={() => setEdit(p => ({ ...p, flipV: !p.flipV }))}
-              className={`p-2 rounded-lg text-[10px] flex flex-col items-center gap-0.5 
+              className={`p-2 rounded-lg text-[10px] flex flex-col items-center gap-0.5
                 ${edit.flipV ? 'text-primary bg-primary/20' : 'text-white/40 hover:text-white'}`}
               title="Flip Vertical"
             >
@@ -463,6 +540,13 @@ function EditorInner() {
             >
               <RotateCcw className="w-4 h-4" />
               <span>Rotate</span>
+            </button>
+            <button
+              onClick={() => setActivePanel('keyframes')}
+              className={`p-2 rounded-lg text-[10px] flex flex-col items-center gap-0.5 ${activePanel === 'keyframes' ? 'bg-primary text-primary-foreground' : 'text-white/40 hover:text-white'}`}
+            >
+              <Zap className="w-4 h-4" />
+              <span>Motion</span>
             </button>
           </div>
         </aside>
@@ -502,9 +586,13 @@ function EditorInner() {
                 ref={videoRef}
                 className="w-full h-full object-cover"
                 style={{ filter: previewFilter, transform: previewTransform }}
-                muted={false}
+                muted={edit.muteOriginal}
                 playsInline
               />
+
+              {audioUrl && (
+                  <audio ref={audioRef} src={audioUrl} loop={false} />
+              )}
 
               {/* Text overlays preview */}
               {visibleLayers.map(l => (
@@ -529,6 +617,25 @@ function EditorInner() {
                   }}
                 >
                   {l.text}
+                </div>
+              ))}
+
+              {/* Sticker overlays preview */}
+              {(edit.stickers || []).filter(s => {
+                const absTime = edit.startMs + currentTime;
+                return absTime >= s.startMs && absTime <= s.endMs;
+              }).map(stk => (
+                <div
+                  key={stk.id}
+                  className="absolute pointer-events-none"
+                  style={{
+                    left: `${stk.x}%`, top: `${stk.y}%`,
+                    transform: `translate(-50%, -50%) scale(${stk.scale})`,
+                    width: '30%', // Default relative width
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={stk.src} alt="Sticker" className="w-full h-auto object-contain drop-shadow-2xl" />
                 </div>
               ))}
 
@@ -635,10 +742,23 @@ function EditorInner() {
                 <div className="w-0.5 h-4 bg-white/70 rounded" />
               </div>
 
+              {/* Waveform Background Overlay */}
+              {waveformUrl && (
+                <div
+                  className="absolute inset-x-0 bottom-0 h-10 opacity-30 pointer-events-none"
+                  style={{
+                     backgroundImage: `url(${waveformUrl})`,
+                     backgroundSize: '100% 100%',
+                     backgroundRepeat: 'no-repeat',
+                     mixBlendMode: 'screen'
+                  }}
+                />
+              )}
+
               {/* Playhead */}
               <div
-                className="absolute top-0 h-full w-0.5 bg-white z-20 pointer-events-none"
-                style={{ left: `${(currentTime / Math.max(1, edit.endMs - edit.startMs)) * 100}%` }}
+                className="absolute top-0 h-full w-0.5 bg-red-500 z-20 pointer-events-none"
+                style={{ left: `${(currentTime / Math.max(1, edit.endMs - edit.startMs)) * 100}%`, boxShadow: '0 0 4px red' }}
               />
 
               {/* Text layer markers */}
@@ -659,405 +779,51 @@ function EditorInner() {
               <span>{msToTime(initStart)}</span>
               <span>{msToTime(initEnd)}</span>
             </div>
+
+            {/* Audio Track Indication */}
+            {edit.audioTrack && (
+              <div className="relative h-6 mt-2 bg-primary/10 rounded overflow-hidden border border-primary/20 flex items-center shrink-0">
+                <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, var(--primary) 4px, var(--primary) 8px)' }}></div>
+                <div className="px-2 text-[10px] text-primary/80 font-mono truncate z-10 flex items-center gap-1.5 w-full">
+                  <Music className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{edit.audioTrack.path.split(/[\\/]/).pop()}</span>
+                </div>
+              </div>
+            )}
           </div>
         </main>
 
         {/* RIGHT PANEL */}
         {activePanel && (
           <aside className="w-72 bg-[#1c1c1c] border-l border-white/10 flex flex-col overflow-y-auto shrink-0">
-            
             {/* ── COLOR GRADING ─────────────────────────────────────────── */}
-            {activePanel === 'color' && (
-              <div className="p-4 space-y-5">
-                <h3 className="font-semibold text-sm flex items-center gap-2">
-                  <Palette className="h-4 w-4 text-primary" /> Color Grading
-                </h3>
-
-                {/* Filter Presets */}
-                <div>
-                  <Label className="text-xs text-white/50 mb-2 block">Preset</Label>
-                  <div className="grid grid-cols-4 gap-1.5">
-                    {PRESETS.map(p => (
-                      <button
-                        key={p.name}
-                        onClick={() => setEdit(prev => ({ ...prev, colorFilter: { ...p.color } }))}
-                        className="text-center rounded overflow-hidden border border-white/10 hover:border-primary transition-colors"
-                      >
-                        <div className="h-10 w-full bg-gradient-to-br from-neutral-700 to-neutral-900"
-                          style={{ filter: `brightness(${1 + p.color.brightness}) contrast(${1 + p.color.contrast}) saturate(${1 + p.color.saturation})` }} />
-                        <div className="text-[9px] text-white/60 py-1">{p.name}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Sliders */}
-                {([
-                  { key: 'brightness',  label: 'Brightness',  min: -1,   max: 1,   step: 0.01 },
-                  { key: 'contrast',    label: 'Contrast',    min: -1,   max: 1,   step: 0.01 },
-                  { key: 'saturation',  label: 'Saturation',  min: -1,   max: 1,   step: 0.01 },
-                  { key: 'hue',         label: 'Hue',         min: -180, max: 180, step: 1    },
-                  { key: 'temperature', label: 'Temperature', min: -100, max: 100, step: 1    },
-                  { key: 'vignette',    label: 'Vignette',    min: 0,    max: 1,   step: 0.01 },
-                ] as const).map(({ key, label, min, max, step }) => (
-                  <div key={key} className="space-y-1">
-                    <div className="flex justify-between items-center">
-                      <Label className="text-xs text-white/60">{label}</Label>
-                      <span className="text-xs font-mono text-white/40">
-                        {edit.colorFilter[key].toFixed(key === 'hue' || key === 'temperature' ? 0 : 2)}
-                      </span>
-                    </div>
-                    <Slider
-                      value={[edit.colorFilter[key]]}
-                      min={min} max={max} step={step}
-                      onValueChange={([v]) => updateColor(key, v)}
-                      className="w-full"
-                    />
-                  </div>
-                ))}
-
-                <Button
-                  variant="outline" size="sm" className="w-full text-xs border-white/20"
-                  onClick={() => setEdit(p => ({ ...p, colorFilter: { ...DEFAULT_COLOR } }))}
-                >
-                  <RotateCcw className="h-3 w-3 mr-1.5" /> Reset Color
-                </Button>
-              </div>
-            )}
+            {activePanel === 'color' && <ColorPanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} />}
 
             {/* ── TEXT LAYERS ───────────────────────────────────────────── */}
             {activePanel === 'text' && (
-              <div className="p-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-sm flex items-center gap-2">
-                    <Type className="h-4 w-4 text-primary" /> Text Overlays
-                  </h3>
-                  <Button size="sm" variant="outline" className="h-7 border-white/20 text-xs gap-1" onClick={addTextLayer}>
-                    <Plus className="h-3 w-3" /> Add
-                  </Button>
-                </div>
-
-                {/* Layer list */}
-                <div className="space-y-2">
-                  {edit.textLayers.length === 0 && (
-                    <p className="text-xs text-white/30 text-center py-4">Belum ada text layer. Klik Add!</p>
-                  )}
-                  {edit.textLayers.map(l => (
-                    <div
-                      key={l.id}
-                      onClick={() => setSelectedLayerId(l.id)}
-                      className={`p-2 rounded-lg border cursor-pointer transition-colors
-                        ${selectedLayerId === l.id ? 'border-primary bg-primary/10' : 'border-white/10 bg-white/5 hover:border-white/30'}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium truncate">{l.text || '(empty)'}</span>
-                        <div className="flex items-center gap-1">
-                          <button onClick={e => { e.stopPropagation(); updateLayer(l.id, { visible: !l.visible }); }}>
-                            {l.visible ? <Eye className="h-3.5 w-3.5 text-white/40" /> : <EyeOff className="h-3.5 w-3.5 text-white/20" />}
-                          </button>
-                          <button onClick={e => { e.stopPropagation(); deleteLayer(l.id); }}>
-                            <Trash2 className="h-3.5 w-3.5 text-red-400/60 hover:text-red-400" />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="text-[10px] text-white/30 mt-0.5">
-                        {msToTime(l.startMs)} → {msToTime(l.endMs)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Layer properties */}
-                {selectedLayer && (
-                  <div className="space-y-3 border-t border-white/10 pt-4">
-                    <Label className="text-xs text-white/50">Selected Layer</Label>
-
-                    <div>
-                      <Label className="text-xs text-white/40">Text</Label>
-                      <Input
-                        value={selectedLayer.text}
-                        onChange={e => updateLayer(selectedLayer.id, { text: e.target.value })}
-                        className="mt-1 bg-white/5 border-white/20 text-white text-sm"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <Label className="text-xs text-white/40">Start (ms)</Label>
-                        <Input type="number" value={selectedLayer.startMs}
-                          onChange={e => updateLayer(selectedLayer.id, { startMs: parseInt(e.target.value) || 0 })}
-                          className="mt-1 bg-white/5 border-white/20 text-white text-xs" />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-white/40">End (ms)</Label>
-                        <Input type="number" value={selectedLayer.endMs}
-                          onChange={e => updateLayer(selectedLayer.id, { endMs: parseInt(e.target.value) || 3000 })}
-                          className="mt-1 bg-white/5 border-white/20 text-white text-xs" />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <Label className="text-xs text-white/40">X (%)</Label>
-                        <Slider value={[selectedLayer.x]} min={0} max={100}
-                          onValueChange={([v]) => updateLayer(selectedLayer.id, { x: v })} />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-white/40">Y (%)</Label>
-                        <Slider value={[selectedLayer.y]} min={0} max={100}
-                          onValueChange={([v]) => updateLayer(selectedLayer.id, { y: v })} />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label className="text-xs text-white/40">Font Size</Label>
-                      <Slider value={[selectedLayer.fontSize]} min={16} max={120}
-                        onValueChange={([v]) => updateLayer(selectedLayer.id, { fontSize: v })} />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <Label className="text-xs text-white/40">Color</Label>
-                        <input type="color" value={selectedLayer.color}
-                          onChange={e => updateLayer(selectedLayer.id, { color: e.target.value })}
-                          className="mt-1 w-full h-8 rounded border border-white/20 bg-transparent cursor-pointer" />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-white/40">BG Color</Label>
-                        <input type="color" value={selectedLayer.bgColor === 'transparent' ? '#000000' : selectedLayer.bgColor}
-                          onChange={e => updateLayer(selectedLayer.id, { bgColor: e.target.value })}
-                          className="mt-1 w-full h-8 rounded border border-white/20 bg-transparent cursor-pointer" />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label className="text-xs text-white/40 mb-1 block">Font</Label>
-                      <select value={selectedLayer.fontFamily}
-                        onChange={e => updateLayer(selectedLayer.id, { fontFamily: e.target.value })}
-                        className="w-full bg-white/5 border border-white/20 rounded px-2 py-1.5 text-xs text-white">
-                        {FONTS.map(f => <option key={f} value={f}>{f}</option>)}
-                      </select>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => updateLayer(selectedLayer.id, { bold: !selectedLayer.bold })}
-                        className={`px-2 py-1 rounded text-sm font-bold border ${selectedLayer.bold ? 'border-primary text-primary' : 'border-white/20 text-white/40'}`}>
-                        B
-                      </button>
-                      <button onClick={() => updateLayer(selectedLayer.id, { italic: !selectedLayer.italic })}
-                        className={`px-2 py-1 rounded text-sm italic border ${selectedLayer.italic ? 'border-primary text-primary' : 'border-white/20 text-white/40'}`}>
-                        I
-                      </button>
-                      <div className="flex items-center gap-1 ml-auto">
-                        {[['left', <AlignLeft key="l" className="h-3 w-3" />], ['center', <AlignCenter key="c" className="h-3 w-3" />], ['right', <AlignRight key="r" className="h-3 w-3" />]].map(([a, icon]) => (
-                          <button key={String(a)} onClick={() => updateLayer(selectedLayer.id, { align: a as 'left'|'center'|'right' })}
-                            className={`p-1.5 rounded border ${selectedLayer.align === a ? 'border-primary text-primary' : 'border-white/20 text-white/40'}`}>
-                            {icon}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label className="text-xs text-white/40 mb-1 block">Animation</Label>
-                      <div className="grid grid-cols-2 gap-1.5">
-                        {(['none', 'fade', 'slide_up', 'typewriter'] as const).map(a => (
-                          <button key={a} onClick={() => updateLayer(selectedLayer.id, { animation: a })}
-                            className={`py-1 px-2 rounded text-xs border transition-colors
-                              ${selectedLayer.animation === a ? 'border-primary text-primary bg-primary/10' : 'border-white/20 text-white/40 hover:text-white'}`}>
-                            {a === 'slide_up' ? 'Slide Up' : a.charAt(0).toUpperCase() + a.slice(1)}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <TextPanel
+                edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>}
+                currentTime={currentTime}
+                selectedLayerId={selectedLayerId} setSelectedLayerId={setSelectedLayerId}
+              />
             )}
 
             {/* ── AUDIO ─────────────────────────────────────────────────── */}
-            {activePanel === 'audio' && (
-              <div className="p-4 space-y-5">
-                <h3 className="font-semibold text-sm flex items-center gap-2">
-                  <Music className="h-4 w-4 text-primary" /> Audio Mixer
-                </h3>
-
-                <div className="space-y-2">
-                  <Label className="text-xs text-white/60">Video Audio Volume</Label>
-                  <div className="flex items-center gap-2">
-                    <Volume2 className="h-4 w-4 text-white/40" />
-                    <Slider
-                      value={[edit.videoVolume * 100]}
-                      onValueChange={([v]) => setEdit(p => ({ ...p, videoVolume: v / 100 }))}
-                      max={100} step={1} className="flex-1"
-                    />
-                    <span className="text-xs font-mono text-white/40 w-8">{Math.round(edit.videoVolume * 100)}%</span>
-                  </div>
-                </div>
-
-                <div className="border-t border-white/10 pt-4 space-y-3">
-                  <Label className="text-xs text-white/60">Background Music</Label>
-                  {edit.audioTrack ? (
-                    <div className="bg-white/5 rounded-lg p-3 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Music className="h-4 w-4 text-primary" />
-                          <span className="text-xs text-white/70 truncate max-w-[140px]">
-                            {edit.audioTrack.path.split(/[\\/]/).pop()}
-                          </span>
-                        </div>
-                        <button onClick={() => setEdit(p => ({ ...p, audioTrack: null }))}>
-                          <Trash2 className="h-3.5 w-3.5 text-red-400/60 hover:text-red-400" />
-                        </button>
-                      </div>
-
-                      <div className="space-y-1">
-                        <Label className="text-xs text-white/40">Music Volume</Label>
-                        <Slider
-                          value={[edit.audioTrack.volume * 100]}
-                          onValueChange={([v]) => setEdit(p => ({
-                            ...p, audioTrack: p.audioTrack ? { ...p.audioTrack, volume: v / 100 } : null
-                          }))}
-                          max={100} step={1}
-                        />
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <label className="flex items-center gap-1.5 cursor-pointer">
-                          <input type="checkbox" checked={edit.audioTrack.fadeIn}
-                            onChange={e => setEdit(p => ({ ...p, audioTrack: p.audioTrack ? { ...p.audioTrack, fadeIn: e.target.checked } : null }))}
-                            className="accent-primary" />
-                          <span className="text-xs text-white/60">Fade In</span>
-                        </label>
-                        <label className="flex items-center gap-1.5 cursor-pointer">
-                          <input type="checkbox" checked={edit.audioTrack.fadeOut}
-                            onChange={e => setEdit(p => ({ ...p, audioTrack: p.audioTrack ? { ...p.audioTrack, fadeOut: e.target.checked } : null }))}
-                            className="accent-primary" />
-                          <span className="text-xs text-white/60">Fade Out</span>
-                        </label>
-                      </div>
-                    </div>
-                  ) : (
-                    <Button
-                      variant="outline" size="sm" className="w-full border-white/20 border-dashed text-white/40 hover:text-white"
-                      onClick={async () => {
-                        const res = await api?.openFilePicker?.([{ name: 'Audio', extensions: ['mp3','aac','wav','m4a','ogg'] }]);
-                        if (res?.success && res.filePath) {
-                          setEdit(p => ({ ...p, audioTrack: { path: res.filePath!, volume: 0.15, fadeIn: true, fadeOut: true } }));
-                        }
-                      }}
-                    >
-                      <Plus className="h-4 w-4 mr-2" /> Add Music File
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )}
+            {activePanel === 'audio' && <AudioPanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} api={api || null} />}
 
             {/* ── EFFECTS ───────────────────────────────────────────────── */}
-            {activePanel === 'effects' && (
-              <div className="p-4 space-y-5">
-                <h3 className="font-semibold text-sm flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" /> Effects
-                </h3>
-
-                <div className="space-y-2">
-                  <Label className="text-xs text-white/60">Playback Speed</Label>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4].map(s => (
-                      <button key={s}
-                        onClick={() => setEdit(p => ({ ...p, speed: s }))}
-                        className={`py-1.5 rounded text-xs font-mono border transition-colors
-                          ${edit.speed === s ? 'border-primary bg-primary/20 text-primary' : 'border-white/15 text-white/40 hover:text-white hover:border-white/30'}`}
-                      >
-                        {s}×
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="border-t border-white/10 pt-4 space-y-2">
-                  <Label className="text-xs text-white/60">Rotation</Label>
-                  <div className="grid grid-cols-4 gap-1.5">
-                    {[0, 90, 180, 270].map(r => (
-                      <button key={r}
-                        onClick={() => setEdit(p => ({ ...p, rotate: r }))}
-                        className={`py-1.5 rounded text-xs border transition-colors
-                          ${edit.rotate === r ? 'border-primary bg-primary/20 text-primary' : 'border-white/15 text-white/40 hover:text-white'}`}
-                      >
-                        {r}°
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="border-t border-white/10 pt-4 space-y-2">
-                  <Label className="text-xs text-white/60">Mirror</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => setEdit(p => ({ ...p, flipH: !p.flipH }))}
-                      className={`py-2 rounded text-xs border flex items-center justify-center gap-2 transition-colors
-                        ${edit.flipH ? 'border-primary bg-primary/20 text-primary' : 'border-white/15 text-white/40 hover:text-white'}`}
-                    >
-                      <FlipHorizontal className="h-3.5 w-3.5" /> Horizontal
-                    </button>
-                    <button
-                      onClick={() => setEdit(p => ({ ...p, flipV: !p.flipV }))}
-                      className={`py-2 rounded text-xs border flex items-center justify-center gap-2 transition-colors
-                        ${edit.flipV ? 'border-primary bg-primary/20 text-primary' : 'border-white/15 text-white/40 hover:text-white'}`}
-                    >
-                      <FlipVertical className="h-3.5 w-3.5" /> Vertical
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+            {activePanel === 'effects' && <EffectsPanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} />}
 
             {/* ── TRANSITIONS ───────────────────────────────────────────── */}
             {activePanel === 'transitions' && (
-              <div className="p-4 space-y-5">
-                <h3 className="font-semibold text-sm flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-primary" /> Transitions
-                </h3>
-                <p className="text-xs text-white/30">Select a transition to apply to the start of this clip.</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {([
-                    { key: 'none',  label: 'None',    emoji: '🚫' },
-                    { key: 'fade',  label: 'Fade In',  emoji: '🌅' },
-                    { key: 'wipe',  label: 'Wipe Left', emoji: '👈' },
-                    { key: 'zoom',  label: 'Zoom In',  emoji: '🔍' },
-                  ] as const).map(t => (
-                    <button key={t.key}
-                      onClick={() => setEdit(p => ({ ...p, transition: t.key }))}
-                      className={`py-3 px-2 rounded-lg border flex flex-col items-center gap-1.5 text-xs transition-colors
-                        ${edit.transition === t.key ? 'border-primary bg-primary/20 text-primary' : 'border-white/15 text-white/40 hover:text-white hover:border-white/30'}`}
-                    >
-                      <span className="text-xl">{t.emoji}</span>
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="border-t border-white/10 pt-4 space-y-2">
-                  <Label className="text-xs text-white/60">Format & Export</Label>
-                  <div className="space-y-1.5 rounded-lg bg-white/5 p-3 text-xs text-white/50">
-                    <div className="flex justify-between"><span>Format</span><span className="text-white font-mono">{edit.format}</span></div>
-                    <div className="flex justify-between"><span>Speed</span><span className="text-white font-mono">{edit.speed}×</span></div>
-                    <div className="flex justify-between"><span>Duration</span><span className="text-white font-mono">{msToTime(edit.endMs - edit.startMs)}</span></div>
-                    <div className="flex justify-between"><span>Text Layers</span><span className="text-white font-mono">{edit.textLayers.length}</span></div>
-                    <div className="flex justify-between"><span>Flip H/V</span><span className="text-white font-mono">{edit.flipH ? 'Yes' : 'No'} / {edit.flipV ? 'Yes' : 'No'}</span></div>
-                    <div className="flex justify-between"><span>Transition</span><span className="text-white font-mono capitalize">{edit.transition}</span></div>
-                  </div>
-
-                  <Button size="sm" className="w-full bg-primary hover:bg-primary/90 gap-2 mt-2"
-                    onClick={handleExport} disabled={exporting}>
-                    <Download className="h-4 w-4" />
-                    {exporting ? 'Rendering...' : `Export ${edit.format}`}
-                  </Button>
-                </div>
-              </div>
+              <TransitionsPanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} handleExport={handleExport} exporting={exporting} />
             )}
 
+            {/* ── KEYFRAMES ─────────────────────────────────────────────── */}
+            {activePanel === 'keyframes' && <KeyframePanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} currentTime={currentTime} />}
+
+            {/* ── AI IMAGE ──────────────────────────────────────────────── */}
+            {activePanel === 'image' && <ImagePanel edit={edit} setEdit={setEdit as React.Dispatch<React.SetStateAction<EditState>>} />}
           </aside>
         )}
       </div>

@@ -73,7 +73,7 @@ async function extractSceneFrames(sourcePath, startMs, endMs, maxFrames = 5) {
       .seekInput(startSec)
       .duration(durationSec)
       .outputOptions([
-        '-vf', `select='gt(scene\\,0.25)',scale=640:-1`,
+        '-vf', `select='eq(pict_type\\,I)'`,
         '-vsync', 'vfr',
         '-frames:v', String(maxFrames),
       ])
@@ -114,7 +114,7 @@ async function extractSceneFrames(sourcePath, startMs, endMs, maxFrames = 5) {
  * Returns the index of the best frame.
  */
 async function scoreFamesWithGemini(frames, geminiKey) {
-  const geminiModel = 'gemini-1.5-flash';
+  const geminiModel = 'gemini-2.0-flash';
 
   const contents = [
     {
@@ -152,8 +152,16 @@ async function scoreFamesWithGemini(frames, geminiKey) {
 /**
  * Overlay text on a frame using FFmpeg drawtext filter.
  */
-async function overlayTextOnFrame(inputPath, outputPath, text) {
+async function overlayTextOnFrame(inputPath, outputPath, text, options = {}) {
   const escapedText = text.replace(/[':]/g, '\\$&').slice(0, 60);
+  const color = options.fontColor || 'white';
+  const outline = options.outlineColor || 'black';
+  
+  // Note: For native Windows compatibility when passing custom fonts, we assume Arial fallback if not absolute path
+  let fontPath = '/Windows/Fonts/arialbd.ttf';
+  if (options.fontFamily && fs.existsSync(options.fontFamily)) {
+     fontPath = options.fontFamily.replace(/\\/g, '/'); // FFmpeg needs forward slashes even on Windows
+  }
 
   await new Promise((resolve, reject) => {
     ffmpeg(inputPath)
@@ -161,10 +169,10 @@ async function overlayTextOnFrame(inputPath, outputPath, text) {
         '-vf',
         `scale=1280:720,` +
         `drawtext=text='${escapedText}':` +
-        `fontsize=52:fontcolor=white:` +
-        `shadowcolor=black:shadowx=3:shadowy=3:` +
+        `fontsize=52:fontcolor=${color}:` +
+        `shadowcolor=${outline}:shadowx=3:shadowy=3:` +
         `x=(w-text_w)/2:y=h-th-40:` +
-        `fontfile=/Windows/Fonts/arialbd.ttf`,
+        `fontfile='${fontPath}'`,
         '-frames:v', '1',
         '-q:v', '2',
       ])
@@ -187,54 +195,81 @@ ipcMain.handle('thumbnail:generateAI', async (_, { sourcePath, startMs, endMs, c
     const clipsDir = await getDir('clips');
 
     // 1. Extract candidate frames
-    const { frames, tmpDir: frameDir } = await extractSceneFrames(sourcePath, startMs, endMs);
+    const { frames, tmpDir: frameDir } = await extractSceneFrames(sourcePath, startMs, endMs, 3);
+    if (!frames || frames.length === 0) throw new Error('Could not extract frames for thumbnail');
 
-    if (frames.length === 0) throw new Error('Could not extract frames for AI thumbnail');
+    // 2. Prepare variants to send to the frontend
+    const maxVars = Math.min(3, frames.length);
+    const variants = [];
+    
+    // Fetch user's active brand settings if passing an ID or use fallback
+    let userFontPath = null;
+    let userColor = 'white';
+    
+    // In a real app we'd fetch this from Prisma using a passed WorkspaceID,
+    // but without one in the current IPC payload, we'll try pulling the first valid Kit
+    try {
+       const prisma = require('../prisma');
+       const kit = await prisma.brandKit.findFirst();
+       if (kit) {
+          userColor = kit.primaryColor || 'white';
+          if (kit.fontFamily && fs.existsSync(kit.fontFamily)) userFontPath = kit.fontFamily;
+       }
+    } catch (e) { console.warn('[Thumbnail] Could not fetch brand kit:', e.message); }
 
-    let bestFrameIdx = 0;
-
-    // 2. Score frames with Gemini Vision (if key available)
+    // Try AI scoring with Gemini Vision if key available
     const geminiKey = await getSetting('gemini_api_key');
+    let bestFrameIdx = 0;
     if (geminiKey && frames.length > 1) {
       try {
         bestFrameIdx = await scoreFamesWithGemini(frames, geminiKey);
-      } catch (scoringErr) {
-        console.warn('[AI Thumbnail] Vision scoring failed, using first frame:', scoringErr.message);
+        console.log(`[Thumbnail] Gemini selected frame ${bestFrameIdx}`);
+      } catch (e) {
+        console.warn('[Thumbnail] Gemini Vision scoring failed, using first frame:', e.message);
       }
+    } else if (!geminiKey) {
+      console.log('[Thumbnail] No Gemini key, skipping AI frame scoring');
+    }
+    
+    for (let i = 0; i < maxVars; i++) {
+        const frameSrc = frames[i];
+        
+        // Variant A (Clean)
+        const cleanPath = path.join(clipsDir, `thumb_clean_${Date.now()}_v${i}.jpg`);
+        fs.copyFileSync(frameSrc, cleanPath);
+        
+        // Variant B (With Text)
+        const textPath = path.join(clipsDir, `thumb_text_${Date.now()}_v${i}.jpg`);
+        const overlayText = caption || 'Watch Now';
+        try {
+            await overlayTextOnFrame(frameSrc, textPath, overlayText, {
+               fontColor: userColor,
+               fontFamily: userFontPath,
+               outlineColor: 'black'
+            });
+            const cleanBuf = fs.readFileSync(cleanPath);
+            const textBuf = fs.readFileSync(textPath);
+            
+            variants.push({
+                cleanDataUrl: `data:image/jpeg;base64,${cleanBuf.toString('base64')}`,
+                textDataUrl: `data:image/jpeg;base64,${textBuf.toString('base64')}`,
+            });
+        } catch (e) {
+            console.warn("Text overlay failed for frame", i, e.message);
+            const cleanBuf = fs.readFileSync(cleanPath);
+            variants.push({
+                cleanDataUrl: `data:image/jpeg;base64,${cleanBuf.toString('base64')}`,
+                textDataUrl: "", // Failed text composite
+            });
+        }
     }
 
-    const bestFrame = frames[bestFrameIdx];
-    const baseId = clipId || Date.now().toString();
-
-    // 3. Variant A: Clean frame (no text)
-    const variantAPath = path.join(clipsDir, `thumb_ai_clean_${baseId}.jpg`);
-    fs.copyFileSync(bestFrame, variantAPath);
-
-    // 4. Variant B: Frame with text overlay
-    const variantBPath = path.join(clipsDir, `thumb_ai_text_${baseId}.jpg`);
-    const overlayText = caption || 'Watch Full Video';
-    try {
-      await overlayTextOnFrame(bestFrame, variantBPath, overlayText);
-    } catch {
-      // If text overlay fails (e.g. font not found on system), just copy clean frame
-      fs.copyFileSync(bestFrame, variantBPath);
-    }
-
-    // 5. Cleanup temp frames
+    // 3. Cleanup temp frames
     try { fs.rmSync(frameDir, { recursive: true, force: true }); } catch {}
-
-    // 6. Read as data URLs
-    const bufA = fs.readFileSync(variantAPath);
-    const bufB = fs.readFileSync(variantBPath);
 
     return {
       success: true,
-      variants: [
-        { label: 'Clean', path: variantAPath, dataUrl: `data:image/jpeg;base64,${bufA.toString('base64')}` },
-        { label: 'With Text', path: variantBPath, dataUrl: `data:image/jpeg;base64,${bufB.toString('base64')}` },
-      ],
-      framesScored: frames.length,
-      bestFrameIdx,
+      variants
     };
   } catch (e) {
     console.error('[AI Thumbnail]', e.message);

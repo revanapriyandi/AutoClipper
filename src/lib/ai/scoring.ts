@@ -19,13 +19,18 @@ export interface ScoredCandidate extends ClipCandidate {
 /**
  * Builds the generic LLM prompt for evaluating a clip.
  */
-export function buildPrompt(transcript: string) {
+export function buildPrompt(transcript: string, visionEnabled: boolean = false) {
+  const visionInstruction = visionEnabled 
+    ? "NOTE: You will also be provided with video frames. Consider the visual context (actions, visual comedy, interesting objects) in addition to the transcript."
+    : "";
   return `
 You are an expert AI video editor for TikTok/Shorts/Reels. Given the following transcript segment, rate it from 0-25 for each category:
 1. Hook: Does the start immediately grab attention?
 2. Clarity: Is the message clear and easy to understand without extra context?
 3. Payoff: Is there a satisfying punchline, lesson, or conclusion at the end?
 4. Standalone: Does the clip make sense as an independent video?
+
+${visionInstruction}
 
 Also provide a 1-sentence explanation of your rating.
 Return ONLY valid JSON matching this schema:
@@ -47,7 +52,7 @@ ${transcript}
 /**
  * Sends prompt to OpenAI or Ollama via Electron IPC securely.
  */
-async function callLlm(prompt: string): Promise<AiScores> {
+async function callLlm(prompt: string, sourcePath?: string, visionEnabled?: boolean, startMs?: number, endMs?: number): Promise<AiScores> {
   // Simple fallback mock if running outside electron (e.g. browser preview mode)
   const isElectron = typeof window !== "undefined" && "electronAPI" in window;
   if (!isElectron) {
@@ -62,16 +67,18 @@ async function callLlm(prompt: string): Promise<AiScores> {
   }
 
   const api = (window as unknown as { 
-    electronAPI: { aiScore: (prompt: string, provider: string) => Promise<{ success: boolean; scores?: AiScores; error?: string }> }
+    electronAPI: { aiScore: (opts: { promptText: string; provider: string; sourcePath?: string; visionEnabled?: boolean; startMs?: number; endMs?: number }) => Promise<{ success: boolean; scores?: AiScores; error?: string }> }
   }).electronAPI;
 
+  const payload = { promptText: prompt, sourcePath, visionEnabled, startMs, endMs };
+
   // Attempt Local AI first (Local-first mindset as per user)
-  let result = await api.aiScore(prompt, "local");
+  let result = await api.aiScore({ ...payload, provider: "local" });
 
   // If local fails, fallback to Cloud (OpenAI)
   if (!result.success) {
     console.warn("Local AI failed, falling back to OpenAI...");
-    result = await api.aiScore(prompt, "openai");
+    result = await api.aiScore({ ...payload, provider: "openai" });
   }
 
   if (result.success && result.scores) {
@@ -84,10 +91,10 @@ async function callLlm(prompt: string): Promise<AiScores> {
 /**
  * Scores a batch of candidates and returns the top ones.
  */
-export async function scoreCandidates(candidates: ClipCandidate[], limit = 5): Promise<ScoredCandidate[]> {
+export async function scoreCandidates(candidates: ClipCandidate[], limit = 5, sourcePath?: string, visionEnabled?: boolean): Promise<ScoredCandidate[]> {
   const scoredDefferred = candidates.map(async (c) => {
-    const prompt = buildPrompt(c.transcriptText);
-    const scores = await callLlm(prompt);
+    const prompt = buildPrompt(c.transcriptText, visionEnabled);
+    const scores = await callLlm(prompt, sourcePath, visionEnabled, c.startMs, c.endMs);
     const totalScore = scores.hook + scores.clarity + scores.payoff + scores.standalone;
     return { ...c, scores, totalScore };
   });
@@ -101,10 +108,10 @@ export async function scoreCandidates(candidates: ClipCandidate[], limit = 5): P
 /**
  * Scores a single candidate. Returns null if scoring fails.
  */
-export async function scoreCandidate(candidate: ClipCandidate): Promise<ScoredCandidate | null> {
+export async function scoreCandidate(candidate: ClipCandidate, sourcePath?: string, visionEnabled?: boolean): Promise<ScoredCandidate | null> {
   try {
-    const prompt = buildPrompt(candidate.transcriptText);
-    const scores = await callLlm(prompt);
+    const prompt = buildPrompt(candidate.transcriptText, visionEnabled);
+    const scores = await callLlm(prompt, sourcePath, visionEnabled, candidate.startMs, candidate.endMs);
     const totalScore = scores.hook + scores.clarity + scores.payoff + scores.standalone;
     return { ...candidate, scores, totalScore };
   } catch {

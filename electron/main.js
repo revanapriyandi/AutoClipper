@@ -11,6 +11,15 @@ const path = require('path');
 // ── App Identity ─────────────────────────────────────────────────────────────
 app.setName('AutoClipper');
 
+// ── Chromium flags (must be set before app is ready) ─────────────────────────
+// Prevents "Gpu Cache Creation failed" / "Unable to create cache" errors on Windows
+// that occur when the GPU cache directory from a previous session is still locked.
+app.commandLine.appendSwitch('disable-gpu-sandbox');
+app.commandLine.appendSwitch('no-sandbox');
+app.commandLine.appendSwitch('disable-gpu-disk-cache');
+app.commandLine.appendSwitch('disable-software-rasterizer');
+
+
 // ── Environment & Database Path Setup (CRITICAL FOR PRODUCTION) ───────────────
 const isDev = !app.isPackaged;
 const envPath = isDev
@@ -18,22 +27,8 @@ const envPath = isDev
   : path.join(process.resourcesPath, '.env');
 require('dotenv').config({ path: envPath });
 
-const userDataPath = app.getPath('userData');
-const dbFolder     = path.join(userDataPath, 'db');
-const targetDbPath = path.join(dbFolder, 'dev.db');
-
-if (!require('fs').existsSync(dbFolder)) {
-  require('fs').mkdirSync(dbFolder, { recursive: true });
-}
-
-if (!require('fs').existsSync(targetDbPath) && !isDev) {
-  const sourceDbPath = path.join(__dirname, '../prisma/dev.db');
-  if (require('fs').existsSync(sourceDbPath)) {
-    require('fs').copyFileSync(sourceDbPath, targetDbPath);
-  }
-}
-
-process.env.DATABASE_URL = `file:${targetDbPath}`;
+// Local DB instantiation removed for Phase 4.3 Cloud DB Sync. 
+// Prisma directly utilizes the `.env` DATABASE_URL populated during dotenv injection above.
 
 // ── Register all IPC handlers ─────────────────────────────────────────────────
 require('./handlers/keychain');
@@ -44,26 +39,45 @@ require('./handlers/auth');
 require('./handlers/upload');
 require('./handlers/broll');
 require('./handlers/caption');
+require('./handlers/translation');
 require('./handlers/logger');
 require('./handlers/facetrack');
 require('./handlers/dubbing');
+require('./handlers/supabase');
 const { checkOnStartup } = require('./handlers/updater');
 
 require('./handlers/db');
+require('./handlers/reset');
+require('./handlers/env_addon');
 require('./handlers/db_calendar_addon');
 require('./handlers/db_theme_addon');
 require('./handlers/db_analytics_addon');
 require('./handlers/db_clipprofile_addon');
+require('./handlers/db_brand_addon');
 require('./handlers/ffmpeg');
 require('./handlers/thumbnail');
 require('./handlers/insights');
 require('./handlers/webhook');
 require('./handlers/analytics_sync');
 require('./handlers/compilation');
+require('./handlers/download');
 
 const { startAutopilotPoller }      = require('./handlers/autopilot');
 const { pollJobQueue, prisma }       = require('./handlers/jobs');
 const { startAnalyticsSyncPoller }  = require('./handlers/analytics_sync');
+const { writeLog }                  = require('./handlers/logger');
+
+// ── Global Error Catching for Telemetry ───────────────────────────────────────
+process.on('uncaughtException', (error) => {
+  console.error('[Uncaught Exception]', error);
+  writeLog('error', 'system', `Uncaught Exception: ${error.message}\n${error.stack}`);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('[Unhandled Rejection]', reason);
+  const msg = reason instanceof Error ? `${reason.message}\n${reason.stack}` : String(reason);
+  writeLog('error', 'system', `Unhandled Rejection: ${msg}`);
+});
 
 // ── Icon paths ────────────────────────────────────────────────────────────────
 const ICON_PATH_WIN  = path.join(__dirname, '../build/icon.ico');
@@ -192,7 +206,11 @@ function buildMenu(mainWindow) {
   ];
 
   const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
+  if (process.platform === 'darwin') {
+    Menu.setApplicationMenu(menu);
+  } else {
+    Menu.setApplicationMenu(null); // Menyembunyikan menu bar bawaan di Windows/Linux
+  }
 }
 
 // ── System Tray ───────────────────────────────────────────────────────────────
@@ -233,7 +251,7 @@ function createWindow() {
   // Splash screen
   const splashWindow = new BrowserWindow({
     width: 500,
-    height: 350,
+    height: 340,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
@@ -242,9 +260,17 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      preload: path.join(__dirname, 'splash-preload.js'),
     },
   });
   splashWindow.loadFile(path.join(__dirname, 'splash.html'));
+
+  // Global broadcaster — modules call global.splashStatus('message') during startup
+  global.splashStatus = (msg) => {
+    if (!splashWindow.isDestroyed()) {
+      splashWindow.webContents.send('splash:status', msg);
+    }
+  };
 
   // Main window
   const mainWindow = new BrowserWindow({
@@ -277,21 +303,36 @@ function createWindow() {
   buildMenu(mainWindow);
   createTray(mainWindow);
 
-  // Show window after splash
-  mainWindow.once('ready-to-show', () => {
+  let isShown = false;
+  
+  const showMainWindow = () => {
+    if (isShown) return;
+    isShown = true;
+    global.splashStatus?.('Siap!');
     setTimeout(() => {
       if (!splashWindow.isDestroyed()) splashWindow.destroy();
-      mainWindow.show();
-      mainWindow.focus();
-    }, 1500);
-  });
+      global.splashStatus = null; // clean up
+      if (!mainWindow.isDestroyed()) {
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    }, 800);
+  };
 
-  // Minimize to tray instead of closing (Windows/Linux)
-  mainWindow.on('close', (event) => {
-    if (!app.isQuitting && process.platform !== 'darwin') {
-      event.preventDefault();
-      mainWindow.hide();
+  // Show window after splash
+  mainWindow.once('ready-to-show', showMainWindow);
+
+  // Fallback Failsafe: if 'ready-to-show' doesn't fire within 15s (e.g. dev server GPU lock or webpack delay), force show.
+  setTimeout(() => {
+    if (!isShown && !mainWindow.isDestroyed()) {
+      console.warn('[AutoClipper] Splash Screen stuck: Force-showing main window...');
+      showMainWindow();
     }
+  }, 15000);
+
+  // Klik X → langsung keluar (matikan semua koneksi & proses)
+  mainWindow.on('close', () => {
+    app.isQuitting = true;
   });
 }
 

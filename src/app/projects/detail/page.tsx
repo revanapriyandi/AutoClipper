@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, Play, Download, Edit3, Send, Music, FolderOpen, ExternalLink, Clapperboard, Eye, Zap, Sparkles, Clock, Star, CheckCircle2 } from "lucide-react";
+import { Loader2, Download, Edit3, Send, Music, FolderOpen, Clapperboard, Eye, Zap, Sparkles, Clock, Star, CheckCircle2, ArrowLeft, Type } from "lucide-react";
 import { ScoredCandidate } from "@/lib/ai/scoring";
 import { enrichCandidates } from "@/lib/ai/enrichment";
 import { generateCandidates } from "@/lib/ai/segmentation";
@@ -54,11 +54,12 @@ function ProjectDetailsContent() {
   const [alignment, setAlignment] = useState("2");
   const [marginV, setMarginV] = useState("150");
   const [bgMusicPath, setBgMusicPath] = useState<string>("");
-  const [themePresets, setThemePresets] = useState<{ id: string; name: string; fontFamily: string; primaryColor: string; outlineColor: string; alignment: string; marginV: string }[]>([]);
+  const [brandKits, setBrandKits] = useState<{ id: string; name: string; fontFamily: string; primaryColor: string; watermarkPath?: string }[]>([]);
 
   // F6: Multi-variant captions
   const [captionVariants, setCaptionVariants] = useState<Record<number, string[]>>({});
   const [generatingCaptions, setGeneratingCaptions] = useState<Set<number>>(new Set());
+  const [visionEnabled, setVisionEnabled] = useState(false);
 
   // Post Scheduling State
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
@@ -78,14 +79,43 @@ function ProjectDetailsContent() {
         const data = await api.dbGetProject(id) as { success: boolean; project?: ProjectRecord; error?: string };
         if (data.success && data.project) {
           setProject(data.project);
-          setStatus("Ready. Click 'Auto-Cut Clips' to start the AI pipeline.");
           loadVideoPreview(data.project.sourcePath);
+
+          // ── Restore previously generated clips from DB ──
+          if (api.dbGetProjectClips) {
+            const clipsRes = await api.dbGetProjectClips(id) as { success: boolean; candidates?: ScoredCandidate[] };
+            if (clipsRes.success && clipsRes.candidates && clipsRes.candidates.length > 0) {
+              const restored = clipsRes.candidates;
+              setCandidates(restored);
+              // Restore brollKeywordMap
+              const brollMap: Record<number, string[]> = {};
+              restored.forEach((c: ScoredCandidate & { brollKeywords?: string[] }, i: number) => {
+                if (c.brollKeywords) brollMap[i] = c.brollKeywords;
+              });
+              setBrollKeywordMap(brollMap);
+              // Restore outputPaths for rendered clips
+              const paths: Record<number, string> = {};
+              restored.forEach((c: ScoredCandidate & { outputPath?: string }, i: number) => {
+                if (c.outputPath) paths[i] = c.outputPath;
+              });
+              setOutputPaths(paths);
+              setStatus(`✅ ${restored.length} klip tersimpan dari sesi sebelumnya.`);
+            } else {
+              setStatus("Ready. Click 'Auto-Cut Clips' to start the AI pipeline.");
+            }
+          } else {
+            setStatus("Ready. Click 'Auto-Cut Clips' to start the AI pipeline.");
+          }
         } else {
           setStatus("Failed to load project: " + data.error);
         }
-        if (api.dbGetThemePresets) {
-          const presetsResp = await api.dbGetThemePresets();
-          if (presetsResp.success && presetsResp.presets) setThemePresets(presetsResp.presets);
+        if (api.dbGetWorkspaces) {
+          const wsResp = await api.dbGetWorkspaces();
+          if (wsResp.success && wsResp.workspaces && wsResp.workspaces.length > 0) {
+             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             const allKits = (wsResp.workspaces as any[]).flatMap(w => w.kits || []);
+             setBrandKits(allKits);
+          }
         }
       } catch (err: unknown) {
         setStatus("Error loading project: " + (err instanceof Error ? err.message : "Unknown error"));
@@ -103,6 +133,8 @@ function ProjectDetailsContent() {
 
   const [brollKeywordMap, setBrollKeywordMap] = useState<Record<number, string[]>>({});
 
+  const msToSec = (ms: number) => (ms / 1000).toFixed(0);
+
   // ============================
   // REAL AI Pipeline
   // ============================
@@ -115,36 +147,43 @@ function ProjectDetailsContent() {
     const isElectron = !!api;
 
     try {
+      // Get deepgram key as optional hint (the transcription IPC handler has its own fallback chain)
       let deepgramKey = "";
       if (isElectron && api.getKey) {
         const keyRes = await api.getKey("deepgram_key");
         deepgramKey = keyRes.value || "";
       }
-      if (!deepgramKey) {
-        setStatus("⚠️ Deepgram API Key belum dipasang. Silakan konfigurasikan via Settings.");
-        setLoading(false);
-        return;
-      }
 
-      setStatus("🎙️ Extracting audio & transcribing with Deepgram...");
-      const transcribeRes = await api!.aiTranscribe(project.sourcePath, deepgramKey);
+      setStatus("🎙️ Extracting audio & transcribing...");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const transcribeRes = await (api as unknown as { aiTranscribe: (p: string, k: string, id: string) => Promise<any> }).aiTranscribe(project.sourcePath, deepgramKey, project.id);
       if (!transcribeRes.success || !transcribeRes.results) throw new Error("Transcription failed: " + transcribeRes.error);
 
-      const words = transcribeRes.results.channels[0].alternatives[0].words;
-      const segments = words.map((w: { word: string; start: number; end: number }) => ({
-        start: w.start, end: w.end, text: w.word,
-        words: [{ word: w.word, start: w.start, end: w.end, confidence: 1, punctuated_word: w.word }]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const words = transcribeRes.results.channels[0].alternatives[0].words as any[];
+      if (!words || words.length === 0) throw new Error("Transcription succeeded but returned no word-level data. Pastikan video memiliki audio dan kunci ASR sudah dikonfigurasi.");
+      // Build flat list of words — use punctuated_word if available (Deepgram), otherwise fall back to word
+      const allWordTokens = words.map((w) => ({
+        word: w.word ?? w.text ?? "",
+        start: typeof w.start === "number" ? w.start : (w.startMs ?? 0) / 1000,
+        end: typeof w.end === "number" ? w.end : (w.endMs ?? 0) / 1000,
+        confidence: w.confidence ?? 1,
+        punctuated_word: w.punctuated_word || w.word || w.text || "",
       }));
+      const segments = [{ start: allWordTokens[0]?.start ?? 0, end: allWordTokens[allWordTokens.length - 1]?.end ?? 0, text: allWordTokens.map(w => w.punctuated_word).join(" "), words: allWordTokens }];
 
-      setStatus("✂️ Segmenting transcript into viral clip candidates...");
-      const rawCandidates = generateCandidates(segments, { minDurationSec: 15, idealDurationSec: 30, maxDurationSec: 60 });
-      if (rawCandidates.length === 0) { setStatus("No clip candidates found. Try a longer video."); setLoading(false); return; }
+      const videoDurationSec = (allWordTokens[allWordTokens.length - 1]?.end ?? 0) - (allWordTokens[0]?.start ?? 0);
+      setStatus(`✂️ Segmenting ${allWordTokens.length} words (${videoDurationSec.toFixed(0)}s audio)...`);
+      // Use shorter minDuration for videos under 2 minutes
+      const minDur = videoDurationSec < 120 ? 10 : 15;
+      const rawCandidates = generateCandidates(segments, { minDurationSec: minDur, idealDurationSec: 30, maxDurationSec: 60 });
+      if (rawCandidates.length === 0) { setStatus(`❌ No clip candidates found. Video duration detected: ${videoDurationSec.toFixed(0)}s, words: ${allWordTokens.length}. Coba video yang lebih panjang (min ${minDur * 2}s dengan audio).`); setLoading(false); return; }
 
       setStatus(`🤖 Scoring ${Math.min(rawCandidates.length, 5)} candidates with LLM...`);
       const toScore = rawCandidates.slice(0, 5);
       const scored: ScoredCandidate[] = [];
       for (const candidate of toScore) {
-        const result = await scoreCandidate(candidate);
+        const result = await scoreCandidate(candidate, project.sourcePath, visionEnabled);
         if (result) scored.push(result);
       }
       scored.sort((a, b) => b.totalScore - a.totalScore);
@@ -153,6 +192,13 @@ function ProjectDetailsContent() {
       const { enriched, brollKeywordMap: newMap } = enrichCandidates(scored);
       setCandidates(enriched);
       setBrollKeywordMap(newMap);
+
+      // ── Persist to database ──
+      if (project && api?.dbSaveProjectClips) {
+        api.dbSaveProjectClips({ projectId: project.id, candidates: enriched, brollKeywordMap: newMap })
+          .catch((e: Error) => console.warn('[DB] Failed to save clips:', e.message));
+      }
+
       setStatus(`✅ Done! ${enriched.length} clip(s) ready. Click 'Render 9:16' to export.`);
     } catch (err: unknown) {
       setStatus("❌ Error: " + (err instanceof Error ? err.message : "Unknown error"));
@@ -173,7 +219,6 @@ function ProjectDetailsContent() {
       if (res.success && res.captions) {
         setCaptionVariants(prev => ({ ...prev, [index]: res.captions! }));
       } else {
-        // Fallback: generate local variants
         const hook = clip.transcriptText.slice(0, 60);
         setCaptionVariants(prev => ({
           ...prev,
@@ -249,6 +294,68 @@ function ProjectDetailsContent() {
     }
   }, [project, bgMusicPath, fontName, primaryColor, outlineColor, alignment, marginV]);
 
+  // F6.1: A/B Test Hook Generator Render
+  const handleRenderABTest = useCallback(async (clip: ScoredCandidate, index: number) => {
+    if (!project) return;
+    const targets = captionVariants[index];
+    if (!targets || targets.length < 3) {
+       setStatus(`⚠️ Harap buat Captions terlebih dahulu untuk The Hook Variations.`);
+       return;
+    }
+    const api = window.electronAPI;
+    if (!api?.enqueueJob) { setStatus("Render requires Electron environment."); return; }
+
+    const jobId = `render_ab_${index + 1}_${Date.now()}`;
+    setJobIds(prev => ({ ...prev, [index]: jobId }));
+    setRenderingClips(prev => new Set(prev).add(index));
+    setStatus(`⚙️ Queuing A/B Hook Variations for Clip #${index + 1}...`);
+
+    try {
+      const basePayload = {
+        jobId,
+        sourcePath: project.sourcePath,
+        startMs: clip.startMs,
+        endMs: clip.endMs,
+        segments: clip.chunks.map(c => ({
+          start: c.startMs / 1000, end: c.endMs / 1000, text: c.text,
+          words: c.words.map(w => ({ start: w.startMs / 1000, end: w.endMs / 1000, text: w.text }))
+        })),
+        isVerticalTarget: true,
+        bgMusicPath: bgMusicPath || null,
+        style: { font: fontName, primaryColor, outlineColor, alignment: parseInt(alignment), marginV: parseInt(marginV) }
+      };
+
+      const hookVariants = targets.map(t => {
+         const parts = t.split('#');
+         return parts[0].trim();
+      });
+
+      const res = await api.enqueueJob("RENDER_AB_TEST", { basePayload, hookVariants });
+
+      if (!res.success) { setStatus("Failed to enqueue A/B render: " + res.error); setRenderingClips(prev => { const s = new Set(prev); s.delete(index); return s; }); return; }
+
+      const interval = setInterval(async () => {
+        const jobRes = await api.getJob(jobId);
+        if (jobRes?.success && jobRes.job) {
+          const job = jobRes.job;
+          if (job.status === "COMPLETED") {
+            clearInterval(interval);
+            setRenderingClips(prev => { const s = new Set(prev); s.delete(index); return s; });
+            setStatus(`✅ A/B Variations rendered! Check clips folder for the 3 variations.`);
+          } else if (job.status === "FAILED") {
+            clearInterval(interval);
+            setRenderingClips(prev => { const s = new Set(prev); s.delete(index); return s; });
+            setStatus(`❌ A/B Render failed: ${job.error}`);
+          }
+        }
+      }, 3000);
+
+    } catch (err: unknown) {
+      setStatus("Error: " + (err instanceof Error ? err.message : "Unknown"));
+      setRenderingClips(prev => { const s = new Set(prev); s.delete(index); return s; });
+    }
+  }, [project, captionVariants, bgMusicPath, fontName, primaryColor, outlineColor, alignment, marginV]);
+
   // F2: Load output video for in-app preview
   const handlePreviewClip = async (outputPath: string, index: number) => {
     const api = window.electronAPI;
@@ -307,141 +414,201 @@ function ProjectDetailsContent() {
   };
 
   const getScoreColor = (score: number) =>
-    score >= 80 ? "text-green-400" : score >= 60 ? "text-yellow-400" : "text-red-400";
+    score >= 80 ? "text-green-500" : score >= 60 ? "text-yellow-500" : "text-red-500";
 
   // ============================
   // Render
   // ============================
   return (
-    <div className="grid gap-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">{project ? project.title : "Project Studio"}</h2>
-          <p className="text-muted-foreground text-sm">{project?.sourcePath}</p>
-        </div>
-        <Button onClick={handleGenerateClips} disabled={loading || !project} size="lg">
-          {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Zap className="mr-2 h-4 w-4" />}
-          Auto-Cut Clips
-        </Button>
-      </div>
-
-      {status && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground border p-3 rounded-lg bg-muted/30">
-          {loading && <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" />}
-          <span>{status}</span>
-        </div>
-      )}
-
-      {/* Background Music */}
-      <div className="flex items-center gap-3 p-3 border rounded-lg bg-muted/40">
-        <Music className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-        <div className="flex-1">
-          <label className="text-xs font-semibold">Background Music (.mp3)</label>
-          <div className="flex gap-2 mt-1">
-            <Input className="h-7 text-xs flex-1" placeholder="Optional — lofi.mp3" value={bgMusicPath} onChange={e => setBgMusicPath(e.target.value)} readOnly={!!(window.electronAPI)} />
-            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={async () => {
-              const res = await window.electronAPI?.openFilePicker([{ name: "Audio Files", extensions: ["mp3", "wav", "ogg"] }]);
-              if (res?.success && res.filePath) setBgMusicPath(res.filePath);
-            }}>
-              <FolderOpen className="h-3 w-3 mr-1" /> Browse
-            </Button>
+    <div className="flex flex-col h-screen bg-background text-foreground">
+      {/* ── TOP HEADER ── */}
+      <header className="flex items-center justify-between px-6 py-3 bg-card border-b border-border shrink-0">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-muted-foreground hover:text-foreground" title="Ganti Project">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div className="hidden sm:block">
+            <h2 className="text-lg font-bold tracking-tight leading-tight">{project ? project.title : "Project Studio"}</h2>
+            <p className="text-muted-foreground text-xs truncate max-w-[300px]">{project?.sourcePath}</p>
           </div>
         </div>
-      </div>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 text-sm cursor-pointer whitespace-nowrap bg-muted/30 px-3 py-1.5 rounded-full border border-border/50 hover:bg-muted/50 transition-colors">
+            <input type="checkbox" className="accent-primary w-4 h-4 cursor-pointer" checked={visionEnabled} onChange={e => setVisionEnabled(e.target.checked)} />
+            <span className="text-muted-foreground font-medium flex items-center gap-1.5" title="LLM analyzes video frames for better contextual clipping (Slower, requires internet API)">
+              <Eye className="w-4 h-4" /> AI Vision
+            </span>
+          </label>
+          <Button onClick={handleGenerateClips} disabled={loading || !project} className="bg-primary hover:bg-primary/90 rounded-full px-6 shadow-lg shadow-primary/20">
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Zap className="mr-2 h-4 w-4" />}
+            Auto-Cut Clips
+          </Button>
+        </div>
+      </header>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Video Player */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Video Preview</CardTitle>
-            <CardDescription>Source — {project ? `${Math.round((project.durationMs || 0) / 1000)}s` : "loading..."}</CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center bg-black rounded-b-lg min-h-[280px] items-center overflow-hidden p-0">
-            {videoSrc ? (
-              <video ref={videoRef} src={videoSrc} controls className="w-full max-h-[360px]" />
-            ) : (
-              <p className="text-muted-foreground text-sm p-6 text-center">
-                {project ? "Loading video preview..." : "Select a project to preview."}
-              </p>
+      {/* ── MAIN LAYOUT ── */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* ── LEFT PANEL ── */}
+        <aside className="w-[380px] lg:w-[450px] bg-card border-r border-border flex flex-col p-5 gap-5 shrink-0 overflow-y-auto hidden md:flex">
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-foreground/80">Video Preview</h3>
+            <div className="w-full bg-black rounded-xl overflow-hidden shadow-2xl border border-border relative aspect-video flex items-center justify-center">
+              {videoSrc ? (
+                <video ref={videoRef} src={videoSrc} controls controlsList="nodownload" className="w-full h-full object-contain" />
+              ) : (
+                <div className="text-muted-foreground/50 text-xs flex flex-col items-center gap-2">
+                  <Clapperboard className="h-8 w-8 mb-1 opacity-50" />
+                  {project ? "Memuat video..." : "Tidak ada video"}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+               <h3 className="text-sm font-semibold text-foreground/80">🎵 Audio & Musik Latar</h3>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+               Tambahkan musik latar (.mp3) untuk semua potongan klip. Musik ini akan otomatis digabung & menyesuaikan durasi saat Anda melakukan Export atau A/B Test.
+            </p>
+            <div className="flex flex-col gap-3 p-3 border border-border rounded-lg bg-muted/40 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                 <Music className="h-24 w-24" />
+              </div>
+              <div className="flex items-center gap-3 relative z-10">
+                <div className="bg-primary/20 p-2 rounded-md shrink-0">
+                  <Music className="h-4 w-4 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <label className="text-xs font-semibold text-foreground block mb-1">File Music (.mp3, .wav)</label>
+                  <div className="flex gap-2">
+                    <Input
+                      className="h-8 text-xs flex-1 focus-visible:ring-primary font-mono placeholder:font-sans"
+                      placeholder="Pilih file lagu... (Opsional)" value={bgMusicPath} onChange={e => setBgMusicPath(e.target.value)} readOnly={!!(window.electronAPI)}
+                    />
+                    <Button size="sm" variant="secondary" className="h-8 text-xs hover:bg-primary/20" onClick={async () => {
+                      const res = await window.electronAPI?.openFilePicker([{ name: "Audio Files", extensions: ["mp3", "wav", "ogg"] }]);
+                      if (res?.success && res.filePath) setBgMusicPath(res.filePath);
+                    }}>
+                      <FolderOpen className="h-3 w-3 sm:mr-1" /> <span className="hidden sm:inline">Browse</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* ── RIGHT PANEL ── */}
+        <main className="flex-1 overflow-y-auto bg-background p-6 lg:p-8">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <div className="flex items-center justify-between border-b border-border pb-4">
+              <div>
+                <h3 className="font-bold text-xl flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Kandidat Klip AI
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">Potongan otomatis dari AI. {candidates.length} klip ditemukan.</p>
+              </div>
+            </div>
+
+            {/* Status / Loading indicator — shown in right panel */}
+            {status && loading && (
+              <div className="flex items-center gap-3 text-sm text-primary bg-primary/10 border border-primary/20 p-4 rounded-xl">
+                <Loader2 className="h-5 w-5 animate-spin shrink-0" />
+                <span className="leading-snug font-medium">{status}</span>
+              </div>
             )}
-          </CardContent>
-        </Card>
+            {status && !loading && (
+              <div className={`flex items-start gap-3 text-sm p-4 rounded-xl border ${
+                status.startsWith("❌") || status.startsWith("Err")
+                  ? "text-destructive bg-destructive/10 border-destructive/20"
+                  : status.startsWith("✅")
+                  ? "text-green-600 dark:text-green-400 bg-green-500/10 border-green-500/20"
+                  : "text-muted-foreground bg-muted/40 border-border"
+              }`}>
+                <span className="leading-snug">{status}</span>
+              </div>
+            )}
 
-        {/* Clip Cards */}
-        <div className="flex flex-col gap-4">
-          <h3 className="font-semibold text-lg">AI Generated Clips</h3>
-          {candidates.length === 0 && !loading && (
-            <Card className="border-dashed bg-muted/20 flex flex-col items-center justify-center py-10">
-              <Play className="h-10 w-10 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">No clips generated yet. Click Auto-Cut to begin.</p>
-            </Card>
-          )}
-          <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-1">
-            {candidates.map((c, i) => {
-              const jobId = jobIds[i];
-              const progress = jobId ? (renderProgress[jobId] ?? (renderingClips.has(i) ? 0 : null)) : null;
-              const isDone = outputPaths[i] !== undefined;
-              const isRendering = renderingClips.has(i);
+            {candidates.length === 0 && !loading && (
+              <div className="border border-dashed border-border bg-muted/30 rounded-2xl flex flex-col items-center justify-center p-16 text-center">
+                <div className="h-16 w-16 bg-muted/50 rounded-full flex items-center justify-center mb-4">
+                  <Clapperboard className="h-8 w-8 text-muted-foreground/50" />
+                </div>
+                <h4 className="text-lg font-medium text-foreground/80">Belum Ada Potongan</h4>
+                <p className="text-sm text-muted-foreground mt-1 max-w-sm">Klik &quot;Auto-Cut Clips&quot; di sudut kanan atas untuk membiarkan AI menganalisis dan memotong video ini.</p>
+              </div>
+            )}
 
-              return (
-                <Card key={i} className={`transition-all ${isDone ? "border-green-500/30 bg-green-950/10" : ""}`}>
-                  <CardHeader className="pb-2 pt-4 px-4">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                        {isDone && <CheckCircle2 className="h-4 w-4 text-green-400" />}
-                        Clip #{i + 1}
-                      </CardTitle>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs flex items-center gap-1 text-muted-foreground">
-                          <Clock className="h-3 w-3" />
-                          {((c.endMs - c.startMs) / 1000).toFixed(0)}s
-                        </span>
-                        <span className={`text-xs font-bold flex items-center gap-1 ${getScoreColor(c.totalScore)}`}>
-                          <Star className="h-3 w-3" />
-                          {c.totalScore}/100
-                        </span>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pb-4 px-4 space-y-3">
-                    <p className="text-xs text-muted-foreground line-clamp-2 italic">&quot;{c.transcriptText}&quot;</p>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 pb-20">
+              {candidates.map((c, i) => {
+                const jobId = jobIds[i];
+                const progress = jobId ? (renderProgress[jobId] ?? (renderingClips.has(i) ? 0 : null)) : null;
+                const isDone = outputPaths[i] !== undefined;
+                const isRendering = renderingClips.has(i);
 
-                    {/* B-Roll keywords */}
-                    {brollKeywordMap[i]?.length > 0 && (
-                      <div className="flex gap-1 flex-wrap">
-                        {brollKeywordMap[i].map((kw, ki) => (
-                          <Badge key={ki} variant="secondary" className="text-[10px] px-1.5 py-0">{kw}</Badge>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* F6: Caption Variants */}
-                    {captionVariants[i] && (
-                      <div className="bg-muted/30 rounded-lg p-2 space-y-1">
-                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Caption Options:</p>
-                        {captionVariants[i].map((cap, ci) => (
-                          <div key={ci} className="text-xs bg-background rounded px-2 py-1 border cursor-pointer hover:border-primary/50 transition-colors">
-                            {cap}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* F1: Render Progress Bar */}
+                return (
+                  <Card key={i} className={`flex flex-col overflow-hidden transition-all border-border shadow-none hover:bg-accent/30 ${isDone ? "border-green-500/30" : ""}`}>
                     {isRendering && progress !== null && (
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] text-muted-foreground">
-                          <span>Rendering...</span>
-                          <span>{progress}%</span>
-                        </div>
-                        <Progress value={progress} className="h-1.5" />
-                      </div>
+                      <Progress value={progress} className="h-1 rounded-none" />
                     )}
 
-                    <div className="flex gap-1.5 flex-wrap pt-1">
+                    <CardHeader className="p-4 pb-2">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle className="text-base font-bold flex items-center gap-2">
+                            {isDone && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+                            Klip #{i + 1}
+                          </CardTitle>
+                          <div className="flex items-center gap-3 mt-1.5 text-xs font-medium">
+                            <div className="flex items-center gap-1.5 bg-muted px-2 py-1 rounded-md text-muted-foreground">
+                              <Clock className="h-3 w-3 text-blue-500" />
+                              {msToSec(c.endMs - c.startMs)}s
+                            </div>
+                            <div className={`flex items-center gap-1.5 bg-muted px-2 py-1 rounded-md ${getScoreColor(c.totalScore)}`}>
+                              <Star className="h-3 w-3" />
+                              {c.totalScore}/100
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="p-4 pt-2 flex-grow">
+                      <div className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground italic border border-border leading-relaxed relative">
+                        <span className="text-xl font-serif text-muted-foreground/30 absolute top-2 left-2">&quot;</span>
+                        <p className="line-clamp-3 relative z-10">{c.transcriptText}</p>
+                      </div>
+
+                      <div className="mt-4 space-y-3">
+                        {brollKeywordMap[i]?.length > 0 && (
+                          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                            <div className="text-[10px] uppercase font-bold text-muted-foreground/50 shrink-0">B-Roll:</div>
+                            {brollKeywordMap[i].map((kw, ki) => (
+                              <Badge key={ki} variant="secondary" className="text-[10px] font-medium whitespace-nowrap">{kw}</Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        {captionVariants[i] && (
+                          <div className="bg-muted/50 rounded-lg p-2.5">
+                            <div className="text-[10px] uppercase font-bold text-muted-foreground/50 mb-2">Hook / Caption Variants:</div>
+                            <div className="space-y-1.5">
+                              {captionVariants[i].map((cap, ci) => (
+                                <div key={ci} className="text-xs text-foreground/80 bg-muted rounded px-2.5 py-1.5 border border-border truncate">
+                                  {cap}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+
+                    <CardFooter className="p-4 pt-1 bg-muted/20 border-t border-border gap-2 grid grid-cols-2 md:flex flex-wrap">
                       <Button
-                        variant="default" size="sm"
-                        className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-7"
+                        size="sm"
+                        className="w-full md:w-auto bg-indigo-600/20 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-600/40 hover:text-white border border-indigo-500/30 font-medium"
                         onClick={() => {
                           if (!project) return;
                           const q = new URLSearchParams({
@@ -451,51 +618,69 @@ function ProjectDetailsContent() {
                           router.push(`/editor?${q.toString()}`);
                         }}
                       >
-                        <Clapperboard className="mr-1 h-3 w-3" /> Editor
+                        <Clapperboard className="mr-2 h-4 w-4" /> Buka Editor
                       </Button>
-                      <Button variant="outline" size="sm" className="text-xs h-7" onClick={() => openEditor(c, i)}>
-                        <Edit3 className="mr-1 h-3 w-3" /> Subs
-                      </Button>
-                      <Button
-                        variant="outline" size="sm" className="text-xs h-7"
-                        onClick={() => handleGenerateCaptions(c, i)}
-                        disabled={generatingCaptions.has(i)}
-                      >
-                        {generatingCaptions.has(i) ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Sparkles className="mr-1 h-3 w-3" />}
-                        Captions
-                      </Button>
-                      <Button
-                        size="sm" className="text-xs h-7"
-                        onClick={() => handleRender(c, i)}
-                        disabled={isRendering}
-                      >
-                        {isRendering ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Download className="mr-1 h-3 w-3" />}
-                        Render
-                      </Button>
-                      {/* F2: In-app Preview */}
-                      {isDone && (
-                        <Button variant="secondary" size="sm" className="text-xs h-7" onClick={() => handlePreviewClip(outputPaths[i], i)}>
-                          <Eye className="mr-1 h-3 w-3" /> Preview
+
+                      <div className="h-8 w-px bg-border mx-1 hidden md:block"></div>
+
+                      <div className="col-span-2 flex flex-wrap gap-2 w-full md:w-auto">
+                        <Button
+                          size="sm"
+                          className="flex-1 md:flex-none bg-primary text-primary-foreground hover:bg-primary/90 rounded border-0"
+                          onClick={() => handleRender(c, i)}
+                          disabled={isRendering}
+                        >
+                          {isRendering && progress !== null ? (
+                            <><Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> {progress}%</>
+                          ) : (
+                            <><Download className="mr-1.5 h-3.5 w-3.5" /> Export 9:16</>
+                          )}
                         </Button>
-                      )}
-                      {isDone && (
-                        <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => window.electronAPI?.showItemInFolder(outputPaths[i])}>
-                          <ExternalLink className="mr-1 h-3 w-3" /> File
+
+                        <Button
+                          variant="secondary" size="sm" className="flex-1 md:flex-none"
+                          onClick={() => handleRenderABTest(c, i)}
+                          disabled={isRendering || !captionVariants[i]}
+                          title="Render 3 separate versions using AI hooks"
+                        >
+                          {isRendering ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Sparkles className="mr-1.5 h-3.5 w-3.5 text-yellow-500" />}
+                          <span className="hidden sm:inline">Export</span> A/B
                         </Button>
-                      )}
-                      <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => openScheduleModal(c, i)}>
-                        <Send className="mr-1 h-3 w-3" /> Schedule
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                      </div>
+
+                      <div className="col-span-2 flex flex-wrap gap-2 w-full md:w-auto md:ml-auto">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => openEditor(c, i)} title="Edit Timings">
+                          <Edit3 className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => handleGenerateCaptions(c, i)} disabled={generatingCaptions.has(i)} title="Generate Caption Hook">
+                          {generatingCaptions.has(i) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Type className="h-4 w-4" />}
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => openScheduleModal(c, i)} disabled={!isDone} title="Jadwalkan Post">
+                          <Send className="h-4 w-4" />
+                        </Button>
+
+                        {isDone && (
+                          <>
+                            <div className="h-8 w-px bg-border mx-1"></div>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-400 hover:bg-blue-400/10 rounded-full" onClick={() => handlePreviewClip(outputPaths[i], i)} title="Preview Video">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => window.electronAPI?.showItemInFolder(outputPaths[i])} title="Buka Folder">
+                              <FolderOpen className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </main>
       </div>
 
-      {/* F2: In-app Clip Preview Modal */}
+      {/* Preview Modal */}
       <Dialog open={!!previewModal} onOpenChange={(open) => !open && setPreviewModal(null)}>
         <DialogContent className="max-w-lg p-0 overflow-hidden">
           <DialogHeader className="p-4 pb-0">
@@ -516,15 +701,15 @@ function ProjectDetailsContent() {
             <DialogTitle>Edit Subtitles & Style</DialogTitle>
             <DialogDescription>Customize font, colors, positions, and adjust subtitle timings.</DialogDescription>
           </DialogHeader>
-          {themePresets.length > 0 && (
+          {brandKits.length > 0 && (
             <div className="bg-muted/30 p-2 rounded border mb-3 flex items-center gap-3">
               <span className="text-sm font-medium">🎨 Apply Brand Kit:</span>
               <select className="text-sm border rounded p-1 bg-background" onChange={(e) => {
-                const sel = themePresets.find(p => p.id === e.target.value);
-                if (sel) { setFontName(sel.fontFamily); setPrimaryColor(sel.primaryColor); setOutlineColor(sel.outlineColor); setAlignment(sel.alignment); setMarginV(sel.marginV); }
+                const sel = brandKits.find(p => p.id === e.target.value);
+                if (sel) { setFontName(sel.fontFamily); setPrimaryColor(sel.primaryColor); }
               }}>
-                <option value="">-- Select Preset --</option>
-                {themePresets.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                <option value="">-- Select Kit --</option>
+                {brandKits.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
             </div>
           )}

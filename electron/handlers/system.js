@@ -37,8 +37,11 @@ ipcMain.handle('shell:openExternal', async (_, url) => {
 ipcMain.handle('file:readAsDataUrl', async (_, filePath) => {
   try {
     const ext = path.extname(filePath).slice(1).toLowerCase();
-    const mimeMap = { mp4: 'video/mp4', mov: 'video/quicktime', avi: 'video/x-msvideo', mkv: 'video/x-matroska', webm: 'video/webm' };
-    const mime = mimeMap[ext] || 'video/mp4';
+    const mimeMap = { 
+      mp4: 'video/mp4', mov: 'video/quicktime', avi: 'video/x-msvideo', mkv: 'video/x-matroska', webm: 'video/webm',
+      mp3: 'audio/mpeg', wav: 'audio/wav', ogg: 'audio/ogg'
+    };
+    const mime = mimeMap[ext] || 'application/octet-stream';
     const buffer = fs.readFileSync(filePath);
     return { success: true, dataUrl: `data:${mime};base64,${buffer.toString('base64')}` };
   } catch (e) {

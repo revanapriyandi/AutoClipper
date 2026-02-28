@@ -14,6 +14,16 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
+ * Model Workspace
+ * 
+ */
+export type Workspace = $Result.DefaultSelection<Prisma.$WorkspacePayload>
+/**
+ * Model BrandKit
+ * 
+ */
+export type BrandKit = $Result.DefaultSelection<Prisma.$BrandKitPayload>
+/**
  * Model Project
  * 
  */
@@ -73,6 +83,11 @@ export type AutopilotConfig = $Result.DefaultSelection<Prisma.$AutopilotConfigPa
  * 
  */
 export type AutopilotHistory = $Result.DefaultSelection<Prisma.$AutopilotHistoryPayload>
+/**
+ * Model ReviewLink
+ * 
+ */
+export type ReviewLink = $Result.DefaultSelection<Prisma.$ReviewLinkPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -81,8 +96,8 @@ export type AutopilotHistory = $Result.DefaultSelection<Prisma.$AutopilotHistory
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Projects
- * const projects = await prisma.project.findMany()
+ * // Fetch zero or more Workspaces
+ * const workspaces = await prisma.workspace.findMany()
  * ```
  *
  *
@@ -102,8 +117,8 @@ export class PrismaClient<
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more Projects
-   * const projects = await prisma.project.findMany()
+   * // Fetch zero or more Workspaces
+   * const workspaces = await prisma.workspace.findMany()
    * ```
    *
    *
@@ -192,6 +207,26 @@ export class PrismaClient<
   }>>
 
       /**
+   * `prisma.workspace`: Exposes CRUD operations for the **Workspace** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Workspaces
+    * const workspaces = await prisma.workspace.findMany()
+    * ```
+    */
+  get workspace(): Prisma.WorkspaceDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.brandKit`: Exposes CRUD operations for the **BrandKit** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BrandKits
+    * const brandKits = await prisma.brandKit.findMany()
+    * ```
+    */
+  get brandKit(): Prisma.BrandKitDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.project`: Exposes CRUD operations for the **Project** model.
     * Example usage:
     * ```ts
@@ -310,6 +345,16 @@ export class PrismaClient<
     * ```
     */
   get autopilotHistory(): Prisma.AutopilotHistoryDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.reviewLink`: Exposes CRUD operations for the **ReviewLink** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ReviewLinks
+    * const reviewLinks = await prisma.reviewLink.findMany()
+    * ```
+    */
+  get reviewLink(): Prisma.ReviewLinkDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -744,6 +789,8 @@ export namespace Prisma {
 
 
   export const ModelName: {
+    Workspace: 'Workspace',
+    BrandKit: 'BrandKit',
     Project: 'Project',
     ClipProfile: 'ClipProfile',
     Transcript: 'Transcript',
@@ -755,7 +802,8 @@ export namespace Prisma {
     Analytics: 'Analytics',
     Settings: 'Settings',
     AutopilotConfig: 'AutopilotConfig',
-    AutopilotHistory: 'AutopilotHistory'
+    AutopilotHistory: 'AutopilotHistory',
+    ReviewLink: 'ReviewLink'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -771,10 +819,158 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "project" | "clipProfile" | "transcript" | "clipCandidate" | "clip" | "asset" | "job" | "themePreset" | "analytics" | "settings" | "autopilotConfig" | "autopilotHistory"
+      modelProps: "workspace" | "brandKit" | "project" | "clipProfile" | "transcript" | "clipCandidate" | "clip" | "asset" | "job" | "themePreset" | "analytics" | "settings" | "autopilotConfig" | "autopilotHistory" | "reviewLink"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
+      Workspace: {
+        payload: Prisma.$WorkspacePayload<ExtArgs>
+        fields: Prisma.WorkspaceFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.WorkspaceFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkspacePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.WorkspaceFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkspacePayload>
+          }
+          findFirst: {
+            args: Prisma.WorkspaceFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkspacePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.WorkspaceFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkspacePayload>
+          }
+          findMany: {
+            args: Prisma.WorkspaceFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkspacePayload>[]
+          }
+          create: {
+            args: Prisma.WorkspaceCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkspacePayload>
+          }
+          createMany: {
+            args: Prisma.WorkspaceCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.WorkspaceCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkspacePayload>[]
+          }
+          delete: {
+            args: Prisma.WorkspaceDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkspacePayload>
+          }
+          update: {
+            args: Prisma.WorkspaceUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkspacePayload>
+          }
+          deleteMany: {
+            args: Prisma.WorkspaceDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.WorkspaceUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.WorkspaceUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkspacePayload>[]
+          }
+          upsert: {
+            args: Prisma.WorkspaceUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkspacePayload>
+          }
+          aggregate: {
+            args: Prisma.WorkspaceAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateWorkspace>
+          }
+          groupBy: {
+            args: Prisma.WorkspaceGroupByArgs<ExtArgs>
+            result: $Utils.Optional<WorkspaceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.WorkspaceCountArgs<ExtArgs>
+            result: $Utils.Optional<WorkspaceCountAggregateOutputType> | number
+          }
+        }
+      }
+      BrandKit: {
+        payload: Prisma.$BrandKitPayload<ExtArgs>
+        fields: Prisma.BrandKitFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BrandKitFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BrandKitPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BrandKitFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BrandKitPayload>
+          }
+          findFirst: {
+            args: Prisma.BrandKitFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BrandKitPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BrandKitFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BrandKitPayload>
+          }
+          findMany: {
+            args: Prisma.BrandKitFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BrandKitPayload>[]
+          }
+          create: {
+            args: Prisma.BrandKitCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BrandKitPayload>
+          }
+          createMany: {
+            args: Prisma.BrandKitCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BrandKitCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BrandKitPayload>[]
+          }
+          delete: {
+            args: Prisma.BrandKitDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BrandKitPayload>
+          }
+          update: {
+            args: Prisma.BrandKitUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BrandKitPayload>
+          }
+          deleteMany: {
+            args: Prisma.BrandKitDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BrandKitUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BrandKitUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BrandKitPayload>[]
+          }
+          upsert: {
+            args: Prisma.BrandKitUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BrandKitPayload>
+          }
+          aggregate: {
+            args: Prisma.BrandKitAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBrandKit>
+          }
+          groupBy: {
+            args: Prisma.BrandKitGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BrandKitGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BrandKitCountArgs<ExtArgs>
+            result: $Utils.Optional<BrandKitCountAggregateOutputType> | number
+          }
+        }
+      }
       Project: {
         payload: Prisma.$ProjectPayload<ExtArgs>
         fields: Prisma.ProjectFieldRefs
@@ -1663,6 +1859,80 @@ export namespace Prisma {
           }
         }
       }
+      ReviewLink: {
+        payload: Prisma.$ReviewLinkPayload<ExtArgs>
+        fields: Prisma.ReviewLinkFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ReviewLinkFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReviewLinkPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ReviewLinkFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReviewLinkPayload>
+          }
+          findFirst: {
+            args: Prisma.ReviewLinkFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReviewLinkPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ReviewLinkFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReviewLinkPayload>
+          }
+          findMany: {
+            args: Prisma.ReviewLinkFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReviewLinkPayload>[]
+          }
+          create: {
+            args: Prisma.ReviewLinkCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReviewLinkPayload>
+          }
+          createMany: {
+            args: Prisma.ReviewLinkCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ReviewLinkCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReviewLinkPayload>[]
+          }
+          delete: {
+            args: Prisma.ReviewLinkDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReviewLinkPayload>
+          }
+          update: {
+            args: Prisma.ReviewLinkUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReviewLinkPayload>
+          }
+          deleteMany: {
+            args: Prisma.ReviewLinkDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ReviewLinkUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ReviewLinkUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReviewLinkPayload>[]
+          }
+          upsert: {
+            args: Prisma.ReviewLinkUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReviewLinkPayload>
+          }
+          aggregate: {
+            args: Prisma.ReviewLinkAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateReviewLink>
+          }
+          groupBy: {
+            args: Prisma.ReviewLinkGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ReviewLinkGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ReviewLinkCountArgs<ExtArgs>
+            result: $Utils.Optional<ReviewLinkCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1771,6 +2041,8 @@ export namespace Prisma {
     comments?: runtime.SqlCommenterPlugin[]
   }
   export type GlobalOmitConfig = {
+    workspace?: WorkspaceOmit
+    brandKit?: BrandKitOmit
     project?: ProjectOmit
     clipProfile?: ClipProfileOmit
     transcript?: TranscriptOmit
@@ -1783,6 +2055,7 @@ export namespace Prisma {
     settings?: SettingsOmit
     autopilotConfig?: AutopilotConfigOmit
     autopilotHistory?: AutopilotHistoryOmit
+    reviewLink?: ReviewLinkOmit
   }
 
   /* Types for Logging */
@@ -1859,6 +2132,77 @@ export namespace Prisma {
 
 
   /**
+   * Count Type WorkspaceCountOutputType
+   */
+
+  export type WorkspaceCountOutputType = {
+    kits: number
+    projects: number
+  }
+
+  export type WorkspaceCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    kits?: boolean | WorkspaceCountOutputTypeCountKitsArgs
+    projects?: boolean | WorkspaceCountOutputTypeCountProjectsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * WorkspaceCountOutputType without action
+   */
+  export type WorkspaceCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WorkspaceCountOutputType
+     */
+    select?: WorkspaceCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * WorkspaceCountOutputType without action
+   */
+  export type WorkspaceCountOutputTypeCountKitsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BrandKitWhereInput
+  }
+
+  /**
+   * WorkspaceCountOutputType without action
+   */
+  export type WorkspaceCountOutputTypeCountProjectsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProjectWhereInput
+  }
+
+
+  /**
+   * Count Type BrandKitCountOutputType
+   */
+
+  export type BrandKitCountOutputType = {
+    projects: number
+  }
+
+  export type BrandKitCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    projects?: boolean | BrandKitCountOutputTypeCountProjectsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * BrandKitCountOutputType without action
+   */
+  export type BrandKitCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKitCountOutputType
+     */
+    select?: BrandKitCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * BrandKitCountOutputType without action
+   */
+  export type BrandKitCountOutputTypeCountProjectsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProjectWhereInput
+  }
+
+
+  /**
    * Count Type ProjectCountOutputType
    */
 
@@ -1866,12 +2210,14 @@ export namespace Prisma {
     transcripts: number
     candidates: number
     clips: number
+    reviewLinks: number
   }
 
   export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     transcripts?: boolean | ProjectCountOutputTypeCountTranscriptsArgs
     candidates?: boolean | ProjectCountOutputTypeCountCandidatesArgs
     clips?: boolean | ProjectCountOutputTypeCountClipsArgs
+    reviewLinks?: boolean | ProjectCountOutputTypeCountReviewLinksArgs
   }
 
   // Custom InputTypes
@@ -1906,6 +2252,13 @@ export namespace Prisma {
     where?: ClipWhereInput
   }
 
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountReviewLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ReviewLinkWhereInput
+  }
+
 
   /**
    * Count Type ClipCountOutputType
@@ -1914,11 +2267,13 @@ export namespace Prisma {
   export type ClipCountOutputType = {
     assets: number
     analytics: number
+    reviewLinks: number
   }
 
   export type ClipCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     assets?: boolean | ClipCountOutputTypeCountAssetsArgs
     analytics?: boolean | ClipCountOutputTypeCountAnalyticsArgs
+    reviewLinks?: boolean | ClipCountOutputTypeCountReviewLinksArgs
   }
 
   // Custom InputTypes
@@ -1946,10 +2301,2238 @@ export namespace Prisma {
     where?: AnalyticsWhereInput
   }
 
+  /**
+   * ClipCountOutputType without action
+   */
+  export type ClipCountOutputTypeCountReviewLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ReviewLinkWhereInput
+  }
+
 
   /**
    * Models
    */
+
+  /**
+   * Model Workspace
+   */
+
+  export type AggregateWorkspace = {
+    _count: WorkspaceCountAggregateOutputType | null
+    _min: WorkspaceMinAggregateOutputType | null
+    _max: WorkspaceMaxAggregateOutputType | null
+  }
+
+  export type WorkspaceMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    userId: string | null
+  }
+
+  export type WorkspaceMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    userId: string | null
+  }
+
+  export type WorkspaceCountAggregateOutputType = {
+    id: number
+    name: number
+    createdAt: number
+    updatedAt: number
+    userId: number
+    _all: number
+  }
+
+
+  export type WorkspaceMinAggregateInputType = {
+    id?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+  }
+
+  export type WorkspaceMaxAggregateInputType = {
+    id?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+  }
+
+  export type WorkspaceCountAggregateInputType = {
+    id?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+    userId?: true
+    _all?: true
+  }
+
+  export type WorkspaceAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Workspace to aggregate.
+     */
+    where?: WorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Workspaces to fetch.
+     */
+    orderBy?: WorkspaceOrderByWithRelationInput | WorkspaceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: WorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Workspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Workspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Workspaces
+    **/
+    _count?: true | WorkspaceCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: WorkspaceMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: WorkspaceMaxAggregateInputType
+  }
+
+  export type GetWorkspaceAggregateType<T extends WorkspaceAggregateArgs> = {
+        [P in keyof T & keyof AggregateWorkspace]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateWorkspace[P]>
+      : GetScalarType<T[P], AggregateWorkspace[P]>
+  }
+
+
+
+
+  export type WorkspaceGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WorkspaceWhereInput
+    orderBy?: WorkspaceOrderByWithAggregationInput | WorkspaceOrderByWithAggregationInput[]
+    by: WorkspaceScalarFieldEnum[] | WorkspaceScalarFieldEnum
+    having?: WorkspaceScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: WorkspaceCountAggregateInputType | true
+    _min?: WorkspaceMinAggregateInputType
+    _max?: WorkspaceMaxAggregateInputType
+  }
+
+  export type WorkspaceGroupByOutputType = {
+    id: string
+    name: string
+    createdAt: Date
+    updatedAt: Date
+    userId: string | null
+    _count: WorkspaceCountAggregateOutputType | null
+    _min: WorkspaceMinAggregateOutputType | null
+    _max: WorkspaceMaxAggregateOutputType | null
+  }
+
+  type GetWorkspaceGroupByPayload<T extends WorkspaceGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<WorkspaceGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof WorkspaceGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], WorkspaceGroupByOutputType[P]>
+            : GetScalarType<T[P], WorkspaceGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type WorkspaceSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+    kits?: boolean | Workspace$kitsArgs<ExtArgs>
+    projects?: boolean | Workspace$projectsArgs<ExtArgs>
+    _count?: boolean | WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["workspace"]>
+
+  export type WorkspaceSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+  }, ExtArgs["result"]["workspace"]>
+
+  export type WorkspaceSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+  }, ExtArgs["result"]["workspace"]>
+
+  export type WorkspaceSelectScalar = {
+    id?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    userId?: boolean
+  }
+
+  export type WorkspaceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["workspace"]>
+  export type WorkspaceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    kits?: boolean | Workspace$kitsArgs<ExtArgs>
+    projects?: boolean | Workspace$projectsArgs<ExtArgs>
+    _count?: boolean | WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type WorkspaceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type WorkspaceIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $WorkspacePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Workspace"
+    objects: {
+      kits: Prisma.$BrandKitPayload<ExtArgs>[]
+      projects: Prisma.$ProjectPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      createdAt: Date
+      updatedAt: Date
+      userId: string | null
+    }, ExtArgs["result"]["workspace"]>
+    composites: {}
+  }
+
+  type WorkspaceGetPayload<S extends boolean | null | undefined | WorkspaceDefaultArgs> = $Result.GetResult<Prisma.$WorkspacePayload, S>
+
+  type WorkspaceCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<WorkspaceFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: WorkspaceCountAggregateInputType | true
+    }
+
+  export interface WorkspaceDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Workspace'], meta: { name: 'Workspace' } }
+    /**
+     * Find zero or one Workspace that matches the filter.
+     * @param {WorkspaceFindUniqueArgs} args - Arguments to find a Workspace
+     * @example
+     * // Get one Workspace
+     * const workspace = await prisma.workspace.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends WorkspaceFindUniqueArgs>(args: SelectSubset<T, WorkspaceFindUniqueArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Workspace that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {WorkspaceFindUniqueOrThrowArgs} args - Arguments to find a Workspace
+     * @example
+     * // Get one Workspace
+     * const workspace = await prisma.workspace.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends WorkspaceFindUniqueOrThrowArgs>(args: SelectSubset<T, WorkspaceFindUniqueOrThrowArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Workspace that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceFindFirstArgs} args - Arguments to find a Workspace
+     * @example
+     * // Get one Workspace
+     * const workspace = await prisma.workspace.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends WorkspaceFindFirstArgs>(args?: SelectSubset<T, WorkspaceFindFirstArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Workspace that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceFindFirstOrThrowArgs} args - Arguments to find a Workspace
+     * @example
+     * // Get one Workspace
+     * const workspace = await prisma.workspace.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends WorkspaceFindFirstOrThrowArgs>(args?: SelectSubset<T, WorkspaceFindFirstOrThrowArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Workspaces that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Workspaces
+     * const workspaces = await prisma.workspace.findMany()
+     * 
+     * // Get first 10 Workspaces
+     * const workspaces = await prisma.workspace.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const workspaceWithIdOnly = await prisma.workspace.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends WorkspaceFindManyArgs>(args?: SelectSubset<T, WorkspaceFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Workspace.
+     * @param {WorkspaceCreateArgs} args - Arguments to create a Workspace.
+     * @example
+     * // Create one Workspace
+     * const Workspace = await prisma.workspace.create({
+     *   data: {
+     *     // ... data to create a Workspace
+     *   }
+     * })
+     * 
+     */
+    create<T extends WorkspaceCreateArgs>(args: SelectSubset<T, WorkspaceCreateArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Workspaces.
+     * @param {WorkspaceCreateManyArgs} args - Arguments to create many Workspaces.
+     * @example
+     * // Create many Workspaces
+     * const workspace = await prisma.workspace.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends WorkspaceCreateManyArgs>(args?: SelectSubset<T, WorkspaceCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Workspaces and returns the data saved in the database.
+     * @param {WorkspaceCreateManyAndReturnArgs} args - Arguments to create many Workspaces.
+     * @example
+     * // Create many Workspaces
+     * const workspace = await prisma.workspace.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Workspaces and only return the `id`
+     * const workspaceWithIdOnly = await prisma.workspace.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends WorkspaceCreateManyAndReturnArgs>(args?: SelectSubset<T, WorkspaceCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Workspace.
+     * @param {WorkspaceDeleteArgs} args - Arguments to delete one Workspace.
+     * @example
+     * // Delete one Workspace
+     * const Workspace = await prisma.workspace.delete({
+     *   where: {
+     *     // ... filter to delete one Workspace
+     *   }
+     * })
+     * 
+     */
+    delete<T extends WorkspaceDeleteArgs>(args: SelectSubset<T, WorkspaceDeleteArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Workspace.
+     * @param {WorkspaceUpdateArgs} args - Arguments to update one Workspace.
+     * @example
+     * // Update one Workspace
+     * const workspace = await prisma.workspace.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends WorkspaceUpdateArgs>(args: SelectSubset<T, WorkspaceUpdateArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Workspaces.
+     * @param {WorkspaceDeleteManyArgs} args - Arguments to filter Workspaces to delete.
+     * @example
+     * // Delete a few Workspaces
+     * const { count } = await prisma.workspace.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends WorkspaceDeleteManyArgs>(args?: SelectSubset<T, WorkspaceDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Workspaces.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Workspaces
+     * const workspace = await prisma.workspace.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends WorkspaceUpdateManyArgs>(args: SelectSubset<T, WorkspaceUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Workspaces and returns the data updated in the database.
+     * @param {WorkspaceUpdateManyAndReturnArgs} args - Arguments to update many Workspaces.
+     * @example
+     * // Update many Workspaces
+     * const workspace = await prisma.workspace.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Workspaces and only return the `id`
+     * const workspaceWithIdOnly = await prisma.workspace.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends WorkspaceUpdateManyAndReturnArgs>(args: SelectSubset<T, WorkspaceUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Workspace.
+     * @param {WorkspaceUpsertArgs} args - Arguments to update or create a Workspace.
+     * @example
+     * // Update or create a Workspace
+     * const workspace = await prisma.workspace.upsert({
+     *   create: {
+     *     // ... data to create a Workspace
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Workspace we want to update
+     *   }
+     * })
+     */
+    upsert<T extends WorkspaceUpsertArgs>(args: SelectSubset<T, WorkspaceUpsertArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Workspaces.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceCountArgs} args - Arguments to filter Workspaces to count.
+     * @example
+     * // Count the number of Workspaces
+     * const count = await prisma.workspace.count({
+     *   where: {
+     *     // ... the filter for the Workspaces we want to count
+     *   }
+     * })
+    **/
+    count<T extends WorkspaceCountArgs>(
+      args?: Subset<T, WorkspaceCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], WorkspaceCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Workspace.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends WorkspaceAggregateArgs>(args: Subset<T, WorkspaceAggregateArgs>): Prisma.PrismaPromise<GetWorkspaceAggregateType<T>>
+
+    /**
+     * Group by Workspace.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkspaceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends WorkspaceGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: WorkspaceGroupByArgs['orderBy'] }
+        : { orderBy?: WorkspaceGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, WorkspaceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetWorkspaceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Workspace model
+   */
+  readonly fields: WorkspaceFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Workspace.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__WorkspaceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    kits<T extends Workspace$kitsArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$kitsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    projects<T extends Workspace$projectsArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Workspace model
+   */
+  interface WorkspaceFieldRefs {
+    readonly id: FieldRef<"Workspace", 'String'>
+    readonly name: FieldRef<"Workspace", 'String'>
+    readonly createdAt: FieldRef<"Workspace", 'DateTime'>
+    readonly updatedAt: FieldRef<"Workspace", 'DateTime'>
+    readonly userId: FieldRef<"Workspace", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Workspace findUnique
+   */
+  export type WorkspaceFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which Workspace to fetch.
+     */
+    where: WorkspaceWhereUniqueInput
+  }
+
+  /**
+   * Workspace findUniqueOrThrow
+   */
+  export type WorkspaceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which Workspace to fetch.
+     */
+    where: WorkspaceWhereUniqueInput
+  }
+
+  /**
+   * Workspace findFirst
+   */
+  export type WorkspaceFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which Workspace to fetch.
+     */
+    where?: WorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Workspaces to fetch.
+     */
+    orderBy?: WorkspaceOrderByWithRelationInput | WorkspaceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Workspaces.
+     */
+    cursor?: WorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Workspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Workspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Workspaces.
+     */
+    distinct?: WorkspaceScalarFieldEnum | WorkspaceScalarFieldEnum[]
+  }
+
+  /**
+   * Workspace findFirstOrThrow
+   */
+  export type WorkspaceFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which Workspace to fetch.
+     */
+    where?: WorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Workspaces to fetch.
+     */
+    orderBy?: WorkspaceOrderByWithRelationInput | WorkspaceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Workspaces.
+     */
+    cursor?: WorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Workspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Workspaces.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Workspaces.
+     */
+    distinct?: WorkspaceScalarFieldEnum | WorkspaceScalarFieldEnum[]
+  }
+
+  /**
+   * Workspace findMany
+   */
+  export type WorkspaceFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter, which Workspaces to fetch.
+     */
+    where?: WorkspaceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Workspaces to fetch.
+     */
+    orderBy?: WorkspaceOrderByWithRelationInput | WorkspaceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Workspaces.
+     */
+    cursor?: WorkspaceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Workspaces from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Workspaces.
+     */
+    skip?: number
+    distinct?: WorkspaceScalarFieldEnum | WorkspaceScalarFieldEnum[]
+  }
+
+  /**
+   * Workspace create
+   */
+  export type WorkspaceCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Workspace.
+     */
+    data: XOR<WorkspaceCreateInput, WorkspaceUncheckedCreateInput>
+  }
+
+  /**
+   * Workspace createMany
+   */
+  export type WorkspaceCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Workspaces.
+     */
+    data: WorkspaceCreateManyInput | WorkspaceCreateManyInput[]
+  }
+
+  /**
+   * Workspace createManyAndReturn
+   */
+  export type WorkspaceCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * The data used to create many Workspaces.
+     */
+    data: WorkspaceCreateManyInput | WorkspaceCreateManyInput[]
+  }
+
+  /**
+   * Workspace update
+   */
+  export type WorkspaceUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Workspace.
+     */
+    data: XOR<WorkspaceUpdateInput, WorkspaceUncheckedUpdateInput>
+    /**
+     * Choose, which Workspace to update.
+     */
+    where: WorkspaceWhereUniqueInput
+  }
+
+  /**
+   * Workspace updateMany
+   */
+  export type WorkspaceUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Workspaces.
+     */
+    data: XOR<WorkspaceUpdateManyMutationInput, WorkspaceUncheckedUpdateManyInput>
+    /**
+     * Filter which Workspaces to update
+     */
+    where?: WorkspaceWhereInput
+    /**
+     * Limit how many Workspaces to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Workspace updateManyAndReturn
+   */
+  export type WorkspaceUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * The data used to update Workspaces.
+     */
+    data: XOR<WorkspaceUpdateManyMutationInput, WorkspaceUncheckedUpdateManyInput>
+    /**
+     * Filter which Workspaces to update
+     */
+    where?: WorkspaceWhereInput
+    /**
+     * Limit how many Workspaces to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Workspace upsert
+   */
+  export type WorkspaceUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Workspace to update in case it exists.
+     */
+    where: WorkspaceWhereUniqueInput
+    /**
+     * In case the Workspace found by the `where` argument doesn't exist, create a new Workspace with this data.
+     */
+    create: XOR<WorkspaceCreateInput, WorkspaceUncheckedCreateInput>
+    /**
+     * In case the Workspace was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<WorkspaceUpdateInput, WorkspaceUncheckedUpdateInput>
+  }
+
+  /**
+   * Workspace delete
+   */
+  export type WorkspaceDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    /**
+     * Filter which Workspace to delete.
+     */
+    where: WorkspaceWhereUniqueInput
+  }
+
+  /**
+   * Workspace deleteMany
+   */
+  export type WorkspaceDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Workspaces to delete
+     */
+    where?: WorkspaceWhereInput
+    /**
+     * Limit how many Workspaces to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Workspace.kits
+   */
+  export type Workspace$kitsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+    where?: BrandKitWhereInput
+    orderBy?: BrandKitOrderByWithRelationInput | BrandKitOrderByWithRelationInput[]
+    cursor?: BrandKitWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BrandKitScalarFieldEnum | BrandKitScalarFieldEnum[]
+  }
+
+  /**
+   * Workspace.projects
+   */
+  export type Workspace$projectsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Project
+     */
+    select?: ProjectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Project
+     */
+    omit?: ProjectOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectInclude<ExtArgs> | null
+    where?: ProjectWhereInput
+    orderBy?: ProjectOrderByWithRelationInput | ProjectOrderByWithRelationInput[]
+    cursor?: ProjectWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProjectScalarFieldEnum | ProjectScalarFieldEnum[]
+  }
+
+  /**
+   * Workspace without action
+   */
+  export type WorkspaceDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BrandKit
+   */
+
+  export type AggregateBrandKit = {
+    _count: BrandKitCountAggregateOutputType | null
+    _min: BrandKitMinAggregateOutputType | null
+    _max: BrandKitMaxAggregateOutputType | null
+  }
+
+  export type BrandKitMinAggregateOutputType = {
+    id: string | null
+    workspaceId: string | null
+    name: string | null
+    fontFamily: string | null
+    primaryColor: string | null
+    watermarkPath: string | null
+    logoPath: string | null
+    createdAt: Date | null
+  }
+
+  export type BrandKitMaxAggregateOutputType = {
+    id: string | null
+    workspaceId: string | null
+    name: string | null
+    fontFamily: string | null
+    primaryColor: string | null
+    watermarkPath: string | null
+    logoPath: string | null
+    createdAt: Date | null
+  }
+
+  export type BrandKitCountAggregateOutputType = {
+    id: number
+    workspaceId: number
+    name: number
+    fontFamily: number
+    primaryColor: number
+    watermarkPath: number
+    logoPath: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type BrandKitMinAggregateInputType = {
+    id?: true
+    workspaceId?: true
+    name?: true
+    fontFamily?: true
+    primaryColor?: true
+    watermarkPath?: true
+    logoPath?: true
+    createdAt?: true
+  }
+
+  export type BrandKitMaxAggregateInputType = {
+    id?: true
+    workspaceId?: true
+    name?: true
+    fontFamily?: true
+    primaryColor?: true
+    watermarkPath?: true
+    logoPath?: true
+    createdAt?: true
+  }
+
+  export type BrandKitCountAggregateInputType = {
+    id?: true
+    workspaceId?: true
+    name?: true
+    fontFamily?: true
+    primaryColor?: true
+    watermarkPath?: true
+    logoPath?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type BrandKitAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BrandKit to aggregate.
+     */
+    where?: BrandKitWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BrandKits to fetch.
+     */
+    orderBy?: BrandKitOrderByWithRelationInput | BrandKitOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BrandKitWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BrandKits from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BrandKits.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BrandKits
+    **/
+    _count?: true | BrandKitCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BrandKitMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BrandKitMaxAggregateInputType
+  }
+
+  export type GetBrandKitAggregateType<T extends BrandKitAggregateArgs> = {
+        [P in keyof T & keyof AggregateBrandKit]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBrandKit[P]>
+      : GetScalarType<T[P], AggregateBrandKit[P]>
+  }
+
+
+
+
+  export type BrandKitGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BrandKitWhereInput
+    orderBy?: BrandKitOrderByWithAggregationInput | BrandKitOrderByWithAggregationInput[]
+    by: BrandKitScalarFieldEnum[] | BrandKitScalarFieldEnum
+    having?: BrandKitScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BrandKitCountAggregateInputType | true
+    _min?: BrandKitMinAggregateInputType
+    _max?: BrandKitMaxAggregateInputType
+  }
+
+  export type BrandKitGroupByOutputType = {
+    id: string
+    workspaceId: string
+    name: string
+    fontFamily: string
+    primaryColor: string
+    watermarkPath: string | null
+    logoPath: string | null
+    createdAt: Date
+    _count: BrandKitCountAggregateOutputType | null
+    _min: BrandKitMinAggregateOutputType | null
+    _max: BrandKitMaxAggregateOutputType | null
+  }
+
+  type GetBrandKitGroupByPayload<T extends BrandKitGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BrandKitGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BrandKitGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BrandKitGroupByOutputType[P]>
+            : GetScalarType<T[P], BrandKitGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BrandKitSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    workspaceId?: boolean
+    name?: boolean
+    fontFamily?: boolean
+    primaryColor?: boolean
+    watermarkPath?: boolean
+    logoPath?: boolean
+    createdAt?: boolean
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+    projects?: boolean | BrandKit$projectsArgs<ExtArgs>
+    _count?: boolean | BrandKitCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["brandKit"]>
+
+  export type BrandKitSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    workspaceId?: boolean
+    name?: boolean
+    fontFamily?: boolean
+    primaryColor?: boolean
+    watermarkPath?: boolean
+    logoPath?: boolean
+    createdAt?: boolean
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["brandKit"]>
+
+  export type BrandKitSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    workspaceId?: boolean
+    name?: boolean
+    fontFamily?: boolean
+    primaryColor?: boolean
+    watermarkPath?: boolean
+    logoPath?: boolean
+    createdAt?: boolean
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["brandKit"]>
+
+  export type BrandKitSelectScalar = {
+    id?: boolean
+    workspaceId?: boolean
+    name?: boolean
+    fontFamily?: boolean
+    primaryColor?: boolean
+    watermarkPath?: boolean
+    logoPath?: boolean
+    createdAt?: boolean
+  }
+
+  export type BrandKitOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "workspaceId" | "name" | "fontFamily" | "primaryColor" | "watermarkPath" | "logoPath" | "createdAt", ExtArgs["result"]["brandKit"]>
+  export type BrandKitInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+    projects?: boolean | BrandKit$projectsArgs<ExtArgs>
+    _count?: boolean | BrandKitCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type BrandKitIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+  }
+  export type BrandKitIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+  }
+
+  export type $BrandKitPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BrandKit"
+    objects: {
+      workspace: Prisma.$WorkspacePayload<ExtArgs>
+      projects: Prisma.$ProjectPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      workspaceId: string
+      name: string
+      fontFamily: string
+      primaryColor: string
+      watermarkPath: string | null
+      logoPath: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["brandKit"]>
+    composites: {}
+  }
+
+  type BrandKitGetPayload<S extends boolean | null | undefined | BrandKitDefaultArgs> = $Result.GetResult<Prisma.$BrandKitPayload, S>
+
+  type BrandKitCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BrandKitFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BrandKitCountAggregateInputType | true
+    }
+
+  export interface BrandKitDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BrandKit'], meta: { name: 'BrandKit' } }
+    /**
+     * Find zero or one BrandKit that matches the filter.
+     * @param {BrandKitFindUniqueArgs} args - Arguments to find a BrandKit
+     * @example
+     * // Get one BrandKit
+     * const brandKit = await prisma.brandKit.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BrandKitFindUniqueArgs>(args: SelectSubset<T, BrandKitFindUniqueArgs<ExtArgs>>): Prisma__BrandKitClient<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BrandKit that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BrandKitFindUniqueOrThrowArgs} args - Arguments to find a BrandKit
+     * @example
+     * // Get one BrandKit
+     * const brandKit = await prisma.brandKit.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BrandKitFindUniqueOrThrowArgs>(args: SelectSubset<T, BrandKitFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BrandKitClient<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BrandKit that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BrandKitFindFirstArgs} args - Arguments to find a BrandKit
+     * @example
+     * // Get one BrandKit
+     * const brandKit = await prisma.brandKit.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BrandKitFindFirstArgs>(args?: SelectSubset<T, BrandKitFindFirstArgs<ExtArgs>>): Prisma__BrandKitClient<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BrandKit that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BrandKitFindFirstOrThrowArgs} args - Arguments to find a BrandKit
+     * @example
+     * // Get one BrandKit
+     * const brandKit = await prisma.brandKit.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BrandKitFindFirstOrThrowArgs>(args?: SelectSubset<T, BrandKitFindFirstOrThrowArgs<ExtArgs>>): Prisma__BrandKitClient<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BrandKits that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BrandKitFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BrandKits
+     * const brandKits = await prisma.brandKit.findMany()
+     * 
+     * // Get first 10 BrandKits
+     * const brandKits = await prisma.brandKit.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const brandKitWithIdOnly = await prisma.brandKit.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BrandKitFindManyArgs>(args?: SelectSubset<T, BrandKitFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BrandKit.
+     * @param {BrandKitCreateArgs} args - Arguments to create a BrandKit.
+     * @example
+     * // Create one BrandKit
+     * const BrandKit = await prisma.brandKit.create({
+     *   data: {
+     *     // ... data to create a BrandKit
+     *   }
+     * })
+     * 
+     */
+    create<T extends BrandKitCreateArgs>(args: SelectSubset<T, BrandKitCreateArgs<ExtArgs>>): Prisma__BrandKitClient<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BrandKits.
+     * @param {BrandKitCreateManyArgs} args - Arguments to create many BrandKits.
+     * @example
+     * // Create many BrandKits
+     * const brandKit = await prisma.brandKit.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BrandKitCreateManyArgs>(args?: SelectSubset<T, BrandKitCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BrandKits and returns the data saved in the database.
+     * @param {BrandKitCreateManyAndReturnArgs} args - Arguments to create many BrandKits.
+     * @example
+     * // Create many BrandKits
+     * const brandKit = await prisma.brandKit.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BrandKits and only return the `id`
+     * const brandKitWithIdOnly = await prisma.brandKit.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BrandKitCreateManyAndReturnArgs>(args?: SelectSubset<T, BrandKitCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BrandKit.
+     * @param {BrandKitDeleteArgs} args - Arguments to delete one BrandKit.
+     * @example
+     * // Delete one BrandKit
+     * const BrandKit = await prisma.brandKit.delete({
+     *   where: {
+     *     // ... filter to delete one BrandKit
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BrandKitDeleteArgs>(args: SelectSubset<T, BrandKitDeleteArgs<ExtArgs>>): Prisma__BrandKitClient<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BrandKit.
+     * @param {BrandKitUpdateArgs} args - Arguments to update one BrandKit.
+     * @example
+     * // Update one BrandKit
+     * const brandKit = await prisma.brandKit.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BrandKitUpdateArgs>(args: SelectSubset<T, BrandKitUpdateArgs<ExtArgs>>): Prisma__BrandKitClient<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BrandKits.
+     * @param {BrandKitDeleteManyArgs} args - Arguments to filter BrandKits to delete.
+     * @example
+     * // Delete a few BrandKits
+     * const { count } = await prisma.brandKit.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BrandKitDeleteManyArgs>(args?: SelectSubset<T, BrandKitDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BrandKits.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BrandKitUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BrandKits
+     * const brandKit = await prisma.brandKit.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BrandKitUpdateManyArgs>(args: SelectSubset<T, BrandKitUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BrandKits and returns the data updated in the database.
+     * @param {BrandKitUpdateManyAndReturnArgs} args - Arguments to update many BrandKits.
+     * @example
+     * // Update many BrandKits
+     * const brandKit = await prisma.brandKit.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BrandKits and only return the `id`
+     * const brandKitWithIdOnly = await prisma.brandKit.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BrandKitUpdateManyAndReturnArgs>(args: SelectSubset<T, BrandKitUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BrandKit.
+     * @param {BrandKitUpsertArgs} args - Arguments to update or create a BrandKit.
+     * @example
+     * // Update or create a BrandKit
+     * const brandKit = await prisma.brandKit.upsert({
+     *   create: {
+     *     // ... data to create a BrandKit
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BrandKit we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BrandKitUpsertArgs>(args: SelectSubset<T, BrandKitUpsertArgs<ExtArgs>>): Prisma__BrandKitClient<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BrandKits.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BrandKitCountArgs} args - Arguments to filter BrandKits to count.
+     * @example
+     * // Count the number of BrandKits
+     * const count = await prisma.brandKit.count({
+     *   where: {
+     *     // ... the filter for the BrandKits we want to count
+     *   }
+     * })
+    **/
+    count<T extends BrandKitCountArgs>(
+      args?: Subset<T, BrandKitCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BrandKitCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BrandKit.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BrandKitAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BrandKitAggregateArgs>(args: Subset<T, BrandKitAggregateArgs>): Prisma.PrismaPromise<GetBrandKitAggregateType<T>>
+
+    /**
+     * Group by BrandKit.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BrandKitGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BrandKitGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BrandKitGroupByArgs['orderBy'] }
+        : { orderBy?: BrandKitGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BrandKitGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBrandKitGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BrandKit model
+   */
+  readonly fields: BrandKitFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BrandKit.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BrandKitClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    workspace<T extends WorkspaceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, WorkspaceDefaultArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    projects<T extends BrandKit$projectsArgs<ExtArgs> = {}>(args?: Subset<T, BrandKit$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BrandKit model
+   */
+  interface BrandKitFieldRefs {
+    readonly id: FieldRef<"BrandKit", 'String'>
+    readonly workspaceId: FieldRef<"BrandKit", 'String'>
+    readonly name: FieldRef<"BrandKit", 'String'>
+    readonly fontFamily: FieldRef<"BrandKit", 'String'>
+    readonly primaryColor: FieldRef<"BrandKit", 'String'>
+    readonly watermarkPath: FieldRef<"BrandKit", 'String'>
+    readonly logoPath: FieldRef<"BrandKit", 'String'>
+    readonly createdAt: FieldRef<"BrandKit", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BrandKit findUnique
+   */
+  export type BrandKitFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+    /**
+     * Filter, which BrandKit to fetch.
+     */
+    where: BrandKitWhereUniqueInput
+  }
+
+  /**
+   * BrandKit findUniqueOrThrow
+   */
+  export type BrandKitFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+    /**
+     * Filter, which BrandKit to fetch.
+     */
+    where: BrandKitWhereUniqueInput
+  }
+
+  /**
+   * BrandKit findFirst
+   */
+  export type BrandKitFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+    /**
+     * Filter, which BrandKit to fetch.
+     */
+    where?: BrandKitWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BrandKits to fetch.
+     */
+    orderBy?: BrandKitOrderByWithRelationInput | BrandKitOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BrandKits.
+     */
+    cursor?: BrandKitWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BrandKits from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BrandKits.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BrandKits.
+     */
+    distinct?: BrandKitScalarFieldEnum | BrandKitScalarFieldEnum[]
+  }
+
+  /**
+   * BrandKit findFirstOrThrow
+   */
+  export type BrandKitFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+    /**
+     * Filter, which BrandKit to fetch.
+     */
+    where?: BrandKitWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BrandKits to fetch.
+     */
+    orderBy?: BrandKitOrderByWithRelationInput | BrandKitOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BrandKits.
+     */
+    cursor?: BrandKitWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BrandKits from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BrandKits.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BrandKits.
+     */
+    distinct?: BrandKitScalarFieldEnum | BrandKitScalarFieldEnum[]
+  }
+
+  /**
+   * BrandKit findMany
+   */
+  export type BrandKitFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+    /**
+     * Filter, which BrandKits to fetch.
+     */
+    where?: BrandKitWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BrandKits to fetch.
+     */
+    orderBy?: BrandKitOrderByWithRelationInput | BrandKitOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BrandKits.
+     */
+    cursor?: BrandKitWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BrandKits from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BrandKits.
+     */
+    skip?: number
+    distinct?: BrandKitScalarFieldEnum | BrandKitScalarFieldEnum[]
+  }
+
+  /**
+   * BrandKit create
+   */
+  export type BrandKitCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BrandKit.
+     */
+    data: XOR<BrandKitCreateInput, BrandKitUncheckedCreateInput>
+  }
+
+  /**
+   * BrandKit createMany
+   */
+  export type BrandKitCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BrandKits.
+     */
+    data: BrandKitCreateManyInput | BrandKitCreateManyInput[]
+  }
+
+  /**
+   * BrandKit createManyAndReturn
+   */
+  export type BrandKitCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * The data used to create many BrandKits.
+     */
+    data: BrandKitCreateManyInput | BrandKitCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BrandKit update
+   */
+  export type BrandKitUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BrandKit.
+     */
+    data: XOR<BrandKitUpdateInput, BrandKitUncheckedUpdateInput>
+    /**
+     * Choose, which BrandKit to update.
+     */
+    where: BrandKitWhereUniqueInput
+  }
+
+  /**
+   * BrandKit updateMany
+   */
+  export type BrandKitUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BrandKits.
+     */
+    data: XOR<BrandKitUpdateManyMutationInput, BrandKitUncheckedUpdateManyInput>
+    /**
+     * Filter which BrandKits to update
+     */
+    where?: BrandKitWhereInput
+    /**
+     * Limit how many BrandKits to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BrandKit updateManyAndReturn
+   */
+  export type BrandKitUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * The data used to update BrandKits.
+     */
+    data: XOR<BrandKitUpdateManyMutationInput, BrandKitUncheckedUpdateManyInput>
+    /**
+     * Filter which BrandKits to update
+     */
+    where?: BrandKitWhereInput
+    /**
+     * Limit how many BrandKits to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BrandKit upsert
+   */
+  export type BrandKitUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BrandKit to update in case it exists.
+     */
+    where: BrandKitWhereUniqueInput
+    /**
+     * In case the BrandKit found by the `where` argument doesn't exist, create a new BrandKit with this data.
+     */
+    create: XOR<BrandKitCreateInput, BrandKitUncheckedCreateInput>
+    /**
+     * In case the BrandKit was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BrandKitUpdateInput, BrandKitUncheckedUpdateInput>
+  }
+
+  /**
+   * BrandKit delete
+   */
+  export type BrandKitDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+    /**
+     * Filter which BrandKit to delete.
+     */
+    where: BrandKitWhereUniqueInput
+  }
+
+  /**
+   * BrandKit deleteMany
+   */
+  export type BrandKitDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BrandKits to delete
+     */
+    where?: BrandKitWhereInput
+    /**
+     * Limit how many BrandKits to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BrandKit.projects
+   */
+  export type BrandKit$projectsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Project
+     */
+    select?: ProjectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Project
+     */
+    omit?: ProjectOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectInclude<ExtArgs> | null
+    where?: ProjectWhereInput
+    orderBy?: ProjectOrderByWithRelationInput | ProjectOrderByWithRelationInput[]
+    cursor?: ProjectWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProjectScalarFieldEnum | ProjectScalarFieldEnum[]
+  }
+
+  /**
+   * BrandKit without action
+   */
+  export type BrandKitDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+  }
+
 
   /**
    * Model Project
@@ -1978,6 +4561,8 @@ export namespace Prisma {
     durationMs: number | null
     status: string | null
     tags: string | null
+    workspaceId: string | null
+    brandKitId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1989,6 +4574,8 @@ export namespace Prisma {
     durationMs: number | null
     status: string | null
     tags: string | null
+    workspaceId: string | null
+    brandKitId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2000,6 +4587,8 @@ export namespace Prisma {
     durationMs: number
     status: number
     tags: number
+    workspaceId: number
+    brandKitId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2021,6 +4610,8 @@ export namespace Prisma {
     durationMs?: true
     status?: true
     tags?: true
+    workspaceId?: true
+    brandKitId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2032,6 +4623,8 @@ export namespace Prisma {
     durationMs?: true
     status?: true
     tags?: true
+    workspaceId?: true
+    brandKitId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2043,6 +4636,8 @@ export namespace Prisma {
     durationMs?: true
     status?: true
     tags?: true
+    workspaceId?: true
+    brandKitId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2141,6 +4736,8 @@ export namespace Prisma {
     durationMs: number | null
     status: string
     tags: string | null
+    workspaceId: string | null
+    brandKitId: string | null
     createdAt: Date
     updatedAt: Date
     _count: ProjectCountAggregateOutputType | null
@@ -2171,11 +4768,16 @@ export namespace Prisma {
     durationMs?: boolean
     status?: boolean
     tags?: boolean
+    workspaceId?: boolean
+    brandKitId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    workspace?: boolean | Project$workspaceArgs<ExtArgs>
+    brandKit?: boolean | Project$brandKitArgs<ExtArgs>
     transcripts?: boolean | Project$transcriptsArgs<ExtArgs>
     candidates?: boolean | Project$candidatesArgs<ExtArgs>
     clips?: boolean | Project$clipsArgs<ExtArgs>
+    reviewLinks?: boolean | Project$reviewLinksArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
@@ -2186,8 +4788,12 @@ export namespace Prisma {
     durationMs?: boolean
     status?: boolean
     tags?: boolean
+    workspaceId?: boolean
+    brandKitId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    workspace?: boolean | Project$workspaceArgs<ExtArgs>
+    brandKit?: boolean | Project$brandKitArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
   export type ProjectSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2197,8 +4803,12 @@ export namespace Prisma {
     durationMs?: boolean
     status?: boolean
     tags?: boolean
+    workspaceId?: boolean
+    brandKitId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    workspace?: boolean | Project$workspaceArgs<ExtArgs>
+    brandKit?: boolean | Project$brandKitArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
   export type ProjectSelectScalar = {
@@ -2208,26 +4818,40 @@ export namespace Prisma {
     durationMs?: boolean
     status?: boolean
     tags?: boolean
+    workspaceId?: boolean
+    brandKitId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "sourcePath" | "durationMs" | "status" | "tags" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "sourcePath" | "durationMs" | "status" | "tags" | "workspaceId" | "brandKitId" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    workspace?: boolean | Project$workspaceArgs<ExtArgs>
+    brandKit?: boolean | Project$brandKitArgs<ExtArgs>
     transcripts?: boolean | Project$transcriptsArgs<ExtArgs>
     candidates?: boolean | Project$candidatesArgs<ExtArgs>
     clips?: boolean | Project$clipsArgs<ExtArgs>
+    reviewLinks?: boolean | Project$reviewLinksArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type ProjectIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type ProjectIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type ProjectIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    workspace?: boolean | Project$workspaceArgs<ExtArgs>
+    brandKit?: boolean | Project$brandKitArgs<ExtArgs>
+  }
+  export type ProjectIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    workspace?: boolean | Project$workspaceArgs<ExtArgs>
+    brandKit?: boolean | Project$brandKitArgs<ExtArgs>
+  }
 
   export type $ProjectPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Project"
     objects: {
+      workspace: Prisma.$WorkspacePayload<ExtArgs> | null
+      brandKit: Prisma.$BrandKitPayload<ExtArgs> | null
       transcripts: Prisma.$TranscriptPayload<ExtArgs>[]
       candidates: Prisma.$ClipCandidatePayload<ExtArgs>[]
       clips: Prisma.$ClipPayload<ExtArgs>[]
+      reviewLinks: Prisma.$ReviewLinkPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2236,6 +4860,8 @@ export namespace Prisma {
       durationMs: number | null
       status: string
       tags: string | null
+      workspaceId: string | null
+      brandKitId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["project"]>
@@ -2632,9 +5258,12 @@ export namespace Prisma {
    */
   export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    workspace<T extends Project$workspaceArgs<ExtArgs> = {}>(args?: Subset<T, Project$workspaceArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    brandKit<T extends Project$brandKitArgs<ExtArgs> = {}>(args?: Subset<T, Project$brandKitArgs<ExtArgs>>): Prisma__BrandKitClient<$Result.GetResult<Prisma.$BrandKitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     transcripts<T extends Project$transcriptsArgs<ExtArgs> = {}>(args?: Subset<T, Project$transcriptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TranscriptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     candidates<T extends Project$candidatesArgs<ExtArgs> = {}>(args?: Subset<T, Project$candidatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClipCandidatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     clips<T extends Project$clipsArgs<ExtArgs> = {}>(args?: Subset<T, Project$clipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reviewLinks<T extends Project$reviewLinksArgs<ExtArgs> = {}>(args?: Subset<T, Project$reviewLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2670,6 +5299,8 @@ export namespace Prisma {
     readonly durationMs: FieldRef<"Project", 'Int'>
     readonly status: FieldRef<"Project", 'String'>
     readonly tags: FieldRef<"Project", 'String'>
+    readonly workspaceId: FieldRef<"Project", 'String'>
+    readonly brandKitId: FieldRef<"Project", 'String'>
     readonly createdAt: FieldRef<"Project", 'DateTime'>
     readonly updatedAt: FieldRef<"Project", 'DateTime'>
   }
@@ -2919,6 +5550,10 @@ export namespace Prisma {
      * The data used to create many Projects.
      */
     data: ProjectCreateManyInput | ProjectCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -2989,6 +5624,10 @@ export namespace Prisma {
      * Limit how many Projects to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -3055,6 +5694,44 @@ export namespace Prisma {
      * Limit how many Projects to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Project.workspace
+   */
+  export type Project$workspaceArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Workspace
+     */
+    select?: WorkspaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Workspace
+     */
+    omit?: WorkspaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WorkspaceInclude<ExtArgs> | null
+    where?: WorkspaceWhereInput
+  }
+
+  /**
+   * Project.brandKit
+   */
+  export type Project$brandKitArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandKit
+     */
+    select?: BrandKitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BrandKit
+     */
+    omit?: BrandKitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandKitInclude<ExtArgs> | null
+    where?: BrandKitWhereInput
   }
 
   /**
@@ -3127,6 +5804,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ClipScalarFieldEnum | ClipScalarFieldEnum[]
+  }
+
+  /**
+   * Project.reviewLinks
+   */
+  export type Project$reviewLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+    where?: ReviewLinkWhereInput
+    orderBy?: ReviewLinkOrderByWithRelationInput | ReviewLinkOrderByWithRelationInput[]
+    cursor?: ReviewLinkWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ReviewLinkScalarFieldEnum | ReviewLinkScalarFieldEnum[]
   }
 
   /**
@@ -6554,6 +9255,7 @@ export namespace Prisma {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     assets?: boolean | Clip$assetsArgs<ExtArgs>
     analytics?: boolean | Clip$analyticsArgs<ExtArgs>
+    reviewLinks?: boolean | Clip$reviewLinksArgs<ExtArgs>
     _count?: boolean | ClipCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["clip"]>
 
@@ -6600,6 +9302,7 @@ export namespace Prisma {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     assets?: boolean | Clip$assetsArgs<ExtArgs>
     analytics?: boolean | Clip$analyticsArgs<ExtArgs>
+    reviewLinks?: boolean | Clip$reviewLinksArgs<ExtArgs>
     _count?: boolean | ClipCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ClipIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6615,6 +9318,7 @@ export namespace Prisma {
       project: Prisma.$ProjectPayload<ExtArgs>
       assets: Prisma.$AssetPayload<ExtArgs>[]
       analytics: Prisma.$AnalyticsPayload<ExtArgs>[]
+      reviewLinks: Prisma.$ReviewLinkPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7023,6 +9727,7 @@ export namespace Prisma {
     project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     assets<T extends Clip$assetsArgs<ExtArgs> = {}>(args?: Subset<T, Clip$assetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     analytics<T extends Clip$analyticsArgs<ExtArgs> = {}>(args?: Subset<T, Clip$analyticsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnalyticsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reviewLinks<T extends Clip$reviewLinksArgs<ExtArgs> = {}>(args?: Subset<T, Clip$reviewLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7500,6 +10205,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AnalyticsScalarFieldEnum | AnalyticsScalarFieldEnum[]
+  }
+
+  /**
+   * Clip.reviewLinks
+   */
+  export type Clip$reviewLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+    where?: ReviewLinkWhereInput
+    orderBy?: ReviewLinkOrderByWithRelationInput | ReviewLinkOrderByWithRelationInput[]
+    cursor?: ReviewLinkWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ReviewLinkScalarFieldEnum | ReviewLinkScalarFieldEnum[]
   }
 
   /**
@@ -14942,6 +17671,1141 @@ export namespace Prisma {
 
 
   /**
+   * Model ReviewLink
+   */
+
+  export type AggregateReviewLink = {
+    _count: ReviewLinkCountAggregateOutputType | null
+    _min: ReviewLinkMinAggregateOutputType | null
+    _max: ReviewLinkMaxAggregateOutputType | null
+  }
+
+  export type ReviewLinkMinAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    clipId: string | null
+    cloudUrl: string | null
+    status: string | null
+    comments: string | null
+    expiresAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ReviewLinkMaxAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    clipId: string | null
+    cloudUrl: string | null
+    status: string | null
+    comments: string | null
+    expiresAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ReviewLinkCountAggregateOutputType = {
+    id: number
+    projectId: number
+    clipId: number
+    cloudUrl: number
+    status: number
+    comments: number
+    expiresAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ReviewLinkMinAggregateInputType = {
+    id?: true
+    projectId?: true
+    clipId?: true
+    cloudUrl?: true
+    status?: true
+    comments?: true
+    expiresAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ReviewLinkMaxAggregateInputType = {
+    id?: true
+    projectId?: true
+    clipId?: true
+    cloudUrl?: true
+    status?: true
+    comments?: true
+    expiresAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ReviewLinkCountAggregateInputType = {
+    id?: true
+    projectId?: true
+    clipId?: true
+    cloudUrl?: true
+    status?: true
+    comments?: true
+    expiresAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ReviewLinkAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ReviewLink to aggregate.
+     */
+    where?: ReviewLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReviewLinks to fetch.
+     */
+    orderBy?: ReviewLinkOrderByWithRelationInput | ReviewLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ReviewLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReviewLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReviewLinks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ReviewLinks
+    **/
+    _count?: true | ReviewLinkCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ReviewLinkMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ReviewLinkMaxAggregateInputType
+  }
+
+  export type GetReviewLinkAggregateType<T extends ReviewLinkAggregateArgs> = {
+        [P in keyof T & keyof AggregateReviewLink]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateReviewLink[P]>
+      : GetScalarType<T[P], AggregateReviewLink[P]>
+  }
+
+
+
+
+  export type ReviewLinkGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ReviewLinkWhereInput
+    orderBy?: ReviewLinkOrderByWithAggregationInput | ReviewLinkOrderByWithAggregationInput[]
+    by: ReviewLinkScalarFieldEnum[] | ReviewLinkScalarFieldEnum
+    having?: ReviewLinkScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ReviewLinkCountAggregateInputType | true
+    _min?: ReviewLinkMinAggregateInputType
+    _max?: ReviewLinkMaxAggregateInputType
+  }
+
+  export type ReviewLinkGroupByOutputType = {
+    id: string
+    projectId: string
+    clipId: string | null
+    cloudUrl: string
+    status: string
+    comments: string | null
+    expiresAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: ReviewLinkCountAggregateOutputType | null
+    _min: ReviewLinkMinAggregateOutputType | null
+    _max: ReviewLinkMaxAggregateOutputType | null
+  }
+
+  type GetReviewLinkGroupByPayload<T extends ReviewLinkGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ReviewLinkGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ReviewLinkGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ReviewLinkGroupByOutputType[P]>
+            : GetScalarType<T[P], ReviewLinkGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ReviewLinkSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    clipId?: boolean
+    cloudUrl?: boolean
+    status?: boolean
+    comments?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    clip?: boolean | ReviewLink$clipArgs<ExtArgs>
+  }, ExtArgs["result"]["reviewLink"]>
+
+  export type ReviewLinkSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    clipId?: boolean
+    cloudUrl?: boolean
+    status?: boolean
+    comments?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    clip?: boolean | ReviewLink$clipArgs<ExtArgs>
+  }, ExtArgs["result"]["reviewLink"]>
+
+  export type ReviewLinkSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    clipId?: boolean
+    cloudUrl?: boolean
+    status?: boolean
+    comments?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    clip?: boolean | ReviewLink$clipArgs<ExtArgs>
+  }, ExtArgs["result"]["reviewLink"]>
+
+  export type ReviewLinkSelectScalar = {
+    id?: boolean
+    projectId?: boolean
+    clipId?: boolean
+    cloudUrl?: boolean
+    status?: boolean
+    comments?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ReviewLinkOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "clipId" | "cloudUrl" | "status" | "comments" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["reviewLink"]>
+  export type ReviewLinkInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    clip?: boolean | ReviewLink$clipArgs<ExtArgs>
+  }
+  export type ReviewLinkIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    clip?: boolean | ReviewLink$clipArgs<ExtArgs>
+  }
+  export type ReviewLinkIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    clip?: boolean | ReviewLink$clipArgs<ExtArgs>
+  }
+
+  export type $ReviewLinkPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ReviewLink"
+    objects: {
+      project: Prisma.$ProjectPayload<ExtArgs>
+      clip: Prisma.$ClipPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      projectId: string
+      clipId: string | null
+      cloudUrl: string
+      status: string
+      comments: string | null
+      expiresAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["reviewLink"]>
+    composites: {}
+  }
+
+  type ReviewLinkGetPayload<S extends boolean | null | undefined | ReviewLinkDefaultArgs> = $Result.GetResult<Prisma.$ReviewLinkPayload, S>
+
+  type ReviewLinkCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ReviewLinkFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ReviewLinkCountAggregateInputType | true
+    }
+
+  export interface ReviewLinkDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ReviewLink'], meta: { name: 'ReviewLink' } }
+    /**
+     * Find zero or one ReviewLink that matches the filter.
+     * @param {ReviewLinkFindUniqueArgs} args - Arguments to find a ReviewLink
+     * @example
+     * // Get one ReviewLink
+     * const reviewLink = await prisma.reviewLink.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ReviewLinkFindUniqueArgs>(args: SelectSubset<T, ReviewLinkFindUniqueArgs<ExtArgs>>): Prisma__ReviewLinkClient<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ReviewLink that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ReviewLinkFindUniqueOrThrowArgs} args - Arguments to find a ReviewLink
+     * @example
+     * // Get one ReviewLink
+     * const reviewLink = await prisma.reviewLink.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ReviewLinkFindUniqueOrThrowArgs>(args: SelectSubset<T, ReviewLinkFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ReviewLinkClient<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ReviewLink that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReviewLinkFindFirstArgs} args - Arguments to find a ReviewLink
+     * @example
+     * // Get one ReviewLink
+     * const reviewLink = await prisma.reviewLink.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ReviewLinkFindFirstArgs>(args?: SelectSubset<T, ReviewLinkFindFirstArgs<ExtArgs>>): Prisma__ReviewLinkClient<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ReviewLink that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReviewLinkFindFirstOrThrowArgs} args - Arguments to find a ReviewLink
+     * @example
+     * // Get one ReviewLink
+     * const reviewLink = await prisma.reviewLink.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ReviewLinkFindFirstOrThrowArgs>(args?: SelectSubset<T, ReviewLinkFindFirstOrThrowArgs<ExtArgs>>): Prisma__ReviewLinkClient<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ReviewLinks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReviewLinkFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ReviewLinks
+     * const reviewLinks = await prisma.reviewLink.findMany()
+     * 
+     * // Get first 10 ReviewLinks
+     * const reviewLinks = await prisma.reviewLink.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const reviewLinkWithIdOnly = await prisma.reviewLink.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ReviewLinkFindManyArgs>(args?: SelectSubset<T, ReviewLinkFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ReviewLink.
+     * @param {ReviewLinkCreateArgs} args - Arguments to create a ReviewLink.
+     * @example
+     * // Create one ReviewLink
+     * const ReviewLink = await prisma.reviewLink.create({
+     *   data: {
+     *     // ... data to create a ReviewLink
+     *   }
+     * })
+     * 
+     */
+    create<T extends ReviewLinkCreateArgs>(args: SelectSubset<T, ReviewLinkCreateArgs<ExtArgs>>): Prisma__ReviewLinkClient<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ReviewLinks.
+     * @param {ReviewLinkCreateManyArgs} args - Arguments to create many ReviewLinks.
+     * @example
+     * // Create many ReviewLinks
+     * const reviewLink = await prisma.reviewLink.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ReviewLinkCreateManyArgs>(args?: SelectSubset<T, ReviewLinkCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ReviewLinks and returns the data saved in the database.
+     * @param {ReviewLinkCreateManyAndReturnArgs} args - Arguments to create many ReviewLinks.
+     * @example
+     * // Create many ReviewLinks
+     * const reviewLink = await prisma.reviewLink.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ReviewLinks and only return the `id`
+     * const reviewLinkWithIdOnly = await prisma.reviewLink.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ReviewLinkCreateManyAndReturnArgs>(args?: SelectSubset<T, ReviewLinkCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ReviewLink.
+     * @param {ReviewLinkDeleteArgs} args - Arguments to delete one ReviewLink.
+     * @example
+     * // Delete one ReviewLink
+     * const ReviewLink = await prisma.reviewLink.delete({
+     *   where: {
+     *     // ... filter to delete one ReviewLink
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ReviewLinkDeleteArgs>(args: SelectSubset<T, ReviewLinkDeleteArgs<ExtArgs>>): Prisma__ReviewLinkClient<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ReviewLink.
+     * @param {ReviewLinkUpdateArgs} args - Arguments to update one ReviewLink.
+     * @example
+     * // Update one ReviewLink
+     * const reviewLink = await prisma.reviewLink.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ReviewLinkUpdateArgs>(args: SelectSubset<T, ReviewLinkUpdateArgs<ExtArgs>>): Prisma__ReviewLinkClient<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ReviewLinks.
+     * @param {ReviewLinkDeleteManyArgs} args - Arguments to filter ReviewLinks to delete.
+     * @example
+     * // Delete a few ReviewLinks
+     * const { count } = await prisma.reviewLink.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ReviewLinkDeleteManyArgs>(args?: SelectSubset<T, ReviewLinkDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ReviewLinks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReviewLinkUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ReviewLinks
+     * const reviewLink = await prisma.reviewLink.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ReviewLinkUpdateManyArgs>(args: SelectSubset<T, ReviewLinkUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ReviewLinks and returns the data updated in the database.
+     * @param {ReviewLinkUpdateManyAndReturnArgs} args - Arguments to update many ReviewLinks.
+     * @example
+     * // Update many ReviewLinks
+     * const reviewLink = await prisma.reviewLink.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ReviewLinks and only return the `id`
+     * const reviewLinkWithIdOnly = await prisma.reviewLink.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ReviewLinkUpdateManyAndReturnArgs>(args: SelectSubset<T, ReviewLinkUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ReviewLink.
+     * @param {ReviewLinkUpsertArgs} args - Arguments to update or create a ReviewLink.
+     * @example
+     * // Update or create a ReviewLink
+     * const reviewLink = await prisma.reviewLink.upsert({
+     *   create: {
+     *     // ... data to create a ReviewLink
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ReviewLink we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ReviewLinkUpsertArgs>(args: SelectSubset<T, ReviewLinkUpsertArgs<ExtArgs>>): Prisma__ReviewLinkClient<$Result.GetResult<Prisma.$ReviewLinkPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ReviewLinks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReviewLinkCountArgs} args - Arguments to filter ReviewLinks to count.
+     * @example
+     * // Count the number of ReviewLinks
+     * const count = await prisma.reviewLink.count({
+     *   where: {
+     *     // ... the filter for the ReviewLinks we want to count
+     *   }
+     * })
+    **/
+    count<T extends ReviewLinkCountArgs>(
+      args?: Subset<T, ReviewLinkCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ReviewLinkCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ReviewLink.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReviewLinkAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ReviewLinkAggregateArgs>(args: Subset<T, ReviewLinkAggregateArgs>): Prisma.PrismaPromise<GetReviewLinkAggregateType<T>>
+
+    /**
+     * Group by ReviewLink.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReviewLinkGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ReviewLinkGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ReviewLinkGroupByArgs['orderBy'] }
+        : { orderBy?: ReviewLinkGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ReviewLinkGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetReviewLinkGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ReviewLink model
+   */
+  readonly fields: ReviewLinkFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ReviewLink.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ReviewLinkClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    clip<T extends ReviewLink$clipArgs<ExtArgs> = {}>(args?: Subset<T, ReviewLink$clipArgs<ExtArgs>>): Prisma__ClipClient<$Result.GetResult<Prisma.$ClipPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ReviewLink model
+   */
+  interface ReviewLinkFieldRefs {
+    readonly id: FieldRef<"ReviewLink", 'String'>
+    readonly projectId: FieldRef<"ReviewLink", 'String'>
+    readonly clipId: FieldRef<"ReviewLink", 'String'>
+    readonly cloudUrl: FieldRef<"ReviewLink", 'String'>
+    readonly status: FieldRef<"ReviewLink", 'String'>
+    readonly comments: FieldRef<"ReviewLink", 'String'>
+    readonly expiresAt: FieldRef<"ReviewLink", 'DateTime'>
+    readonly createdAt: FieldRef<"ReviewLink", 'DateTime'>
+    readonly updatedAt: FieldRef<"ReviewLink", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ReviewLink findUnique
+   */
+  export type ReviewLinkFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which ReviewLink to fetch.
+     */
+    where: ReviewLinkWhereUniqueInput
+  }
+
+  /**
+   * ReviewLink findUniqueOrThrow
+   */
+  export type ReviewLinkFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which ReviewLink to fetch.
+     */
+    where: ReviewLinkWhereUniqueInput
+  }
+
+  /**
+   * ReviewLink findFirst
+   */
+  export type ReviewLinkFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which ReviewLink to fetch.
+     */
+    where?: ReviewLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReviewLinks to fetch.
+     */
+    orderBy?: ReviewLinkOrderByWithRelationInput | ReviewLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ReviewLinks.
+     */
+    cursor?: ReviewLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReviewLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReviewLinks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ReviewLinks.
+     */
+    distinct?: ReviewLinkScalarFieldEnum | ReviewLinkScalarFieldEnum[]
+  }
+
+  /**
+   * ReviewLink findFirstOrThrow
+   */
+  export type ReviewLinkFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which ReviewLink to fetch.
+     */
+    where?: ReviewLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReviewLinks to fetch.
+     */
+    orderBy?: ReviewLinkOrderByWithRelationInput | ReviewLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ReviewLinks.
+     */
+    cursor?: ReviewLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReviewLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReviewLinks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ReviewLinks.
+     */
+    distinct?: ReviewLinkScalarFieldEnum | ReviewLinkScalarFieldEnum[]
+  }
+
+  /**
+   * ReviewLink findMany
+   */
+  export type ReviewLinkFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which ReviewLinks to fetch.
+     */
+    where?: ReviewLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReviewLinks to fetch.
+     */
+    orderBy?: ReviewLinkOrderByWithRelationInput | ReviewLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ReviewLinks.
+     */
+    cursor?: ReviewLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReviewLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReviewLinks.
+     */
+    skip?: number
+    distinct?: ReviewLinkScalarFieldEnum | ReviewLinkScalarFieldEnum[]
+  }
+
+  /**
+   * ReviewLink create
+   */
+  export type ReviewLinkCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ReviewLink.
+     */
+    data: XOR<ReviewLinkCreateInput, ReviewLinkUncheckedCreateInput>
+  }
+
+  /**
+   * ReviewLink createMany
+   */
+  export type ReviewLinkCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ReviewLinks.
+     */
+    data: ReviewLinkCreateManyInput | ReviewLinkCreateManyInput[]
+  }
+
+  /**
+   * ReviewLink createManyAndReturn
+   */
+  export type ReviewLinkCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * The data used to create many ReviewLinks.
+     */
+    data: ReviewLinkCreateManyInput | ReviewLinkCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ReviewLink update
+   */
+  export type ReviewLinkUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ReviewLink.
+     */
+    data: XOR<ReviewLinkUpdateInput, ReviewLinkUncheckedUpdateInput>
+    /**
+     * Choose, which ReviewLink to update.
+     */
+    where: ReviewLinkWhereUniqueInput
+  }
+
+  /**
+   * ReviewLink updateMany
+   */
+  export type ReviewLinkUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ReviewLinks.
+     */
+    data: XOR<ReviewLinkUpdateManyMutationInput, ReviewLinkUncheckedUpdateManyInput>
+    /**
+     * Filter which ReviewLinks to update
+     */
+    where?: ReviewLinkWhereInput
+    /**
+     * Limit how many ReviewLinks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ReviewLink updateManyAndReturn
+   */
+  export type ReviewLinkUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * The data used to update ReviewLinks.
+     */
+    data: XOR<ReviewLinkUpdateManyMutationInput, ReviewLinkUncheckedUpdateManyInput>
+    /**
+     * Filter which ReviewLinks to update
+     */
+    where?: ReviewLinkWhereInput
+    /**
+     * Limit how many ReviewLinks to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ReviewLink upsert
+   */
+  export type ReviewLinkUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ReviewLink to update in case it exists.
+     */
+    where: ReviewLinkWhereUniqueInput
+    /**
+     * In case the ReviewLink found by the `where` argument doesn't exist, create a new ReviewLink with this data.
+     */
+    create: XOR<ReviewLinkCreateInput, ReviewLinkUncheckedCreateInput>
+    /**
+     * In case the ReviewLink was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ReviewLinkUpdateInput, ReviewLinkUncheckedUpdateInput>
+  }
+
+  /**
+   * ReviewLink delete
+   */
+  export type ReviewLinkDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+    /**
+     * Filter which ReviewLink to delete.
+     */
+    where: ReviewLinkWhereUniqueInput
+  }
+
+  /**
+   * ReviewLink deleteMany
+   */
+  export type ReviewLinkDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ReviewLinks to delete
+     */
+    where?: ReviewLinkWhereInput
+    /**
+     * Limit how many ReviewLinks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ReviewLink.clip
+   */
+  export type ReviewLink$clipArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Clip
+     */
+    select?: ClipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Clip
+     */
+    omit?: ClipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClipInclude<ExtArgs> | null
+    where?: ClipWhereInput
+  }
+
+  /**
+   * ReviewLink without action
+   */
+  export type ReviewLinkDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReviewLink
+     */
+    select?: ReviewLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReviewLink
+     */
+    omit?: ReviewLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReviewLinkInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -14952,6 +18816,31 @@ export namespace Prisma {
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+  export const WorkspaceScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    userId: 'userId'
+  };
+
+  export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
+
+
+  export const BrandKitScalarFieldEnum: {
+    id: 'id',
+    workspaceId: 'workspaceId',
+    name: 'name',
+    fontFamily: 'fontFamily',
+    primaryColor: 'primaryColor',
+    watermarkPath: 'watermarkPath',
+    logoPath: 'logoPath',
+    createdAt: 'createdAt'
+  };
+
+  export type BrandKitScalarFieldEnum = (typeof BrandKitScalarFieldEnum)[keyof typeof BrandKitScalarFieldEnum]
+
+
   export const ProjectScalarFieldEnum: {
     id: 'id',
     title: 'title',
@@ -14959,6 +18848,8 @@ export namespace Prisma {
     durationMs: 'durationMs',
     status: 'status',
     tags: 'tags',
+    workspaceId: 'workspaceId',
+    brandKitId: 'brandKitId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -15110,6 +19001,21 @@ export namespace Prisma {
   export type AutopilotHistoryScalarFieldEnum = (typeof AutopilotHistoryScalarFieldEnum)[keyof typeof AutopilotHistoryScalarFieldEnum]
 
 
+  export const ReviewLinkScalarFieldEnum: {
+    id: 'id',
+    projectId: 'projectId',
+    clipId: 'clipId',
+    cloudUrl: 'cloudUrl',
+    status: 'status',
+    comments: 'comments',
+    expiresAt: 'expiresAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ReviewLinkScalarFieldEnum = (typeof ReviewLinkScalarFieldEnum)[keyof typeof ReviewLinkScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -15139,16 +19045,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
+   * Reference to a field of type 'DateTime'
    */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
     
 
 
   /**
-   * Reference to a field of type 'DateTime'
+   * Reference to a field of type 'Int'
    */
-  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
     
 
 
@@ -15169,6 +19075,137 @@ export namespace Prisma {
    */
 
 
+  export type WorkspaceWhereInput = {
+    AND?: WorkspaceWhereInput | WorkspaceWhereInput[]
+    OR?: WorkspaceWhereInput[]
+    NOT?: WorkspaceWhereInput | WorkspaceWhereInput[]
+    id?: StringFilter<"Workspace"> | string
+    name?: StringFilter<"Workspace"> | string
+    createdAt?: DateTimeFilter<"Workspace"> | Date | string
+    updatedAt?: DateTimeFilter<"Workspace"> | Date | string
+    userId?: StringNullableFilter<"Workspace"> | string | null
+    kits?: BrandKitListRelationFilter
+    projects?: ProjectListRelationFilter
+  }
+
+  export type WorkspaceOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    kits?: BrandKitOrderByRelationAggregateInput
+    projects?: ProjectOrderByRelationAggregateInput
+  }
+
+  export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: WorkspaceWhereInput | WorkspaceWhereInput[]
+    OR?: WorkspaceWhereInput[]
+    NOT?: WorkspaceWhereInput | WorkspaceWhereInput[]
+    name?: StringFilter<"Workspace"> | string
+    createdAt?: DateTimeFilter<"Workspace"> | Date | string
+    updatedAt?: DateTimeFilter<"Workspace"> | Date | string
+    userId?: StringNullableFilter<"Workspace"> | string | null
+    kits?: BrandKitListRelationFilter
+    projects?: ProjectListRelationFilter
+  }, "id">
+
+  export type WorkspaceOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    _count?: WorkspaceCountOrderByAggregateInput
+    _max?: WorkspaceMaxOrderByAggregateInput
+    _min?: WorkspaceMinOrderByAggregateInput
+  }
+
+  export type WorkspaceScalarWhereWithAggregatesInput = {
+    AND?: WorkspaceScalarWhereWithAggregatesInput | WorkspaceScalarWhereWithAggregatesInput[]
+    OR?: WorkspaceScalarWhereWithAggregatesInput[]
+    NOT?: WorkspaceScalarWhereWithAggregatesInput | WorkspaceScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Workspace"> | string
+    name?: StringWithAggregatesFilter<"Workspace"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Workspace"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Workspace"> | Date | string
+    userId?: StringNullableWithAggregatesFilter<"Workspace"> | string | null
+  }
+
+  export type BrandKitWhereInput = {
+    AND?: BrandKitWhereInput | BrandKitWhereInput[]
+    OR?: BrandKitWhereInput[]
+    NOT?: BrandKitWhereInput | BrandKitWhereInput[]
+    id?: StringFilter<"BrandKit"> | string
+    workspaceId?: StringFilter<"BrandKit"> | string
+    name?: StringFilter<"BrandKit"> | string
+    fontFamily?: StringFilter<"BrandKit"> | string
+    primaryColor?: StringFilter<"BrandKit"> | string
+    watermarkPath?: StringNullableFilter<"BrandKit"> | string | null
+    logoPath?: StringNullableFilter<"BrandKit"> | string | null
+    createdAt?: DateTimeFilter<"BrandKit"> | Date | string
+    workspace?: XOR<WorkspaceScalarRelationFilter, WorkspaceWhereInput>
+    projects?: ProjectListRelationFilter
+  }
+
+  export type BrandKitOrderByWithRelationInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    name?: SortOrder
+    fontFamily?: SortOrder
+    primaryColor?: SortOrder
+    watermarkPath?: SortOrderInput | SortOrder
+    logoPath?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    workspace?: WorkspaceOrderByWithRelationInput
+    projects?: ProjectOrderByRelationAggregateInput
+  }
+
+  export type BrandKitWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: BrandKitWhereInput | BrandKitWhereInput[]
+    OR?: BrandKitWhereInput[]
+    NOT?: BrandKitWhereInput | BrandKitWhereInput[]
+    workspaceId?: StringFilter<"BrandKit"> | string
+    name?: StringFilter<"BrandKit"> | string
+    fontFamily?: StringFilter<"BrandKit"> | string
+    primaryColor?: StringFilter<"BrandKit"> | string
+    watermarkPath?: StringNullableFilter<"BrandKit"> | string | null
+    logoPath?: StringNullableFilter<"BrandKit"> | string | null
+    createdAt?: DateTimeFilter<"BrandKit"> | Date | string
+    workspace?: XOR<WorkspaceScalarRelationFilter, WorkspaceWhereInput>
+    projects?: ProjectListRelationFilter
+  }, "id">
+
+  export type BrandKitOrderByWithAggregationInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    name?: SortOrder
+    fontFamily?: SortOrder
+    primaryColor?: SortOrder
+    watermarkPath?: SortOrderInput | SortOrder
+    logoPath?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: BrandKitCountOrderByAggregateInput
+    _max?: BrandKitMaxOrderByAggregateInput
+    _min?: BrandKitMinOrderByAggregateInput
+  }
+
+  export type BrandKitScalarWhereWithAggregatesInput = {
+    AND?: BrandKitScalarWhereWithAggregatesInput | BrandKitScalarWhereWithAggregatesInput[]
+    OR?: BrandKitScalarWhereWithAggregatesInput[]
+    NOT?: BrandKitScalarWhereWithAggregatesInput | BrandKitScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BrandKit"> | string
+    workspaceId?: StringWithAggregatesFilter<"BrandKit"> | string
+    name?: StringWithAggregatesFilter<"BrandKit"> | string
+    fontFamily?: StringWithAggregatesFilter<"BrandKit"> | string
+    primaryColor?: StringWithAggregatesFilter<"BrandKit"> | string
+    watermarkPath?: StringNullableWithAggregatesFilter<"BrandKit"> | string | null
+    logoPath?: StringNullableWithAggregatesFilter<"BrandKit"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"BrandKit"> | Date | string
+  }
+
   export type ProjectWhereInput = {
     AND?: ProjectWhereInput | ProjectWhereInput[]
     OR?: ProjectWhereInput[]
@@ -15179,11 +19216,16 @@ export namespace Prisma {
     durationMs?: IntNullableFilter<"Project"> | number | null
     status?: StringFilter<"Project"> | string
     tags?: StringNullableFilter<"Project"> | string | null
+    workspaceId?: StringNullableFilter<"Project"> | string | null
+    brandKitId?: StringNullableFilter<"Project"> | string | null
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
+    workspace?: XOR<WorkspaceNullableScalarRelationFilter, WorkspaceWhereInput> | null
+    brandKit?: XOR<BrandKitNullableScalarRelationFilter, BrandKitWhereInput> | null
     transcripts?: TranscriptListRelationFilter
     candidates?: ClipCandidateListRelationFilter
     clips?: ClipListRelationFilter
+    reviewLinks?: ReviewLinkListRelationFilter
   }
 
   export type ProjectOrderByWithRelationInput = {
@@ -15193,11 +19235,16 @@ export namespace Prisma {
     durationMs?: SortOrderInput | SortOrder
     status?: SortOrder
     tags?: SortOrderInput | SortOrder
+    workspaceId?: SortOrderInput | SortOrder
+    brandKitId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    workspace?: WorkspaceOrderByWithRelationInput
+    brandKit?: BrandKitOrderByWithRelationInput
     transcripts?: TranscriptOrderByRelationAggregateInput
     candidates?: ClipCandidateOrderByRelationAggregateInput
     clips?: ClipOrderByRelationAggregateInput
+    reviewLinks?: ReviewLinkOrderByRelationAggregateInput
   }
 
   export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -15210,11 +19257,16 @@ export namespace Prisma {
     durationMs?: IntNullableFilter<"Project"> | number | null
     status?: StringFilter<"Project"> | string
     tags?: StringNullableFilter<"Project"> | string | null
+    workspaceId?: StringNullableFilter<"Project"> | string | null
+    brandKitId?: StringNullableFilter<"Project"> | string | null
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
+    workspace?: XOR<WorkspaceNullableScalarRelationFilter, WorkspaceWhereInput> | null
+    brandKit?: XOR<BrandKitNullableScalarRelationFilter, BrandKitWhereInput> | null
     transcripts?: TranscriptListRelationFilter
     candidates?: ClipCandidateListRelationFilter
     clips?: ClipListRelationFilter
+    reviewLinks?: ReviewLinkListRelationFilter
   }, "id">
 
   export type ProjectOrderByWithAggregationInput = {
@@ -15224,6 +19276,8 @@ export namespace Prisma {
     durationMs?: SortOrderInput | SortOrder
     status?: SortOrder
     tags?: SortOrderInput | SortOrder
+    workspaceId?: SortOrderInput | SortOrder
+    brandKitId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProjectCountOrderByAggregateInput
@@ -15243,6 +19297,8 @@ export namespace Prisma {
     durationMs?: IntNullableWithAggregatesFilter<"Project"> | number | null
     status?: StringWithAggregatesFilter<"Project"> | string
     tags?: StringNullableWithAggregatesFilter<"Project"> | string | null
+    workspaceId?: StringNullableWithAggregatesFilter<"Project"> | string | null
+    brandKitId?: StringNullableWithAggregatesFilter<"Project"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
   }
@@ -15437,6 +19493,7 @@ export namespace Prisma {
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
     assets?: AssetListRelationFilter
     analytics?: AnalyticsListRelationFilter
+    reviewLinks?: ReviewLinkListRelationFilter
   }
 
   export type ClipOrderByWithRelationInput = {
@@ -15452,6 +19509,7 @@ export namespace Prisma {
     project?: ProjectOrderByWithRelationInput
     assets?: AssetOrderByRelationAggregateInput
     analytics?: AnalyticsOrderByRelationAggregateInput
+    reviewLinks?: ReviewLinkOrderByRelationAggregateInput
   }
 
   export type ClipWhereUniqueInput = Prisma.AtLeast<{
@@ -15470,6 +19528,7 @@ export namespace Prisma {
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
     assets?: AssetListRelationFilter
     analytics?: AnalyticsListRelationFilter
+    reviewLinks?: ReviewLinkListRelationFilter
   }, "id">
 
   export type ClipOrderByWithAggregationInput = {
@@ -15966,6 +20025,228 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"AutopilotHistory"> | Date | string
   }
 
+  export type ReviewLinkWhereInput = {
+    AND?: ReviewLinkWhereInput | ReviewLinkWhereInput[]
+    OR?: ReviewLinkWhereInput[]
+    NOT?: ReviewLinkWhereInput | ReviewLinkWhereInput[]
+    id?: StringFilter<"ReviewLink"> | string
+    projectId?: StringFilter<"ReviewLink"> | string
+    clipId?: StringNullableFilter<"ReviewLink"> | string | null
+    cloudUrl?: StringFilter<"ReviewLink"> | string
+    status?: StringFilter<"ReviewLink"> | string
+    comments?: StringNullableFilter<"ReviewLink"> | string | null
+    expiresAt?: DateTimeNullableFilter<"ReviewLink"> | Date | string | null
+    createdAt?: DateTimeFilter<"ReviewLink"> | Date | string
+    updatedAt?: DateTimeFilter<"ReviewLink"> | Date | string
+    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+    clip?: XOR<ClipNullableScalarRelationFilter, ClipWhereInput> | null
+  }
+
+  export type ReviewLinkOrderByWithRelationInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    clipId?: SortOrderInput | SortOrder
+    cloudUrl?: SortOrder
+    status?: SortOrder
+    comments?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    project?: ProjectOrderByWithRelationInput
+    clip?: ClipOrderByWithRelationInput
+  }
+
+  export type ReviewLinkWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ReviewLinkWhereInput | ReviewLinkWhereInput[]
+    OR?: ReviewLinkWhereInput[]
+    NOT?: ReviewLinkWhereInput | ReviewLinkWhereInput[]
+    projectId?: StringFilter<"ReviewLink"> | string
+    clipId?: StringNullableFilter<"ReviewLink"> | string | null
+    cloudUrl?: StringFilter<"ReviewLink"> | string
+    status?: StringFilter<"ReviewLink"> | string
+    comments?: StringNullableFilter<"ReviewLink"> | string | null
+    expiresAt?: DateTimeNullableFilter<"ReviewLink"> | Date | string | null
+    createdAt?: DateTimeFilter<"ReviewLink"> | Date | string
+    updatedAt?: DateTimeFilter<"ReviewLink"> | Date | string
+    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+    clip?: XOR<ClipNullableScalarRelationFilter, ClipWhereInput> | null
+  }, "id">
+
+  export type ReviewLinkOrderByWithAggregationInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    clipId?: SortOrderInput | SortOrder
+    cloudUrl?: SortOrder
+    status?: SortOrder
+    comments?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ReviewLinkCountOrderByAggregateInput
+    _max?: ReviewLinkMaxOrderByAggregateInput
+    _min?: ReviewLinkMinOrderByAggregateInput
+  }
+
+  export type ReviewLinkScalarWhereWithAggregatesInput = {
+    AND?: ReviewLinkScalarWhereWithAggregatesInput | ReviewLinkScalarWhereWithAggregatesInput[]
+    OR?: ReviewLinkScalarWhereWithAggregatesInput[]
+    NOT?: ReviewLinkScalarWhereWithAggregatesInput | ReviewLinkScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ReviewLink"> | string
+    projectId?: StringWithAggregatesFilter<"ReviewLink"> | string
+    clipId?: StringNullableWithAggregatesFilter<"ReviewLink"> | string | null
+    cloudUrl?: StringWithAggregatesFilter<"ReviewLink"> | string
+    status?: StringWithAggregatesFilter<"ReviewLink"> | string
+    comments?: StringNullableWithAggregatesFilter<"ReviewLink"> | string | null
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"ReviewLink"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ReviewLink"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ReviewLink"> | Date | string
+  }
+
+  export type WorkspaceCreateInput = {
+    id?: string
+    name?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId?: string | null
+    kits?: BrandKitCreateNestedManyWithoutWorkspaceInput
+    projects?: ProjectCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceUncheckedCreateInput = {
+    id?: string
+    name?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId?: string | null
+    kits?: BrandKitUncheckedCreateNestedManyWithoutWorkspaceInput
+    projects?: ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    kits?: BrandKitUpdateManyWithoutWorkspaceNestedInput
+    projects?: ProjectUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    kits?: BrandKitUncheckedUpdateManyWithoutWorkspaceNestedInput
+    projects?: ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceCreateManyInput = {
+    id?: string
+    name?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId?: string | null
+  }
+
+  export type WorkspaceUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type WorkspaceUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type BrandKitCreateInput = {
+    id?: string
+    name: string
+    fontFamily?: string
+    primaryColor?: string
+    watermarkPath?: string | null
+    logoPath?: string | null
+    createdAt?: Date | string
+    workspace: WorkspaceCreateNestedOneWithoutKitsInput
+    projects?: ProjectCreateNestedManyWithoutBrandKitInput
+  }
+
+  export type BrandKitUncheckedCreateInput = {
+    id?: string
+    workspaceId: string
+    name: string
+    fontFamily?: string
+    primaryColor?: string
+    watermarkPath?: string | null
+    logoPath?: string | null
+    createdAt?: Date | string
+    projects?: ProjectUncheckedCreateNestedManyWithoutBrandKitInput
+  }
+
+  export type BrandKitUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    watermarkPath?: NullableStringFieldUpdateOperationsInput | string | null
+    logoPath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneRequiredWithoutKitsNestedInput
+    projects?: ProjectUpdateManyWithoutBrandKitNestedInput
+  }
+
+  export type BrandKitUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    watermarkPath?: NullableStringFieldUpdateOperationsInput | string | null
+    logoPath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    projects?: ProjectUncheckedUpdateManyWithoutBrandKitNestedInput
+  }
+
+  export type BrandKitCreateManyInput = {
+    id?: string
+    workspaceId: string
+    name: string
+    fontFamily?: string
+    primaryColor?: string
+    watermarkPath?: string | null
+    logoPath?: string | null
+    createdAt?: Date | string
+  }
+
+  export type BrandKitUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    watermarkPath?: NullableStringFieldUpdateOperationsInput | string | null
+    logoPath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BrandKitUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    watermarkPath?: NullableStringFieldUpdateOperationsInput | string | null
+    logoPath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ProjectCreateInput = {
     id?: string
     title: string
@@ -15975,9 +20256,12 @@ export namespace Prisma {
     tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    workspace?: WorkspaceCreateNestedOneWithoutProjectsInput
+    brandKit?: BrandKitCreateNestedOneWithoutProjectsInput
     transcripts?: TranscriptCreateNestedManyWithoutProjectInput
     candidates?: ClipCandidateCreateNestedManyWithoutProjectInput
     clips?: ClipCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
@@ -15987,11 +20271,14 @@ export namespace Prisma {
     durationMs?: number | null
     status?: string
     tags?: string | null
+    workspaceId?: string | null
+    brandKitId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     transcripts?: TranscriptUncheckedCreateNestedManyWithoutProjectInput
     candidates?: ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
     clips?: ClipUncheckedCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUpdateInput = {
@@ -16003,9 +20290,12 @@ export namespace Prisma {
     tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneWithoutProjectsNestedInput
+    brandKit?: BrandKitUpdateOneWithoutProjectsNestedInput
     transcripts?: TranscriptUpdateManyWithoutProjectNestedInput
     candidates?: ClipCandidateUpdateManyWithoutProjectNestedInput
     clips?: ClipUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
@@ -16015,11 +20305,14 @@ export namespace Prisma {
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     tags?: NullableStringFieldUpdateOperationsInput | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    brandKitId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transcripts?: TranscriptUncheckedUpdateManyWithoutProjectNestedInput
     candidates?: ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
     clips?: ClipUncheckedUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateManyInput = {
@@ -16029,6 +20322,8 @@ export namespace Prisma {
     durationMs?: number | null
     status?: string
     tags?: string | null
+    workspaceId?: string | null
+    brandKitId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -16051,6 +20346,8 @@ export namespace Prisma {
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     tags?: NullableStringFieldUpdateOperationsInput | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    brandKitId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -16247,6 +20544,7 @@ export namespace Prisma {
     project: ProjectCreateNestedOneWithoutClipsInput
     assets?: AssetCreateNestedManyWithoutClipInput
     analytics?: AnalyticsCreateNestedManyWithoutClipInput
+    reviewLinks?: ReviewLinkCreateNestedManyWithoutClipInput
   }
 
   export type ClipUncheckedCreateInput = {
@@ -16261,6 +20559,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     assets?: AssetUncheckedCreateNestedManyWithoutClipInput
     analytics?: AnalyticsUncheckedCreateNestedManyWithoutClipInput
+    reviewLinks?: ReviewLinkUncheckedCreateNestedManyWithoutClipInput
   }
 
   export type ClipUpdateInput = {
@@ -16275,6 +20574,7 @@ export namespace Prisma {
     project?: ProjectUpdateOneRequiredWithoutClipsNestedInput
     assets?: AssetUpdateManyWithoutClipNestedInput
     analytics?: AnalyticsUpdateManyWithoutClipNestedInput
+    reviewLinks?: ReviewLinkUpdateManyWithoutClipNestedInput
   }
 
   export type ClipUncheckedUpdateInput = {
@@ -16289,6 +20589,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     assets?: AssetUncheckedUpdateManyWithoutClipNestedInput
     analytics?: AnalyticsUncheckedUpdateManyWithoutClipNestedInput
+    reviewLinks?: ReviewLinkUncheckedUpdateManyWithoutClipNestedInput
   }
 
   export type ClipCreateManyInput = {
@@ -16835,6 +21136,88 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ReviewLinkCreateInput = {
+    id?: string
+    cloudUrl: string
+    status?: string
+    comments?: string | null
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutReviewLinksInput
+    clip?: ClipCreateNestedOneWithoutReviewLinksInput
+  }
+
+  export type ReviewLinkUncheckedCreateInput = {
+    id?: string
+    projectId: string
+    clipId?: string | null
+    cloudUrl: string
+    status?: string
+    comments?: string | null
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ReviewLinkUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    cloudUrl?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutReviewLinksNestedInput
+    clip?: ClipUpdateOneWithoutReviewLinksNestedInput
+  }
+
+  export type ReviewLinkUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    clipId?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudUrl?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReviewLinkCreateManyInput = {
+    id?: string
+    projectId: string
+    clipId?: string | null
+    cloudUrl: string
+    status?: string
+    comments?: string | null
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ReviewLinkUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    cloudUrl?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReviewLinkUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    clipId?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudUrl?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -16849,15 +21232,15 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type StringNullableFilter<$PrismaModel = never> = {
@@ -16874,7 +21257,73 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type DateTimeFilter<$PrismaModel = never> = {
+  export type BrandKitListRelationFilter = {
+    every?: BrandKitWhereInput
+    some?: BrandKitWhereInput
+    none?: BrandKitWhereInput
+  }
+
+  export type ProjectListRelationFilter = {
+    every?: ProjectWhereInput
+    some?: ProjectWhereInput
+    none?: ProjectWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type BrandKitOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ProjectOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type WorkspaceCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type WorkspaceMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type WorkspaceMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
     notIn?: Date[] | string[]
@@ -16882,7 +21331,86 @@ export namespace Prisma {
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type WorkspaceScalarRelationFilter = {
+    is?: WorkspaceWhereInput
+    isNot?: WorkspaceWhereInput
+  }
+
+  export type BrandKitCountOrderByAggregateInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    name?: SortOrder
+    fontFamily?: SortOrder
+    primaryColor?: SortOrder
+    watermarkPath?: SortOrder
+    logoPath?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type BrandKitMaxOrderByAggregateInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    name?: SortOrder
+    fontFamily?: SortOrder
+    primaryColor?: SortOrder
+    watermarkPath?: SortOrder
+    logoPath?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type BrandKitMinOrderByAggregateInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    name?: SortOrder
+    fontFamily?: SortOrder
+    primaryColor?: SortOrder
+    watermarkPath?: SortOrder
+    logoPath?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type WorkspaceNullableScalarRelationFilter = {
+    is?: WorkspaceWhereInput | null
+    isNot?: WorkspaceWhereInput | null
+  }
+
+  export type BrandKitNullableScalarRelationFilter = {
+    is?: BrandKitWhereInput | null
+    isNot?: BrandKitWhereInput | null
   }
 
   export type TranscriptListRelationFilter = {
@@ -16903,9 +21431,10 @@ export namespace Prisma {
     none?: ClipWhereInput
   }
 
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
+  export type ReviewLinkListRelationFilter = {
+    every?: ReviewLinkWhereInput
+    some?: ReviewLinkWhereInput
+    none?: ReviewLinkWhereInput
   }
 
   export type TranscriptOrderByRelationAggregateInput = {
@@ -16920,6 +21449,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type ReviewLinkOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type ProjectCountOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
@@ -16927,6 +21460,8 @@ export namespace Prisma {
     durationMs?: SortOrder
     status?: SortOrder
     tags?: SortOrder
+    workspaceId?: SortOrder
+    brandKitId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16942,6 +21477,8 @@ export namespace Prisma {
     durationMs?: SortOrder
     status?: SortOrder
     tags?: SortOrder
+    workspaceId?: SortOrder
+    brandKitId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -16953,29 +21490,14 @@ export namespace Prisma {
     durationMs?: SortOrder
     status?: SortOrder
     tags?: SortOrder
+    workspaceId?: SortOrder
+    brandKitId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ProjectSumOrderByAggregateInput = {
     durationMs?: SortOrder
-  }
-
-  export type StringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
   }
 
   export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -16992,37 +21514,6 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type ClipProfileCountOrderByAggregateInput = {
@@ -17512,6 +22003,211 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type ClipNullableScalarRelationFilter = {
+    is?: ClipWhereInput | null
+    isNot?: ClipWhereInput | null
+  }
+
+  export type ReviewLinkCountOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    clipId?: SortOrder
+    cloudUrl?: SortOrder
+    status?: SortOrder
+    comments?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ReviewLinkMaxOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    clipId?: SortOrder
+    cloudUrl?: SortOrder
+    status?: SortOrder
+    comments?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ReviewLinkMinOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    clipId?: SortOrder
+    cloudUrl?: SortOrder
+    status?: SortOrder
+    comments?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BrandKitCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<BrandKitCreateWithoutWorkspaceInput, BrandKitUncheckedCreateWithoutWorkspaceInput> | BrandKitCreateWithoutWorkspaceInput[] | BrandKitUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: BrandKitCreateOrConnectWithoutWorkspaceInput | BrandKitCreateOrConnectWithoutWorkspaceInput[]
+    createMany?: BrandKitCreateManyWorkspaceInputEnvelope
+    connect?: BrandKitWhereUniqueInput | BrandKitWhereUniqueInput[]
+  }
+
+  export type ProjectCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<ProjectCreateWithoutWorkspaceInput, ProjectUncheckedCreateWithoutWorkspaceInput> | ProjectCreateWithoutWorkspaceInput[] | ProjectUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutWorkspaceInput | ProjectCreateOrConnectWithoutWorkspaceInput[]
+    createMany?: ProjectCreateManyWorkspaceInputEnvelope
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+  }
+
+  export type BrandKitUncheckedCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<BrandKitCreateWithoutWorkspaceInput, BrandKitUncheckedCreateWithoutWorkspaceInput> | BrandKitCreateWithoutWorkspaceInput[] | BrandKitUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: BrandKitCreateOrConnectWithoutWorkspaceInput | BrandKitCreateOrConnectWithoutWorkspaceInput[]
+    createMany?: BrandKitCreateManyWorkspaceInputEnvelope
+    connect?: BrandKitWhereUniqueInput | BrandKitWhereUniqueInput[]
+  }
+
+  export type ProjectUncheckedCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<ProjectCreateWithoutWorkspaceInput, ProjectUncheckedCreateWithoutWorkspaceInput> | ProjectCreateWithoutWorkspaceInput[] | ProjectUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutWorkspaceInput | ProjectCreateOrConnectWithoutWorkspaceInput[]
+    createMany?: ProjectCreateManyWorkspaceInputEnvelope
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+  }
+
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type BrandKitUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<BrandKitCreateWithoutWorkspaceInput, BrandKitUncheckedCreateWithoutWorkspaceInput> | BrandKitCreateWithoutWorkspaceInput[] | BrandKitUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: BrandKitCreateOrConnectWithoutWorkspaceInput | BrandKitCreateOrConnectWithoutWorkspaceInput[]
+    upsert?: BrandKitUpsertWithWhereUniqueWithoutWorkspaceInput | BrandKitUpsertWithWhereUniqueWithoutWorkspaceInput[]
+    createMany?: BrandKitCreateManyWorkspaceInputEnvelope
+    set?: BrandKitWhereUniqueInput | BrandKitWhereUniqueInput[]
+    disconnect?: BrandKitWhereUniqueInput | BrandKitWhereUniqueInput[]
+    delete?: BrandKitWhereUniqueInput | BrandKitWhereUniqueInput[]
+    connect?: BrandKitWhereUniqueInput | BrandKitWhereUniqueInput[]
+    update?: BrandKitUpdateWithWhereUniqueWithoutWorkspaceInput | BrandKitUpdateWithWhereUniqueWithoutWorkspaceInput[]
+    updateMany?: BrandKitUpdateManyWithWhereWithoutWorkspaceInput | BrandKitUpdateManyWithWhereWithoutWorkspaceInput[]
+    deleteMany?: BrandKitScalarWhereInput | BrandKitScalarWhereInput[]
+  }
+
+  export type ProjectUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<ProjectCreateWithoutWorkspaceInput, ProjectUncheckedCreateWithoutWorkspaceInput> | ProjectCreateWithoutWorkspaceInput[] | ProjectUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutWorkspaceInput | ProjectCreateOrConnectWithoutWorkspaceInput[]
+    upsert?: ProjectUpsertWithWhereUniqueWithoutWorkspaceInput | ProjectUpsertWithWhereUniqueWithoutWorkspaceInput[]
+    createMany?: ProjectCreateManyWorkspaceInputEnvelope
+    set?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    disconnect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    delete?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    update?: ProjectUpdateWithWhereUniqueWithoutWorkspaceInput | ProjectUpdateWithWhereUniqueWithoutWorkspaceInput[]
+    updateMany?: ProjectUpdateManyWithWhereWithoutWorkspaceInput | ProjectUpdateManyWithWhereWithoutWorkspaceInput[]
+    deleteMany?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
+  }
+
+  export type BrandKitUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<BrandKitCreateWithoutWorkspaceInput, BrandKitUncheckedCreateWithoutWorkspaceInput> | BrandKitCreateWithoutWorkspaceInput[] | BrandKitUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: BrandKitCreateOrConnectWithoutWorkspaceInput | BrandKitCreateOrConnectWithoutWorkspaceInput[]
+    upsert?: BrandKitUpsertWithWhereUniqueWithoutWorkspaceInput | BrandKitUpsertWithWhereUniqueWithoutWorkspaceInput[]
+    createMany?: BrandKitCreateManyWorkspaceInputEnvelope
+    set?: BrandKitWhereUniqueInput | BrandKitWhereUniqueInput[]
+    disconnect?: BrandKitWhereUniqueInput | BrandKitWhereUniqueInput[]
+    delete?: BrandKitWhereUniqueInput | BrandKitWhereUniqueInput[]
+    connect?: BrandKitWhereUniqueInput | BrandKitWhereUniqueInput[]
+    update?: BrandKitUpdateWithWhereUniqueWithoutWorkspaceInput | BrandKitUpdateWithWhereUniqueWithoutWorkspaceInput[]
+    updateMany?: BrandKitUpdateManyWithWhereWithoutWorkspaceInput | BrandKitUpdateManyWithWhereWithoutWorkspaceInput[]
+    deleteMany?: BrandKitScalarWhereInput | BrandKitScalarWhereInput[]
+  }
+
+  export type ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<ProjectCreateWithoutWorkspaceInput, ProjectUncheckedCreateWithoutWorkspaceInput> | ProjectCreateWithoutWorkspaceInput[] | ProjectUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutWorkspaceInput | ProjectCreateOrConnectWithoutWorkspaceInput[]
+    upsert?: ProjectUpsertWithWhereUniqueWithoutWorkspaceInput | ProjectUpsertWithWhereUniqueWithoutWorkspaceInput[]
+    createMany?: ProjectCreateManyWorkspaceInputEnvelope
+    set?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    disconnect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    delete?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    update?: ProjectUpdateWithWhereUniqueWithoutWorkspaceInput | ProjectUpdateWithWhereUniqueWithoutWorkspaceInput[]
+    updateMany?: ProjectUpdateManyWithWhereWithoutWorkspaceInput | ProjectUpdateManyWithWhereWithoutWorkspaceInput[]
+    deleteMany?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
+  }
+
+  export type WorkspaceCreateNestedOneWithoutKitsInput = {
+    create?: XOR<WorkspaceCreateWithoutKitsInput, WorkspaceUncheckedCreateWithoutKitsInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutKitsInput
+    connect?: WorkspaceWhereUniqueInput
+  }
+
+  export type ProjectCreateNestedManyWithoutBrandKitInput = {
+    create?: XOR<ProjectCreateWithoutBrandKitInput, ProjectUncheckedCreateWithoutBrandKitInput> | ProjectCreateWithoutBrandKitInput[] | ProjectUncheckedCreateWithoutBrandKitInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutBrandKitInput | ProjectCreateOrConnectWithoutBrandKitInput[]
+    createMany?: ProjectCreateManyBrandKitInputEnvelope
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+  }
+
+  export type ProjectUncheckedCreateNestedManyWithoutBrandKitInput = {
+    create?: XOR<ProjectCreateWithoutBrandKitInput, ProjectUncheckedCreateWithoutBrandKitInput> | ProjectCreateWithoutBrandKitInput[] | ProjectUncheckedCreateWithoutBrandKitInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutBrandKitInput | ProjectCreateOrConnectWithoutBrandKitInput[]
+    createMany?: ProjectCreateManyBrandKitInputEnvelope
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+  }
+
+  export type WorkspaceUpdateOneRequiredWithoutKitsNestedInput = {
+    create?: XOR<WorkspaceCreateWithoutKitsInput, WorkspaceUncheckedCreateWithoutKitsInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutKitsInput
+    upsert?: WorkspaceUpsertWithoutKitsInput
+    connect?: WorkspaceWhereUniqueInput
+    update?: XOR<XOR<WorkspaceUpdateToOneWithWhereWithoutKitsInput, WorkspaceUpdateWithoutKitsInput>, WorkspaceUncheckedUpdateWithoutKitsInput>
+  }
+
+  export type ProjectUpdateManyWithoutBrandKitNestedInput = {
+    create?: XOR<ProjectCreateWithoutBrandKitInput, ProjectUncheckedCreateWithoutBrandKitInput> | ProjectCreateWithoutBrandKitInput[] | ProjectUncheckedCreateWithoutBrandKitInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutBrandKitInput | ProjectCreateOrConnectWithoutBrandKitInput[]
+    upsert?: ProjectUpsertWithWhereUniqueWithoutBrandKitInput | ProjectUpsertWithWhereUniqueWithoutBrandKitInput[]
+    createMany?: ProjectCreateManyBrandKitInputEnvelope
+    set?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    disconnect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    delete?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    update?: ProjectUpdateWithWhereUniqueWithoutBrandKitInput | ProjectUpdateWithWhereUniqueWithoutBrandKitInput[]
+    updateMany?: ProjectUpdateManyWithWhereWithoutBrandKitInput | ProjectUpdateManyWithWhereWithoutBrandKitInput[]
+    deleteMany?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
+  }
+
+  export type ProjectUncheckedUpdateManyWithoutBrandKitNestedInput = {
+    create?: XOR<ProjectCreateWithoutBrandKitInput, ProjectUncheckedCreateWithoutBrandKitInput> | ProjectCreateWithoutBrandKitInput[] | ProjectUncheckedCreateWithoutBrandKitInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutBrandKitInput | ProjectCreateOrConnectWithoutBrandKitInput[]
+    upsert?: ProjectUpsertWithWhereUniqueWithoutBrandKitInput | ProjectUpsertWithWhereUniqueWithoutBrandKitInput[]
+    createMany?: ProjectCreateManyBrandKitInputEnvelope
+    set?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    disconnect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    delete?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    update?: ProjectUpdateWithWhereUniqueWithoutBrandKitInput | ProjectUpdateWithWhereUniqueWithoutBrandKitInput[]
+    updateMany?: ProjectUpdateManyWithWhereWithoutBrandKitInput | ProjectUpdateManyWithWhereWithoutBrandKitInput[]
+    deleteMany?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
+  }
+
+  export type WorkspaceCreateNestedOneWithoutProjectsInput = {
+    create?: XOR<WorkspaceCreateWithoutProjectsInput, WorkspaceUncheckedCreateWithoutProjectsInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutProjectsInput
+    connect?: WorkspaceWhereUniqueInput
+  }
+
+  export type BrandKitCreateNestedOneWithoutProjectsInput = {
+    create?: XOR<BrandKitCreateWithoutProjectsInput, BrandKitUncheckedCreateWithoutProjectsInput>
+    connectOrCreate?: BrandKitCreateOrConnectWithoutProjectsInput
+    connect?: BrandKitWhereUniqueInput
+  }
+
   export type TranscriptCreateNestedManyWithoutProjectInput = {
     create?: XOR<TranscriptCreateWithoutProjectInput, TranscriptUncheckedCreateWithoutProjectInput> | TranscriptCreateWithoutProjectInput[] | TranscriptUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: TranscriptCreateOrConnectWithoutProjectInput | TranscriptCreateOrConnectWithoutProjectInput[]
@@ -17531,6 +22227,13 @@ export namespace Prisma {
     connectOrCreate?: ClipCreateOrConnectWithoutProjectInput | ClipCreateOrConnectWithoutProjectInput[]
     createMany?: ClipCreateManyProjectInputEnvelope
     connect?: ClipWhereUniqueInput | ClipWhereUniqueInput[]
+  }
+
+  export type ReviewLinkCreateNestedManyWithoutProjectInput = {
+    create?: XOR<ReviewLinkCreateWithoutProjectInput, ReviewLinkUncheckedCreateWithoutProjectInput> | ReviewLinkCreateWithoutProjectInput[] | ReviewLinkUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ReviewLinkCreateOrConnectWithoutProjectInput | ReviewLinkCreateOrConnectWithoutProjectInput[]
+    createMany?: ReviewLinkCreateManyProjectInputEnvelope
+    connect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
   }
 
   export type TranscriptUncheckedCreateNestedManyWithoutProjectInput = {
@@ -17554,8 +22257,11 @@ export namespace Prisma {
     connect?: ClipWhereUniqueInput | ClipWhereUniqueInput[]
   }
 
-  export type StringFieldUpdateOperationsInput = {
-    set?: string
+  export type ReviewLinkUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<ReviewLinkCreateWithoutProjectInput, ReviewLinkUncheckedCreateWithoutProjectInput> | ReviewLinkCreateWithoutProjectInput[] | ReviewLinkUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ReviewLinkCreateOrConnectWithoutProjectInput | ReviewLinkCreateOrConnectWithoutProjectInput[]
+    createMany?: ReviewLinkCreateManyProjectInputEnvelope
+    connect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -17566,12 +22272,24 @@ export namespace Prisma {
     divide?: number
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
+  export type WorkspaceUpdateOneWithoutProjectsNestedInput = {
+    create?: XOR<WorkspaceCreateWithoutProjectsInput, WorkspaceUncheckedCreateWithoutProjectsInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutProjectsInput
+    upsert?: WorkspaceUpsertWithoutProjectsInput
+    disconnect?: WorkspaceWhereInput | boolean
+    delete?: WorkspaceWhereInput | boolean
+    connect?: WorkspaceWhereUniqueInput
+    update?: XOR<XOR<WorkspaceUpdateToOneWithWhereWithoutProjectsInput, WorkspaceUpdateWithoutProjectsInput>, WorkspaceUncheckedUpdateWithoutProjectsInput>
   }
 
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
+  export type BrandKitUpdateOneWithoutProjectsNestedInput = {
+    create?: XOR<BrandKitCreateWithoutProjectsInput, BrandKitUncheckedCreateWithoutProjectsInput>
+    connectOrCreate?: BrandKitCreateOrConnectWithoutProjectsInput
+    upsert?: BrandKitUpsertWithoutProjectsInput
+    disconnect?: BrandKitWhereInput | boolean
+    delete?: BrandKitWhereInput | boolean
+    connect?: BrandKitWhereUniqueInput
+    update?: XOR<XOR<BrandKitUpdateToOneWithWhereWithoutProjectsInput, BrandKitUpdateWithoutProjectsInput>, BrandKitUncheckedUpdateWithoutProjectsInput>
   }
 
   export type TranscriptUpdateManyWithoutProjectNestedInput = {
@@ -17616,6 +22334,20 @@ export namespace Prisma {
     deleteMany?: ClipScalarWhereInput | ClipScalarWhereInput[]
   }
 
+  export type ReviewLinkUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<ReviewLinkCreateWithoutProjectInput, ReviewLinkUncheckedCreateWithoutProjectInput> | ReviewLinkCreateWithoutProjectInput[] | ReviewLinkUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ReviewLinkCreateOrConnectWithoutProjectInput | ReviewLinkCreateOrConnectWithoutProjectInput[]
+    upsert?: ReviewLinkUpsertWithWhereUniqueWithoutProjectInput | ReviewLinkUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: ReviewLinkCreateManyProjectInputEnvelope
+    set?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    disconnect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    delete?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    connect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    update?: ReviewLinkUpdateWithWhereUniqueWithoutProjectInput | ReviewLinkUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: ReviewLinkUpdateManyWithWhereWithoutProjectInput | ReviewLinkUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: ReviewLinkScalarWhereInput | ReviewLinkScalarWhereInput[]
+  }
+
   export type TranscriptUncheckedUpdateManyWithoutProjectNestedInput = {
     create?: XOR<TranscriptCreateWithoutProjectInput, TranscriptUncheckedCreateWithoutProjectInput> | TranscriptCreateWithoutProjectInput[] | TranscriptUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: TranscriptCreateOrConnectWithoutProjectInput | TranscriptCreateOrConnectWithoutProjectInput[]
@@ -17656,6 +22388,20 @@ export namespace Prisma {
     update?: ClipUpdateWithWhereUniqueWithoutProjectInput | ClipUpdateWithWhereUniqueWithoutProjectInput[]
     updateMany?: ClipUpdateManyWithWhereWithoutProjectInput | ClipUpdateManyWithWhereWithoutProjectInput[]
     deleteMany?: ClipScalarWhereInput | ClipScalarWhereInput[]
+  }
+
+  export type ReviewLinkUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<ReviewLinkCreateWithoutProjectInput, ReviewLinkUncheckedCreateWithoutProjectInput> | ReviewLinkCreateWithoutProjectInput[] | ReviewLinkUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ReviewLinkCreateOrConnectWithoutProjectInput | ReviewLinkCreateOrConnectWithoutProjectInput[]
+    upsert?: ReviewLinkUpsertWithWhereUniqueWithoutProjectInput | ReviewLinkUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: ReviewLinkCreateManyProjectInputEnvelope
+    set?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    disconnect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    delete?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    connect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    update?: ReviewLinkUpdateWithWhereUniqueWithoutProjectInput | ReviewLinkUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: ReviewLinkUpdateManyWithWhereWithoutProjectInput | ReviewLinkUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: ReviewLinkScalarWhereInput | ReviewLinkScalarWhereInput[]
   }
 
   export type ProjectCreateNestedOneWithoutTranscriptsInput = {
@@ -17714,6 +22460,13 @@ export namespace Prisma {
     connect?: AnalyticsWhereUniqueInput | AnalyticsWhereUniqueInput[]
   }
 
+  export type ReviewLinkCreateNestedManyWithoutClipInput = {
+    create?: XOR<ReviewLinkCreateWithoutClipInput, ReviewLinkUncheckedCreateWithoutClipInput> | ReviewLinkCreateWithoutClipInput[] | ReviewLinkUncheckedCreateWithoutClipInput[]
+    connectOrCreate?: ReviewLinkCreateOrConnectWithoutClipInput | ReviewLinkCreateOrConnectWithoutClipInput[]
+    createMany?: ReviewLinkCreateManyClipInputEnvelope
+    connect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+  }
+
   export type AssetUncheckedCreateNestedManyWithoutClipInput = {
     create?: XOR<AssetCreateWithoutClipInput, AssetUncheckedCreateWithoutClipInput> | AssetCreateWithoutClipInput[] | AssetUncheckedCreateWithoutClipInput[]
     connectOrCreate?: AssetCreateOrConnectWithoutClipInput | AssetCreateOrConnectWithoutClipInput[]
@@ -17726,6 +22479,13 @@ export namespace Prisma {
     connectOrCreate?: AnalyticsCreateOrConnectWithoutClipInput | AnalyticsCreateOrConnectWithoutClipInput[]
     createMany?: AnalyticsCreateManyClipInputEnvelope
     connect?: AnalyticsWhereUniqueInput | AnalyticsWhereUniqueInput[]
+  }
+
+  export type ReviewLinkUncheckedCreateNestedManyWithoutClipInput = {
+    create?: XOR<ReviewLinkCreateWithoutClipInput, ReviewLinkUncheckedCreateWithoutClipInput> | ReviewLinkCreateWithoutClipInput[] | ReviewLinkUncheckedCreateWithoutClipInput[]
+    connectOrCreate?: ReviewLinkCreateOrConnectWithoutClipInput | ReviewLinkCreateOrConnectWithoutClipInput[]
+    createMany?: ReviewLinkCreateManyClipInputEnvelope
+    connect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
   }
 
   export type ProjectUpdateOneRequiredWithoutClipsNestedInput = {
@@ -17764,6 +22524,20 @@ export namespace Prisma {
     deleteMany?: AnalyticsScalarWhereInput | AnalyticsScalarWhereInput[]
   }
 
+  export type ReviewLinkUpdateManyWithoutClipNestedInput = {
+    create?: XOR<ReviewLinkCreateWithoutClipInput, ReviewLinkUncheckedCreateWithoutClipInput> | ReviewLinkCreateWithoutClipInput[] | ReviewLinkUncheckedCreateWithoutClipInput[]
+    connectOrCreate?: ReviewLinkCreateOrConnectWithoutClipInput | ReviewLinkCreateOrConnectWithoutClipInput[]
+    upsert?: ReviewLinkUpsertWithWhereUniqueWithoutClipInput | ReviewLinkUpsertWithWhereUniqueWithoutClipInput[]
+    createMany?: ReviewLinkCreateManyClipInputEnvelope
+    set?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    disconnect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    delete?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    connect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    update?: ReviewLinkUpdateWithWhereUniqueWithoutClipInput | ReviewLinkUpdateWithWhereUniqueWithoutClipInput[]
+    updateMany?: ReviewLinkUpdateManyWithWhereWithoutClipInput | ReviewLinkUpdateManyWithWhereWithoutClipInput[]
+    deleteMany?: ReviewLinkScalarWhereInput | ReviewLinkScalarWhereInput[]
+  }
+
   export type AssetUncheckedUpdateManyWithoutClipNestedInput = {
     create?: XOR<AssetCreateWithoutClipInput, AssetUncheckedCreateWithoutClipInput> | AssetCreateWithoutClipInput[] | AssetUncheckedCreateWithoutClipInput[]
     connectOrCreate?: AssetCreateOrConnectWithoutClipInput | AssetCreateOrConnectWithoutClipInput[]
@@ -17790,6 +22564,20 @@ export namespace Prisma {
     update?: AnalyticsUpdateWithWhereUniqueWithoutClipInput | AnalyticsUpdateWithWhereUniqueWithoutClipInput[]
     updateMany?: AnalyticsUpdateManyWithWhereWithoutClipInput | AnalyticsUpdateManyWithWhereWithoutClipInput[]
     deleteMany?: AnalyticsScalarWhereInput | AnalyticsScalarWhereInput[]
+  }
+
+  export type ReviewLinkUncheckedUpdateManyWithoutClipNestedInput = {
+    create?: XOR<ReviewLinkCreateWithoutClipInput, ReviewLinkUncheckedCreateWithoutClipInput> | ReviewLinkCreateWithoutClipInput[] | ReviewLinkUncheckedCreateWithoutClipInput[]
+    connectOrCreate?: ReviewLinkCreateOrConnectWithoutClipInput | ReviewLinkCreateOrConnectWithoutClipInput[]
+    upsert?: ReviewLinkUpsertWithWhereUniqueWithoutClipInput | ReviewLinkUpsertWithWhereUniqueWithoutClipInput[]
+    createMany?: ReviewLinkCreateManyClipInputEnvelope
+    set?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    disconnect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    delete?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    connect?: ReviewLinkWhereUniqueInput | ReviewLinkWhereUniqueInput[]
+    update?: ReviewLinkUpdateWithWhereUniqueWithoutClipInput | ReviewLinkUpdateWithWhereUniqueWithoutClipInput[]
+    updateMany?: ReviewLinkUpdateManyWithWhereWithoutClipInput | ReviewLinkUpdateManyWithWhereWithoutClipInput[]
+    deleteMany?: ReviewLinkScalarWhereInput | ReviewLinkScalarWhereInput[]
   }
 
   export type ClipCreateNestedOneWithoutAssetsInput = {
@@ -17828,6 +22616,36 @@ export namespace Prisma {
     set?: boolean
   }
 
+  export type ProjectCreateNestedOneWithoutReviewLinksInput = {
+    create?: XOR<ProjectCreateWithoutReviewLinksInput, ProjectUncheckedCreateWithoutReviewLinksInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutReviewLinksInput
+    connect?: ProjectWhereUniqueInput
+  }
+
+  export type ClipCreateNestedOneWithoutReviewLinksInput = {
+    create?: XOR<ClipCreateWithoutReviewLinksInput, ClipUncheckedCreateWithoutReviewLinksInput>
+    connectOrCreate?: ClipCreateOrConnectWithoutReviewLinksInput
+    connect?: ClipWhereUniqueInput
+  }
+
+  export type ProjectUpdateOneRequiredWithoutReviewLinksNestedInput = {
+    create?: XOR<ProjectCreateWithoutReviewLinksInput, ProjectUncheckedCreateWithoutReviewLinksInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutReviewLinksInput
+    upsert?: ProjectUpsertWithoutReviewLinksInput
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutReviewLinksInput, ProjectUpdateWithoutReviewLinksInput>, ProjectUncheckedUpdateWithoutReviewLinksInput>
+  }
+
+  export type ClipUpdateOneWithoutReviewLinksNestedInput = {
+    create?: XOR<ClipCreateWithoutReviewLinksInput, ClipUncheckedCreateWithoutReviewLinksInput>
+    connectOrCreate?: ClipCreateOrConnectWithoutReviewLinksInput
+    upsert?: ClipUpsertWithoutReviewLinksInput
+    disconnect?: ClipWhereInput | boolean
+    delete?: ClipWhereInput | boolean
+    connect?: ClipWhereUniqueInput
+    update?: XOR<XOR<ClipUpdateToOneWithWhereWithoutReviewLinksInput, ClipUpdateWithoutReviewLinksInput>, ClipUncheckedUpdateWithoutReviewLinksInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -17842,15 +22660,15 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type NestedStringNullableFilter<$PrismaModel = never> = {
@@ -17865,17 +22683,6 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
@@ -17906,6 +22713,48 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | null
@@ -17931,37 +22780,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -18029,6 +22847,299 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type BrandKitCreateWithoutWorkspaceInput = {
+    id?: string
+    name: string
+    fontFamily?: string
+    primaryColor?: string
+    watermarkPath?: string | null
+    logoPath?: string | null
+    createdAt?: Date | string
+    projects?: ProjectCreateNestedManyWithoutBrandKitInput
+  }
+
+  export type BrandKitUncheckedCreateWithoutWorkspaceInput = {
+    id?: string
+    name: string
+    fontFamily?: string
+    primaryColor?: string
+    watermarkPath?: string | null
+    logoPath?: string | null
+    createdAt?: Date | string
+    projects?: ProjectUncheckedCreateNestedManyWithoutBrandKitInput
+  }
+
+  export type BrandKitCreateOrConnectWithoutWorkspaceInput = {
+    where: BrandKitWhereUniqueInput
+    create: XOR<BrandKitCreateWithoutWorkspaceInput, BrandKitUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type BrandKitCreateManyWorkspaceInputEnvelope = {
+    data: BrandKitCreateManyWorkspaceInput | BrandKitCreateManyWorkspaceInput[]
+  }
+
+  export type ProjectCreateWithoutWorkspaceInput = {
+    id?: string
+    title: string
+    sourcePath: string
+    durationMs?: number | null
+    status?: string
+    tags?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    brandKit?: BrandKitCreateNestedOneWithoutProjectsInput
+    transcripts?: TranscriptCreateNestedManyWithoutProjectInput
+    candidates?: ClipCandidateCreateNestedManyWithoutProjectInput
+    clips?: ClipCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutWorkspaceInput = {
+    id?: string
+    title: string
+    sourcePath: string
+    durationMs?: number | null
+    status?: string
+    tags?: string | null
+    brandKitId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    transcripts?: TranscriptUncheckedCreateNestedManyWithoutProjectInput
+    candidates?: ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
+    clips?: ClipUncheckedCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutWorkspaceInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutWorkspaceInput, ProjectUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type ProjectCreateManyWorkspaceInputEnvelope = {
+    data: ProjectCreateManyWorkspaceInput | ProjectCreateManyWorkspaceInput[]
+  }
+
+  export type BrandKitUpsertWithWhereUniqueWithoutWorkspaceInput = {
+    where: BrandKitWhereUniqueInput
+    update: XOR<BrandKitUpdateWithoutWorkspaceInput, BrandKitUncheckedUpdateWithoutWorkspaceInput>
+    create: XOR<BrandKitCreateWithoutWorkspaceInput, BrandKitUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type BrandKitUpdateWithWhereUniqueWithoutWorkspaceInput = {
+    where: BrandKitWhereUniqueInput
+    data: XOR<BrandKitUpdateWithoutWorkspaceInput, BrandKitUncheckedUpdateWithoutWorkspaceInput>
+  }
+
+  export type BrandKitUpdateManyWithWhereWithoutWorkspaceInput = {
+    where: BrandKitScalarWhereInput
+    data: XOR<BrandKitUpdateManyMutationInput, BrandKitUncheckedUpdateManyWithoutWorkspaceInput>
+  }
+
+  export type BrandKitScalarWhereInput = {
+    AND?: BrandKitScalarWhereInput | BrandKitScalarWhereInput[]
+    OR?: BrandKitScalarWhereInput[]
+    NOT?: BrandKitScalarWhereInput | BrandKitScalarWhereInput[]
+    id?: StringFilter<"BrandKit"> | string
+    workspaceId?: StringFilter<"BrandKit"> | string
+    name?: StringFilter<"BrandKit"> | string
+    fontFamily?: StringFilter<"BrandKit"> | string
+    primaryColor?: StringFilter<"BrandKit"> | string
+    watermarkPath?: StringNullableFilter<"BrandKit"> | string | null
+    logoPath?: StringNullableFilter<"BrandKit"> | string | null
+    createdAt?: DateTimeFilter<"BrandKit"> | Date | string
+  }
+
+  export type ProjectUpsertWithWhereUniqueWithoutWorkspaceInput = {
+    where: ProjectWhereUniqueInput
+    update: XOR<ProjectUpdateWithoutWorkspaceInput, ProjectUncheckedUpdateWithoutWorkspaceInput>
+    create: XOR<ProjectCreateWithoutWorkspaceInput, ProjectUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type ProjectUpdateWithWhereUniqueWithoutWorkspaceInput = {
+    where: ProjectWhereUniqueInput
+    data: XOR<ProjectUpdateWithoutWorkspaceInput, ProjectUncheckedUpdateWithoutWorkspaceInput>
+  }
+
+  export type ProjectUpdateManyWithWhereWithoutWorkspaceInput = {
+    where: ProjectScalarWhereInput
+    data: XOR<ProjectUpdateManyMutationInput, ProjectUncheckedUpdateManyWithoutWorkspaceInput>
+  }
+
+  export type ProjectScalarWhereInput = {
+    AND?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
+    OR?: ProjectScalarWhereInput[]
+    NOT?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
+    id?: StringFilter<"Project"> | string
+    title?: StringFilter<"Project"> | string
+    sourcePath?: StringFilter<"Project"> | string
+    durationMs?: IntNullableFilter<"Project"> | number | null
+    status?: StringFilter<"Project"> | string
+    tags?: StringNullableFilter<"Project"> | string | null
+    workspaceId?: StringNullableFilter<"Project"> | string | null
+    brandKitId?: StringNullableFilter<"Project"> | string | null
+    createdAt?: DateTimeFilter<"Project"> | Date | string
+    updatedAt?: DateTimeFilter<"Project"> | Date | string
+  }
+
+  export type WorkspaceCreateWithoutKitsInput = {
+    id?: string
+    name?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId?: string | null
+    projects?: ProjectCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceUncheckedCreateWithoutKitsInput = {
+    id?: string
+    name?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId?: string | null
+    projects?: ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceCreateOrConnectWithoutKitsInput = {
+    where: WorkspaceWhereUniqueInput
+    create: XOR<WorkspaceCreateWithoutKitsInput, WorkspaceUncheckedCreateWithoutKitsInput>
+  }
+
+  export type ProjectCreateWithoutBrandKitInput = {
+    id?: string
+    title: string
+    sourcePath: string
+    durationMs?: number | null
+    status?: string
+    tags?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace?: WorkspaceCreateNestedOneWithoutProjectsInput
+    transcripts?: TranscriptCreateNestedManyWithoutProjectInput
+    candidates?: ClipCandidateCreateNestedManyWithoutProjectInput
+    clips?: ClipCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutBrandKitInput = {
+    id?: string
+    title: string
+    sourcePath: string
+    durationMs?: number | null
+    status?: string
+    tags?: string | null
+    workspaceId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    transcripts?: TranscriptUncheckedCreateNestedManyWithoutProjectInput
+    candidates?: ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
+    clips?: ClipUncheckedCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutBrandKitInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutBrandKitInput, ProjectUncheckedCreateWithoutBrandKitInput>
+  }
+
+  export type ProjectCreateManyBrandKitInputEnvelope = {
+    data: ProjectCreateManyBrandKitInput | ProjectCreateManyBrandKitInput[]
+  }
+
+  export type WorkspaceUpsertWithoutKitsInput = {
+    update: XOR<WorkspaceUpdateWithoutKitsInput, WorkspaceUncheckedUpdateWithoutKitsInput>
+    create: XOR<WorkspaceCreateWithoutKitsInput, WorkspaceUncheckedCreateWithoutKitsInput>
+    where?: WorkspaceWhereInput
+  }
+
+  export type WorkspaceUpdateToOneWithWhereWithoutKitsInput = {
+    where?: WorkspaceWhereInput
+    data: XOR<WorkspaceUpdateWithoutKitsInput, WorkspaceUncheckedUpdateWithoutKitsInput>
+  }
+
+  export type WorkspaceUpdateWithoutKitsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    projects?: ProjectUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceUncheckedUpdateWithoutKitsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    projects?: ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type ProjectUpsertWithWhereUniqueWithoutBrandKitInput = {
+    where: ProjectWhereUniqueInput
+    update: XOR<ProjectUpdateWithoutBrandKitInput, ProjectUncheckedUpdateWithoutBrandKitInput>
+    create: XOR<ProjectCreateWithoutBrandKitInput, ProjectUncheckedCreateWithoutBrandKitInput>
+  }
+
+  export type ProjectUpdateWithWhereUniqueWithoutBrandKitInput = {
+    where: ProjectWhereUniqueInput
+    data: XOR<ProjectUpdateWithoutBrandKitInput, ProjectUncheckedUpdateWithoutBrandKitInput>
+  }
+
+  export type ProjectUpdateManyWithWhereWithoutBrandKitInput = {
+    where: ProjectScalarWhereInput
+    data: XOR<ProjectUpdateManyMutationInput, ProjectUncheckedUpdateManyWithoutBrandKitInput>
+  }
+
+  export type WorkspaceCreateWithoutProjectsInput = {
+    id?: string
+    name?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId?: string | null
+    kits?: BrandKitCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceUncheckedCreateWithoutProjectsInput = {
+    id?: string
+    name?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId?: string | null
+    kits?: BrandKitUncheckedCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceCreateOrConnectWithoutProjectsInput = {
+    where: WorkspaceWhereUniqueInput
+    create: XOR<WorkspaceCreateWithoutProjectsInput, WorkspaceUncheckedCreateWithoutProjectsInput>
+  }
+
+  export type BrandKitCreateWithoutProjectsInput = {
+    id?: string
+    name: string
+    fontFamily?: string
+    primaryColor?: string
+    watermarkPath?: string | null
+    logoPath?: string | null
+    createdAt?: Date | string
+    workspace: WorkspaceCreateNestedOneWithoutKitsInput
+  }
+
+  export type BrandKitUncheckedCreateWithoutProjectsInput = {
+    id?: string
+    workspaceId: string
+    name: string
+    fontFamily?: string
+    primaryColor?: string
+    watermarkPath?: string | null
+    logoPath?: string | null
+    createdAt?: Date | string
+  }
+
+  export type BrandKitCreateOrConnectWithoutProjectsInput = {
+    where: BrandKitWhereUniqueInput
+    create: XOR<BrandKitCreateWithoutProjectsInput, BrandKitUncheckedCreateWithoutProjectsInput>
+  }
+
   export type TranscriptCreateWithoutProjectInput = {
     id?: string
     provider: string
@@ -18090,6 +23201,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     assets?: AssetCreateNestedManyWithoutClipInput
     analytics?: AnalyticsCreateNestedManyWithoutClipInput
+    reviewLinks?: ReviewLinkCreateNestedManyWithoutClipInput
   }
 
   export type ClipUncheckedCreateWithoutProjectInput = {
@@ -18103,6 +23215,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     assets?: AssetUncheckedCreateNestedManyWithoutClipInput
     analytics?: AnalyticsUncheckedCreateNestedManyWithoutClipInput
+    reviewLinks?: ReviewLinkUncheckedCreateNestedManyWithoutClipInput
   }
 
   export type ClipCreateOrConnectWithoutProjectInput = {
@@ -18112,6 +23225,99 @@ export namespace Prisma {
 
   export type ClipCreateManyProjectInputEnvelope = {
     data: ClipCreateManyProjectInput | ClipCreateManyProjectInput[]
+  }
+
+  export type ReviewLinkCreateWithoutProjectInput = {
+    id?: string
+    cloudUrl: string
+    status?: string
+    comments?: string | null
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    clip?: ClipCreateNestedOneWithoutReviewLinksInput
+  }
+
+  export type ReviewLinkUncheckedCreateWithoutProjectInput = {
+    id?: string
+    clipId?: string | null
+    cloudUrl: string
+    status?: string
+    comments?: string | null
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ReviewLinkCreateOrConnectWithoutProjectInput = {
+    where: ReviewLinkWhereUniqueInput
+    create: XOR<ReviewLinkCreateWithoutProjectInput, ReviewLinkUncheckedCreateWithoutProjectInput>
+  }
+
+  export type ReviewLinkCreateManyProjectInputEnvelope = {
+    data: ReviewLinkCreateManyProjectInput | ReviewLinkCreateManyProjectInput[]
+  }
+
+  export type WorkspaceUpsertWithoutProjectsInput = {
+    update: XOR<WorkspaceUpdateWithoutProjectsInput, WorkspaceUncheckedUpdateWithoutProjectsInput>
+    create: XOR<WorkspaceCreateWithoutProjectsInput, WorkspaceUncheckedCreateWithoutProjectsInput>
+    where?: WorkspaceWhereInput
+  }
+
+  export type WorkspaceUpdateToOneWithWhereWithoutProjectsInput = {
+    where?: WorkspaceWhereInput
+    data: XOR<WorkspaceUpdateWithoutProjectsInput, WorkspaceUncheckedUpdateWithoutProjectsInput>
+  }
+
+  export type WorkspaceUpdateWithoutProjectsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    kits?: BrandKitUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceUncheckedUpdateWithoutProjectsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    kits?: BrandKitUncheckedUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type BrandKitUpsertWithoutProjectsInput = {
+    update: XOR<BrandKitUpdateWithoutProjectsInput, BrandKitUncheckedUpdateWithoutProjectsInput>
+    create: XOR<BrandKitCreateWithoutProjectsInput, BrandKitUncheckedCreateWithoutProjectsInput>
+    where?: BrandKitWhereInput
+  }
+
+  export type BrandKitUpdateToOneWithWhereWithoutProjectsInput = {
+    where?: BrandKitWhereInput
+    data: XOR<BrandKitUpdateWithoutProjectsInput, BrandKitUncheckedUpdateWithoutProjectsInput>
+  }
+
+  export type BrandKitUpdateWithoutProjectsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    watermarkPath?: NullableStringFieldUpdateOperationsInput | string | null
+    logoPath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneRequiredWithoutKitsNestedInput
+  }
+
+  export type BrandKitUncheckedUpdateWithoutProjectsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    watermarkPath?: NullableStringFieldUpdateOperationsInput | string | null
+    logoPath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TranscriptUpsertWithWhereUniqueWithoutProjectInput = {
@@ -18201,6 +23407,37 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Clip"> | Date | string
   }
 
+  export type ReviewLinkUpsertWithWhereUniqueWithoutProjectInput = {
+    where: ReviewLinkWhereUniqueInput
+    update: XOR<ReviewLinkUpdateWithoutProjectInput, ReviewLinkUncheckedUpdateWithoutProjectInput>
+    create: XOR<ReviewLinkCreateWithoutProjectInput, ReviewLinkUncheckedCreateWithoutProjectInput>
+  }
+
+  export type ReviewLinkUpdateWithWhereUniqueWithoutProjectInput = {
+    where: ReviewLinkWhereUniqueInput
+    data: XOR<ReviewLinkUpdateWithoutProjectInput, ReviewLinkUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type ReviewLinkUpdateManyWithWhereWithoutProjectInput = {
+    where: ReviewLinkScalarWhereInput
+    data: XOR<ReviewLinkUpdateManyMutationInput, ReviewLinkUncheckedUpdateManyWithoutProjectInput>
+  }
+
+  export type ReviewLinkScalarWhereInput = {
+    AND?: ReviewLinkScalarWhereInput | ReviewLinkScalarWhereInput[]
+    OR?: ReviewLinkScalarWhereInput[]
+    NOT?: ReviewLinkScalarWhereInput | ReviewLinkScalarWhereInput[]
+    id?: StringFilter<"ReviewLink"> | string
+    projectId?: StringFilter<"ReviewLink"> | string
+    clipId?: StringNullableFilter<"ReviewLink"> | string | null
+    cloudUrl?: StringFilter<"ReviewLink"> | string
+    status?: StringFilter<"ReviewLink"> | string
+    comments?: StringNullableFilter<"ReviewLink"> | string | null
+    expiresAt?: DateTimeNullableFilter<"ReviewLink"> | Date | string | null
+    createdAt?: DateTimeFilter<"ReviewLink"> | Date | string
+    updatedAt?: DateTimeFilter<"ReviewLink"> | Date | string
+  }
+
   export type ProjectCreateWithoutTranscriptsInput = {
     id?: string
     title: string
@@ -18210,8 +23447,11 @@ export namespace Prisma {
     tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    workspace?: WorkspaceCreateNestedOneWithoutProjectsInput
+    brandKit?: BrandKitCreateNestedOneWithoutProjectsInput
     candidates?: ClipCandidateCreateNestedManyWithoutProjectInput
     clips?: ClipCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutTranscriptsInput = {
@@ -18221,10 +23461,13 @@ export namespace Prisma {
     durationMs?: number | null
     status?: string
     tags?: string | null
+    workspaceId?: string | null
+    brandKitId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     candidates?: ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
     clips?: ClipUncheckedCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutTranscriptsInput = {
@@ -18252,8 +23495,11 @@ export namespace Prisma {
     tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneWithoutProjectsNestedInput
+    brandKit?: BrandKitUpdateOneWithoutProjectsNestedInput
     candidates?: ClipCandidateUpdateManyWithoutProjectNestedInput
     clips?: ClipUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutTranscriptsInput = {
@@ -18263,10 +23509,13 @@ export namespace Prisma {
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     tags?: NullableStringFieldUpdateOperationsInput | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    brandKitId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     candidates?: ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
     clips?: ClipUncheckedUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateWithoutCandidatesInput = {
@@ -18278,8 +23527,11 @@ export namespace Prisma {
     tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    workspace?: WorkspaceCreateNestedOneWithoutProjectsInput
+    brandKit?: BrandKitCreateNestedOneWithoutProjectsInput
     transcripts?: TranscriptCreateNestedManyWithoutProjectInput
     clips?: ClipCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutCandidatesInput = {
@@ -18289,10 +23541,13 @@ export namespace Prisma {
     durationMs?: number | null
     status?: string
     tags?: string | null
+    workspaceId?: string | null
+    brandKitId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     transcripts?: TranscriptUncheckedCreateNestedManyWithoutProjectInput
     clips?: ClipUncheckedCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutCandidatesInput = {
@@ -18320,8 +23575,11 @@ export namespace Prisma {
     tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneWithoutProjectsNestedInput
+    brandKit?: BrandKitUpdateOneWithoutProjectsNestedInput
     transcripts?: TranscriptUpdateManyWithoutProjectNestedInput
     clips?: ClipUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutCandidatesInput = {
@@ -18331,10 +23589,13 @@ export namespace Prisma {
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     tags?: NullableStringFieldUpdateOperationsInput | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    brandKitId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transcripts?: TranscriptUncheckedUpdateManyWithoutProjectNestedInput
     clips?: ClipUncheckedUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateWithoutClipsInput = {
@@ -18346,8 +23607,11 @@ export namespace Prisma {
     tags?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    workspace?: WorkspaceCreateNestedOneWithoutProjectsInput
+    brandKit?: BrandKitCreateNestedOneWithoutProjectsInput
     transcripts?: TranscriptCreateNestedManyWithoutProjectInput
     candidates?: ClipCandidateCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutClipsInput = {
@@ -18357,10 +23621,13 @@ export namespace Prisma {
     durationMs?: number | null
     status?: string
     tags?: string | null
+    workspaceId?: string | null
+    brandKitId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     transcripts?: TranscriptUncheckedCreateNestedManyWithoutProjectInput
     candidates?: ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
+    reviewLinks?: ReviewLinkUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutClipsInput = {
@@ -18422,6 +23689,37 @@ export namespace Prisma {
     data: AnalyticsCreateManyClipInput | AnalyticsCreateManyClipInput[]
   }
 
+  export type ReviewLinkCreateWithoutClipInput = {
+    id?: string
+    cloudUrl: string
+    status?: string
+    comments?: string | null
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutReviewLinksInput
+  }
+
+  export type ReviewLinkUncheckedCreateWithoutClipInput = {
+    id?: string
+    projectId: string
+    cloudUrl: string
+    status?: string
+    comments?: string | null
+    expiresAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ReviewLinkCreateOrConnectWithoutClipInput = {
+    where: ReviewLinkWhereUniqueInput
+    create: XOR<ReviewLinkCreateWithoutClipInput, ReviewLinkUncheckedCreateWithoutClipInput>
+  }
+
+  export type ReviewLinkCreateManyClipInputEnvelope = {
+    data: ReviewLinkCreateManyClipInput | ReviewLinkCreateManyClipInput[]
+  }
+
   export type ProjectUpsertWithoutClipsInput = {
     update: XOR<ProjectUpdateWithoutClipsInput, ProjectUncheckedUpdateWithoutClipsInput>
     create: XOR<ProjectCreateWithoutClipsInput, ProjectUncheckedCreateWithoutClipsInput>
@@ -18442,8 +23740,11 @@ export namespace Prisma {
     tags?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneWithoutProjectsNestedInput
+    brandKit?: BrandKitUpdateOneWithoutProjectsNestedInput
     transcripts?: TranscriptUpdateManyWithoutProjectNestedInput
     candidates?: ClipCandidateUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutClipsInput = {
@@ -18453,10 +23754,13 @@ export namespace Prisma {
     durationMs?: NullableIntFieldUpdateOperationsInput | number | null
     status?: StringFieldUpdateOperationsInput | string
     tags?: NullableStringFieldUpdateOperationsInput | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    brandKitId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transcripts?: TranscriptUncheckedUpdateManyWithoutProjectNestedInput
     candidates?: ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type AssetUpsertWithWhereUniqueWithoutClipInput = {
@@ -18517,6 +23821,22 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Analytics"> | Date | string
   }
 
+  export type ReviewLinkUpsertWithWhereUniqueWithoutClipInput = {
+    where: ReviewLinkWhereUniqueInput
+    update: XOR<ReviewLinkUpdateWithoutClipInput, ReviewLinkUncheckedUpdateWithoutClipInput>
+    create: XOR<ReviewLinkCreateWithoutClipInput, ReviewLinkUncheckedCreateWithoutClipInput>
+  }
+
+  export type ReviewLinkUpdateWithWhereUniqueWithoutClipInput = {
+    where: ReviewLinkWhereUniqueInput
+    data: XOR<ReviewLinkUpdateWithoutClipInput, ReviewLinkUncheckedUpdateWithoutClipInput>
+  }
+
+  export type ReviewLinkUpdateManyWithWhereWithoutClipInput = {
+    where: ReviewLinkScalarWhereInput
+    data: XOR<ReviewLinkUpdateManyMutationInput, ReviewLinkUncheckedUpdateManyWithoutClipInput>
+  }
+
   export type ClipCreateWithoutAssetsInput = {
     id?: string
     startMs: number
@@ -18528,6 +23848,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     project: ProjectCreateNestedOneWithoutClipsInput
     analytics?: AnalyticsCreateNestedManyWithoutClipInput
+    reviewLinks?: ReviewLinkCreateNestedManyWithoutClipInput
   }
 
   export type ClipUncheckedCreateWithoutAssetsInput = {
@@ -18541,6 +23862,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     analytics?: AnalyticsUncheckedCreateNestedManyWithoutClipInput
+    reviewLinks?: ReviewLinkUncheckedCreateNestedManyWithoutClipInput
   }
 
   export type ClipCreateOrConnectWithoutAssetsInput = {
@@ -18570,6 +23892,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutClipsNestedInput
     analytics?: AnalyticsUpdateManyWithoutClipNestedInput
+    reviewLinks?: ReviewLinkUpdateManyWithoutClipNestedInput
   }
 
   export type ClipUncheckedUpdateWithoutAssetsInput = {
@@ -18583,6 +23906,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     analytics?: AnalyticsUncheckedUpdateManyWithoutClipNestedInput
+    reviewLinks?: ReviewLinkUncheckedUpdateManyWithoutClipNestedInput
   }
 
   export type ClipCreateWithoutAnalyticsInput = {
@@ -18596,6 +23920,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     project: ProjectCreateNestedOneWithoutClipsInput
     assets?: AssetCreateNestedManyWithoutClipInput
+    reviewLinks?: ReviewLinkCreateNestedManyWithoutClipInput
   }
 
   export type ClipUncheckedCreateWithoutAnalyticsInput = {
@@ -18609,6 +23934,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     assets?: AssetUncheckedCreateNestedManyWithoutClipInput
+    reviewLinks?: ReviewLinkUncheckedCreateNestedManyWithoutClipInput
   }
 
   export type ClipCreateOrConnectWithoutAnalyticsInput = {
@@ -18638,6 +23964,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutClipsNestedInput
     assets?: AssetUpdateManyWithoutClipNestedInput
+    reviewLinks?: ReviewLinkUpdateManyWithoutClipNestedInput
   }
 
   export type ClipUncheckedUpdateWithoutAnalyticsInput = {
@@ -18651,6 +23978,313 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     assets?: AssetUncheckedUpdateManyWithoutClipNestedInput
+    reviewLinks?: ReviewLinkUncheckedUpdateManyWithoutClipNestedInput
+  }
+
+  export type ProjectCreateWithoutReviewLinksInput = {
+    id?: string
+    title: string
+    sourcePath: string
+    durationMs?: number | null
+    status?: string
+    tags?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace?: WorkspaceCreateNestedOneWithoutProjectsInput
+    brandKit?: BrandKitCreateNestedOneWithoutProjectsInput
+    transcripts?: TranscriptCreateNestedManyWithoutProjectInput
+    candidates?: ClipCandidateCreateNestedManyWithoutProjectInput
+    clips?: ClipCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutReviewLinksInput = {
+    id?: string
+    title: string
+    sourcePath: string
+    durationMs?: number | null
+    status?: string
+    tags?: string | null
+    workspaceId?: string | null
+    brandKitId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    transcripts?: TranscriptUncheckedCreateNestedManyWithoutProjectInput
+    candidates?: ClipCandidateUncheckedCreateNestedManyWithoutProjectInput
+    clips?: ClipUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutReviewLinksInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutReviewLinksInput, ProjectUncheckedCreateWithoutReviewLinksInput>
+  }
+
+  export type ClipCreateWithoutReviewLinksInput = {
+    id?: string
+    startMs: number
+    endMs: number
+    scores: string
+    caption?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutClipsInput
+    assets?: AssetCreateNestedManyWithoutClipInput
+    analytics?: AnalyticsCreateNestedManyWithoutClipInput
+  }
+
+  export type ClipUncheckedCreateWithoutReviewLinksInput = {
+    id?: string
+    projectId: string
+    startMs: number
+    endMs: number
+    scores: string
+    caption?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    assets?: AssetUncheckedCreateNestedManyWithoutClipInput
+    analytics?: AnalyticsUncheckedCreateNestedManyWithoutClipInput
+  }
+
+  export type ClipCreateOrConnectWithoutReviewLinksInput = {
+    where: ClipWhereUniqueInput
+    create: XOR<ClipCreateWithoutReviewLinksInput, ClipUncheckedCreateWithoutReviewLinksInput>
+  }
+
+  export type ProjectUpsertWithoutReviewLinksInput = {
+    update: XOR<ProjectUpdateWithoutReviewLinksInput, ProjectUncheckedUpdateWithoutReviewLinksInput>
+    create: XOR<ProjectCreateWithoutReviewLinksInput, ProjectUncheckedCreateWithoutReviewLinksInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutReviewLinksInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutReviewLinksInput, ProjectUncheckedUpdateWithoutReviewLinksInput>
+  }
+
+  export type ProjectUpdateWithoutReviewLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    sourcePath?: StringFieldUpdateOperationsInput | string
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneWithoutProjectsNestedInput
+    brandKit?: BrandKitUpdateOneWithoutProjectsNestedInput
+    transcripts?: TranscriptUpdateManyWithoutProjectNestedInput
+    candidates?: ClipCandidateUpdateManyWithoutProjectNestedInput
+    clips?: ClipUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutReviewLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    sourcePath?: StringFieldUpdateOperationsInput | string
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    brandKitId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    transcripts?: TranscriptUncheckedUpdateManyWithoutProjectNestedInput
+    candidates?: ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
+    clips?: ClipUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ClipUpsertWithoutReviewLinksInput = {
+    update: XOR<ClipUpdateWithoutReviewLinksInput, ClipUncheckedUpdateWithoutReviewLinksInput>
+    create: XOR<ClipCreateWithoutReviewLinksInput, ClipUncheckedCreateWithoutReviewLinksInput>
+    where?: ClipWhereInput
+  }
+
+  export type ClipUpdateToOneWithWhereWithoutReviewLinksInput = {
+    where?: ClipWhereInput
+    data: XOR<ClipUpdateWithoutReviewLinksInput, ClipUncheckedUpdateWithoutReviewLinksInput>
+  }
+
+  export type ClipUpdateWithoutReviewLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startMs?: IntFieldUpdateOperationsInput | number
+    endMs?: IntFieldUpdateOperationsInput | number
+    scores?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutClipsNestedInput
+    assets?: AssetUpdateManyWithoutClipNestedInput
+    analytics?: AnalyticsUpdateManyWithoutClipNestedInput
+  }
+
+  export type ClipUncheckedUpdateWithoutReviewLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    startMs?: IntFieldUpdateOperationsInput | number
+    endMs?: IntFieldUpdateOperationsInput | number
+    scores?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assets?: AssetUncheckedUpdateManyWithoutClipNestedInput
+    analytics?: AnalyticsUncheckedUpdateManyWithoutClipNestedInput
+  }
+
+  export type BrandKitCreateManyWorkspaceInput = {
+    id?: string
+    name: string
+    fontFamily?: string
+    primaryColor?: string
+    watermarkPath?: string | null
+    logoPath?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ProjectCreateManyWorkspaceInput = {
+    id?: string
+    title: string
+    sourcePath: string
+    durationMs?: number | null
+    status?: string
+    tags?: string | null
+    brandKitId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BrandKitUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    watermarkPath?: NullableStringFieldUpdateOperationsInput | string | null
+    logoPath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    projects?: ProjectUpdateManyWithoutBrandKitNestedInput
+  }
+
+  export type BrandKitUncheckedUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    watermarkPath?: NullableStringFieldUpdateOperationsInput | string | null
+    logoPath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    projects?: ProjectUncheckedUpdateManyWithoutBrandKitNestedInput
+  }
+
+  export type BrandKitUncheckedUpdateManyWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fontFamily?: StringFieldUpdateOperationsInput | string
+    primaryColor?: StringFieldUpdateOperationsInput | string
+    watermarkPath?: NullableStringFieldUpdateOperationsInput | string | null
+    logoPath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    sourcePath?: StringFieldUpdateOperationsInput | string
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    brandKit?: BrandKitUpdateOneWithoutProjectsNestedInput
+    transcripts?: TranscriptUpdateManyWithoutProjectNestedInput
+    candidates?: ClipCandidateUpdateManyWithoutProjectNestedInput
+    clips?: ClipUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    sourcePath?: StringFieldUpdateOperationsInput | string
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    brandKitId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    transcripts?: TranscriptUncheckedUpdateManyWithoutProjectNestedInput
+    candidates?: ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
+    clips?: ClipUncheckedUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateManyWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    sourcePath?: StringFieldUpdateOperationsInput | string
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    brandKitId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectCreateManyBrandKitInput = {
+    id?: string
+    title: string
+    sourcePath: string
+    durationMs?: number | null
+    status?: string
+    tags?: string | null
+    workspaceId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ProjectUpdateWithoutBrandKitInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    sourcePath?: StringFieldUpdateOperationsInput | string
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneWithoutProjectsNestedInput
+    transcripts?: TranscriptUpdateManyWithoutProjectNestedInput
+    candidates?: ClipCandidateUpdateManyWithoutProjectNestedInput
+    clips?: ClipUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutBrandKitInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    sourcePath?: StringFieldUpdateOperationsInput | string
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    transcripts?: TranscriptUncheckedUpdateManyWithoutProjectNestedInput
+    candidates?: ClipCandidateUncheckedUpdateManyWithoutProjectNestedInput
+    clips?: ClipUncheckedUpdateManyWithoutProjectNestedInput
+    reviewLinks?: ReviewLinkUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateManyWithoutBrandKitInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    sourcePath?: StringFieldUpdateOperationsInput | string
+    durationMs?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    tags?: NullableStringFieldUpdateOperationsInput | string | null
+    workspaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TranscriptCreateManyProjectInput = {
@@ -18676,6 +24310,17 @@ export namespace Prisma {
     scores: string
     caption?: string | null
     status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ReviewLinkCreateManyProjectInput = {
+    id?: string
+    clipId?: string | null
+    cloudUrl: string
+    status?: string
+    comments?: string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -18739,6 +24384,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     assets?: AssetUpdateManyWithoutClipNestedInput
     analytics?: AnalyticsUpdateManyWithoutClipNestedInput
+    reviewLinks?: ReviewLinkUpdateManyWithoutClipNestedInput
   }
 
   export type ClipUncheckedUpdateWithoutProjectInput = {
@@ -18752,6 +24398,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     assets?: AssetUncheckedUpdateManyWithoutClipNestedInput
     analytics?: AnalyticsUncheckedUpdateManyWithoutClipNestedInput
+    reviewLinks?: ReviewLinkUncheckedUpdateManyWithoutClipNestedInput
   }
 
   export type ClipUncheckedUpdateManyWithoutProjectInput = {
@@ -18761,6 +24408,39 @@ export namespace Prisma {
     scores?: StringFieldUpdateOperationsInput | string
     caption?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReviewLinkUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    cloudUrl?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clip?: ClipUpdateOneWithoutReviewLinksNestedInput
+  }
+
+  export type ReviewLinkUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clipId?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudUrl?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReviewLinkUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clipId?: NullableStringFieldUpdateOperationsInput | string | null
+    cloudUrl?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -18779,6 +24459,17 @@ export namespace Prisma {
     likes?: number
     comments?: number
     shares?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ReviewLinkCreateManyClipInput = {
+    id?: string
+    projectId: string
+    cloudUrl: string
+    status?: string
+    comments?: string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -18833,6 +24524,39 @@ export namespace Prisma {
     likes?: IntFieldUpdateOperationsInput | number
     comments?: IntFieldUpdateOperationsInput | number
     shares?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReviewLinkUpdateWithoutClipInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    cloudUrl?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutReviewLinksNestedInput
+  }
+
+  export type ReviewLinkUncheckedUpdateWithoutClipInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    cloudUrl?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ReviewLinkUncheckedUpdateManyWithoutClipInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    cloudUrl?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash, CheckCircle2, Loader2, Save, Bot, Mic, KeySquare, Blocks, Settings2, Palette, Zap, HardDrive, FolderOpen, RotateCcw } from "lucide-react";
+import { Trash, CheckCircle2, Loader2, Save, Bot, Mic, Blocks, Settings2, Palette, Zap, HardDrive, FolderOpen, RotateCcw, AlertTriangle } from "lucide-react";
 
 // ---- Provider/Model type (matches electron/config.js) ----
 interface ProviderOption  { id: string; label: string }
@@ -19,23 +19,48 @@ interface AIConfig {
   asrModels:     Record<string, string[]>;
 }
 
+interface BrandKit {
+  id: string;
+  name: string;
+  fontFamily: string;
+  primaryColor: string;
+  watermarkPath?: string;
+  logoPath?: string;
+}
+
+interface Workspace {
+  id: string;
+  name: string;
+  kits: BrandKit[];
+}
+
 export default function SettingsPage() {
   // ---- API Keys ----
-  const [openaiKey,     setOpenaiKey]     = useState("");
-  const [geminiKey,     setGeminiKey]     = useState("");
-  const [claudeKey,     setClaudeKey]     = useState("");
-  const [groqKey,       setGroqKey]       = useState("");
-  const [mistralKey,    setMistralKey]    = useState("");
-  const [cohereKey,     setCohereKey]     = useState("");
-  const [elevenLabsKey, setElevenLabsKey] = useState("");
-  const [deepgramKey,   setDeepgramKey]   = useState("");
-  const [assemblyaiKey, setAssemblyaiKey] = useState("");
+  const [openaiKey,       setOpenaiKey]       = useState("");
+  const [geminiKey,       setGeminiKey]       = useState("");
+  const [claudeKey,       setClaudeKey]       = useState("");
+  const [groqKey,         setGroqKey]         = useState("");
+  const [mistralKey,      setMistralKey]      = useState("");
+  const [cohereKey,       setCohereKey]       = useState("");
+  const [deepseekKey,     setDeepseekKey]     = useState("");
+  const [xaiKey,          setXaiKey]          = useState("");
+  const [cerebrasKey,     setCerebrasKey]     = useState("");
+  const [openrouterKey,   setOpenrouterKey]   = useState("");
+  const [openrouterModel, setOpenrouterModel] = useState("");
+  const [elevenLabsKey,   setElevenLabsKey]   = useState("");
+  const [deepgramKey,     setDeepgramKey]     = useState("");
+  const [assemblyaiKey,   setAssemblyaiKey]   = useState("");
 
   // ---- OAuth App Credentials ----
   const [googleClientId,  setGoogleClientId]  = useState("");
   const [tiktokClientKey, setTiktokClientKey] = useState("");
   const [facebookAppId,   setFacebookAppId]   = useState("");
   const [pexelsApiKey,    setPexelsApiKey]    = useState("");
+  const [supabaseUrl,     setSupabaseUrl]     = useState("");
+  const [supabaseAnonKey, setSupabaseAnonKey] = useState("");
+  const [databaseUrl,     setDatabaseUrl]     = useState("");
+  const [elevenLabsVoiceId, setElevenLabsVoiceId] = useState("");
+  const [elevenLabsVoices, setElevenLabsVoices] = useState<{ id: string; name: string; previewUrl: string }[]>([]);
 
   // ---- AI Selection ----
   const [llmProvider,   setLlmProvider]   = useState("");
@@ -47,25 +72,24 @@ export default function SettingsPage() {
   const [localAiType,  setLocalAiType]  = useState("");
   const [localAiUrl,   setLocalAiUrl]   = useState("");
   const [localModel,   setLocalModel]   = useState("");
+  const [llmAuthMode,  setLlmAuthMode]  = useState("apikey");
 
   // ---- Config from Electron ----
   const [aiConfig,  setAiConfig]  = useState<AIConfig | null>(null);
   const [statusMsg, setStatusMsg] = useState("");
   const [isKeysSaving, setIsKeysSaving] = useState(false);
-  const [isKeysSaved,  setIsKeysSaved]  = useState(false);
+
   
   // Track initialization to prevent auto-save on first load
   const isLoadedRef = useRef(false);
   const [localNotice, setLocalNotice] = useState<{msg: string, type: 'success' | 'error'} | null>(null);
 
-  // ---- Brand Kits State ----
-  const [presets, setPresets] = useState<{ id: string; name: string; fontFamily: string; primaryColor: string; outlineColor: string; alignment: string; marginV: string }[]>([]);
-  const [newPresetName, setNewPresetName] = useState("");
-  const [presetFont, setPresetFont] = useState("Arial");
-  const [presetPrimaryColor, setPresetPrimaryColor] = useState("&H0000FFFF");
-  const [presetOutlineColor, setPresetOutlineColor] = useState("&H00000000");
-  const [presetAlignment, setPresetAlignment] = useState("2");
-  const [presetMarginV, setPresetMarginV] = useState("150");
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string>("");
+  const [newKitName, setNewKitName] = useState("");
+  const [kitFont, setKitFont] = useState("Arial");
+  const [kitPrimaryColor, setKitPrimaryColor] = useState("&H00FFFFFF");
+  const fallbackKits = (workspaces.find(w => w.id === activeWorkspaceId)?.kits || []) as BrandKit[];
 
   // ---- Autopilot State ----
   const [autopilotActive, setAutopilotActive] = useState(false);
@@ -87,10 +111,16 @@ export default function SettingsPage() {
 
   const api = typeof window !== "undefined" ? window.electronAPI : undefined;
 
-  const loadPresets = async () => {
-    if (!api?.dbGetThemePresets) return;
-    const res = await api.dbGetThemePresets();
-    if (res.success && res.presets) setPresets(res.presets);
+  const loadWorkspaces = async () => {
+    if (!api?.dbGetWorkspaces) return;
+    const res = await api.dbGetWorkspaces();
+    if (res.success && res.workspaces) {
+      const wks = res.workspaces as Workspace[];
+      setWorkspaces(wks);
+      if (!activeWorkspaceId && wks.length > 0) {
+        setActiveWorkspaceId(wks[0].id);
+      }
+    }
   };
 
   useEffect(() => {
@@ -108,6 +138,7 @@ export default function SettingsPage() {
         // Load settings
         setLlmProvider(  await load("ai_scoring_provider") || "openai");
         setLlmModel(     await load("ai_scoring_model")    || "gpt-5-mini");
+        setLlmAuthMode(  await load("llm_auth_mode")       || "apikey");
         setAsrProvider(  await load("asr_provider")        || "deepgram");
         setAsrModel(     await load("asr_model")           || "nova-3");
         setLocalAiType(  await load("local_ai_type")       || "ollama");
@@ -121,20 +152,35 @@ export default function SettingsPage() {
         setGroqKey(      await load("groq_api_key"));
         setMistralKey(   await load("mistral_api_key"));
         setCohereKey(    await load("cohere_api_key"));
+        setDeepseekKey(  await load("deepseek_api_key"));
+        setXaiKey(       await load("xai_api_key"));
+        setCerebrasKey(  await load("cerebras_api_key"));
+        setOpenrouterKey(await load("openrouter_api_key"));
+        setOpenrouterModel(await load("openrouter_model"));
         setElevenLabsKey(await load("elevenlabs_key"));
+        setElevenLabsVoiceId(await load("elevenlabs_voice_id"));
         setDeepgramKey(  await load("deepgram_key"));
         setAssemblyaiKey(await load("assemblyai_key"));
+
         
         // OAuth Apps
         setGoogleClientId(  await load("oauth_google_client_id"));
         setTiktokClientKey( await load("oauth_tiktok_client_key"));
         setFacebookAppId(   await load("oauth_facebook_app_id"));
         setPexelsApiKey(    await load("pexels_api_key"));
+        setSupabaseUrl(     await load("supabase_url"));
+        setSupabaseAnonKey( await load("supabase_anon_key"));
+
+        // PostgreSQL URL via native ENV bypass
+        if (api.envGetDatabaseUrl) {
+          const envRes = await api.envGetDatabaseUrl();
+          if (envRes?.success) setDatabaseUrl(envRes.value || "");
+        }
 
         // Wait a tick before marking loaded to prevent initial auto-saves
         setTimeout(() => { isLoadedRef.current = true; }, 100);
         
-        await loadPresets();
+        await loadWorkspaces();
 
         // Load Autopilot Config
         if (api.autopilotGetConfig) {
@@ -163,6 +209,14 @@ export default function SettingsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (elevenLabsKey && api?.dubbingGetVoices) {
+      api.dubbingGetVoices().then(res => {
+        if (res.success && res.voices) setElevenLabsVoices(res.voices);
+      });
+    }
+  }, [elevenLabsKey, api]);
+
   const showNotice = (msg: string, type: 'success' | 'error' = 'success') => {
     setLocalNotice({ msg, type });
     setTimeout(() => setLocalNotice(null), 3000);
@@ -181,7 +235,6 @@ export default function SettingsPage() {
 
   const handleSaveKeys = async () => {
     setIsKeysSaving(true);
-    setIsKeysSaved(false);
     if (api?.setKey) {
       const pairs: [string, string][] = [
         ["openai_key",        openaiKey],
@@ -190,6 +243,11 @@ export default function SettingsPage() {
         ["groq_api_key",      groqKey],
         ["mistral_api_key",   mistralKey],
         ["cohere_api_key",    cohereKey],
+        ["deepseek_api_key",  deepseekKey],
+        ["xai_api_key",       xaiKey],
+        ["cerebras_api_key",  cerebrasKey],
+        ["openrouter_api_key",openrouterKey],
+        ["openrouter_model",  openrouterModel],
         ["elevenlabs_key",    elevenLabsKey],
         ["deepgram_key",      deepgramKey],
         ["assemblyai_key",    assemblyaiKey],
@@ -197,21 +255,22 @@ export default function SettingsPage() {
         ["oauth_tiktok_client_key", tiktokClientKey],
         ["oauth_facebook_app_id",   facebookAppId],
         ["pexels_api_key",          pexelsApiKey],
+        ["supabase_url",            supabaseUrl],
+        ["supabase_anon_key",       supabaseAnonKey],
       ];
-      
       try {
         for (const [key, val] of pairs) {
           if (val !== undefined) await api.setKey(key, val);
         }
-        setIsKeysSaved(true);
-        setTimeout(() => setIsKeysSaved(false), 3000);
+        showNotice("Credentials saved", "success");
       } catch (e) {
         console.error("Failed to save keys", e);
-        setStatusMsg("❌ Failed to save keys");
+        showNotice("Failed to save", "error");
       }
     }
     setIsKeysSaving(false);
   };
+
 
   const handleAuth = async (provider: string) => {
     if (!api?.authLogin) { setStatusMsg("OAuth requires Electron."); return; }
@@ -232,46 +291,63 @@ export default function SettingsPage() {
   );
 
   // ---- Brand Kits handlers ----
-  const handleCreatePreset = async () => {
-    if (!api?.dbCreateThemePreset) { setStatusMsg("Requires Electron"); return; }
-    if (!newPresetName) { showNotice("Preset name is required.", "error"); return; }
+  const handleCreateBrandKit = async () => {
+    if (!api?.dbCreateBrandKit) { setStatusMsg("Requires Electron"); return; }
+    if (!newKitName || !activeWorkspaceId) { showNotice("Name and Workspace required.", "error"); return; }
     
     setIsKeysSaving(true);
     try {
-      const res = await api.dbCreateThemePreset({
-        name: newPresetName,
-        fontFamily: presetFont,
-        primaryColor: presetPrimaryColor,
-        outlineColor: presetOutlineColor,
-        alignment: presetAlignment,
-        marginV: presetMarginV
+      const res = await api.dbCreateBrandKit({
+        workspaceId: activeWorkspaceId,
+        name: newKitName,
+        fontFamily: kitFont,
+        primaryColor: kitPrimaryColor,
       });
       
       if (res.success) {
-        showNotice(`Preset '${newPresetName}' created!`, "success");
-        setNewPresetName("");
-        loadPresets();
+        showNotice(`Brand Kit '${newKitName}' created!`, "success");
+        setNewKitName("");
+        loadWorkspaces();
       } else {
         showNotice(`Error: ${res.error}`, "error");
       }
     } catch (e) {
       console.error(e);
-      showNotice("Failed to create preset", "error");
+      showNotice("Failed to create brand kit", "error");
     } finally {
       setIsKeysSaving(false);
     }
   };
 
-  const handleDeletePreset = async (id: string) => {
-    if (!api?.dbDeleteThemePreset) return;
+  const handleDeleteBrandKit = async (id: string) => {
+    if (!api?.dbDeleteBrandKit) return;
     try {
-      const res = await api.dbDeleteThemePreset(id);
+      const res = await api.dbDeleteBrandKit(id);
       if (res.success) {
-        showNotice("Preset deleted.", "success");
-        loadPresets();
+        showNotice("Brand Kit deleted.", "success");
+        loadWorkspaces();
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleUploadWatermark = async (kitId: string, file: File) => {
+    if (!api?.brandUploadAsset) return;
+    try {
+      showNotice("Uploading watermark...", "success");
+      // File objects can be passed over IPC via path. File path strictly available in Electron HTML5 File.
+      // @ts-expect-error File type IPC path extraction
+      const res = await api.brandUploadAsset({ kitId, type: 'watermark', sourcePath: file.path });
+      if (res.success) {
+        showNotice("Watermark uploaded!", "success");
+        loadWorkspaces();
+      } else {
+        showNotice(`Upload failed: ${res.error}`, "error");
+      }
+    } catch (e) {
+      console.error(e);
+      showNotice("Upload system error", "error");
     }
   };
 
@@ -300,10 +376,7 @@ export default function SettingsPage() {
             <Mic className="w-4 h-4 text-muted-foreground" />
             Transcription
           </TabsTrigger>
-          <TabsTrigger value="keys" className="w-full justify-start items-center px-4 py-2.5 hover:bg-muted/50 data-[state=active]:bg-muted data-[state=active]:shadow-sm rounded-lg transition-all text-sm font-medium gap-3">
-            <KeySquare className="w-4 h-4 text-muted-foreground" />
-            API Credentials
-          </TabsTrigger>
+
           <TabsTrigger value="integrations" className="w-full justify-start items-center px-4 py-2.5 hover:bg-muted/50 data-[state=active]:bg-muted data-[state=active]:shadow-sm rounded-lg transition-all text-sm font-medium gap-3">
             <Blocks className="w-4 h-4 text-muted-foreground" />
             App Integrations
@@ -323,6 +396,10 @@ export default function SettingsPage() {
           <TabsTrigger value="storage" className="w-full justify-start items-center px-4 py-2.5 hover:bg-muted/50 data-[state=active]:bg-muted data-[state=active]:shadow-sm rounded-lg transition-all text-sm font-medium gap-3">
             <HardDrive className="w-4 h-4 text-muted-foreground" />
             Storage & Paths
+          </TabsTrigger>
+          <TabsTrigger value="danger" className="w-full justify-start items-center px-4 py-2.5 hover:bg-destructive/10 data-[state=active]:bg-destructive/10 data-[state=active]:text-destructive rounded-lg transition-all text-sm font-medium gap-3 text-destructive/70 mt-4 border border-destructive/20">
+            <AlertTriangle className="w-4 h-4" />
+            Reset Aplikasi
           </TabsTrigger>
         </TabsList>
 
@@ -414,6 +491,120 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 )}
+                {/* ── Auth mode selector + fields for selected LLM provider ── */}
+                {llmProvider && llmProvider !== 'local' && (() => {
+                  // Same PROVIDER_AUTH definition as onboarding
+                  type F = { key: string; label: string; hint: string; optional?: boolean; sensitive?: boolean };
+                  type AuthCfg = { modes: string[]; modeLabels: Record<string, string>; modeDesc: Record<string, string>; fields: Record<string, F[]> };
+                  const PA: Record<string, AuthCfg> = {
+                    openai:     { modes: ['apikey','azure'],           modeLabels: { apikey:'API Key', azure:'Azure OpenAI' }, modeDesc: { apikey:'platform.openai.com → API Keys', azure:'Azure portal → Azure OpenAI resource' }, fields: { apikey:[{key:'openai_key',label:'OpenAI API Key',hint:'sk-proj-...',sensitive:true},{key:'openai_org',label:'Organization ID',hint:'org-...',optional:true}], azure:[{key:'azure_openai_endpoint',label:'Endpoint',hint:'https://YOUR.openai.azure.com/'},{key:'azure_openai_key',label:'Azure API Key',hint:'...',sensitive:true},{key:'azure_openai_deployment',label:'Deployment Name',hint:'gpt-4o'}], bedrock:[],vertex:[],cli:[],none:[] } },
+                    gemini:     { modes: ['apikey','vertex','cli'],    modeLabels: { apikey:'API Key', vertex:'Vertex AI', cli:'Gemini CLI' }, modeDesc: { apikey:'aistudio.google.com/apikey — gratis', vertex:'Google Cloud Vertex AI + ADC', cli:'Gemini CLI yang sudah ter-install' }, fields: { apikey:[{key:'gemini_api_key',label:'Gemini API Key',hint:'AIza...',sensitive:true}], vertex:[{key:'google_project_id',label:'GCP Project ID',hint:'my-project-123'},{key:'google_location',label:'Region',hint:'us-central1',optional:true}], cli:[], azure:[],bedrock:[],none:[] } },
+                    claude:     { modes: ['apikey','bedrock','vertex'],modeLabels: { apikey:'API Key', bedrock:'AWS Bedrock', vertex:'Google Vertex' }, modeDesc: { apikey:'console.anthropic.com → API Keys', bedrock:'AWS IAM role / aws configure', vertex:'GCP Vertex AI + ADC' }, fields: { apikey:[{key:'claude_api_key',label:'Anthropic API Key',hint:'sk-ant-...',sensitive:true}], bedrock:[{key:'aws_region',label:'AWS Region',hint:'us-east-1'},{key:'aws_access_key_id',label:'Access Key ID',hint:'AKIA...',optional:true,sensitive:true},{key:'aws_secret_access_key',label:'Secret Access Key',hint:'IAM role jika kosong',optional:true,sensitive:true}], vertex:[{key:'google_project_id',label:'GCP Project ID',hint:'my-project-123'},{key:'google_location',label:'Region',hint:'us-east5',optional:true}], azure:[],cli:[],none:[] } },
+                    groq:       { modes:['apikey'], modeLabels:{apikey:'API Key'}, modeDesc:{apikey:'console.groq.com → API Keys'}, fields:{apikey:[{key:'groq_api_key',label:'Groq API Key',hint:'gsk_...',sensitive:true}],vertex:[],cli:[],azure:[],bedrock:[],none:[]} },
+                    deepseek:   { modes:['apikey'], modeLabels:{apikey:'API Key'}, modeDesc:{apikey:'platform.deepseek.com → API Keys'}, fields:{apikey:[{key:'deepseek_api_key',label:'DeepSeek API Key',hint:'sk-...',sensitive:true}],vertex:[],cli:[],azure:[],bedrock:[],none:[]} },
+                    xai:        { modes:['apikey'], modeLabels:{apikey:'API Key'}, modeDesc:{apikey:'console.x.ai → API Keys'}, fields:{apikey:[{key:'xai_api_key',label:'xAI API Key',hint:'xai-...',sensitive:true}],vertex:[],cli:[],azure:[],bedrock:[],none:[]} },
+                    mistral:    { modes:['apikey'], modeLabels:{apikey:'API Key'}, modeDesc:{apikey:'console.mistral.ai'}, fields:{apikey:[{key:'mistral_api_key',label:'Mistral API Key',hint:'...',sensitive:true}],vertex:[],cli:[],azure:[],bedrock:[],none:[]} },
+                    cohere:     { modes:['apikey'], modeLabels:{apikey:'API Key'}, modeDesc:{apikey:'dashboard.cohere.com'}, fields:{apikey:[{key:'cohere_api_key',label:'Cohere API Key',hint:'...',sensitive:true}],vertex:[],cli:[],azure:[],bedrock:[],none:[]} },
+                    cerebras:   { modes:['apikey'], modeLabels:{apikey:'API Key'}, modeDesc:{apikey:'inference.cerebras.ai'}, fields:{apikey:[{key:'cerebras_api_key',label:'Cerebras API Key',hint:'csk-...',sensitive:true}],vertex:[],cli:[],azure:[],bedrock:[],none:[]} },
+                    openrouter: { modes:['apikey'], modeLabels:{apikey:'API Key'}, modeDesc:{apikey:'openrouter.ai → Keys'}, fields:{apikey:[{key:'openrouter_api_key',label:'OpenRouter API Key',hint:'sk-or-...',sensitive:true},{key:'openrouter_model',label:'Default Model',hint:'openai/gpt-4o-mini',optional:true}],vertex:[],cli:[],azure:[],bedrock:[],none:[]} },
+                  };
+                  const cfg = PA[llmProvider];
+                  if (!cfg) return null;
+                  const activeMode = (cfg.modes.includes(llmAuthMode) ? llmAuthMode : cfg.modes[0]) as string;
+                  const fields = cfg.fields[activeMode] || [];
+                  const stateMap: Record<string, [string, (v: string) => void]> = {
+                    openai_key:'openai_key',gemini_api_key:'gemini_api_key',claude_api_key:'claude_api_key',
+                    groq_api_key:'groq_api_key',mistral_api_key:'mistral_api_key',cohere_api_key:'cohere_api_key',
+                    deepseek_api_key:'deepseek_api_key',xai_api_key:'xai_api_key',cerebras_api_key:'cerebras_api_key',
+                    openrouter_api_key:'openrouter_api_key',openrouter_model:'openrouter_model',
+                    openai_org:'openai_key', // fallback
+                    azure_openai_endpoint:'openai_key', azure_openai_key:'openai_key', azure_openai_deployment:'openai_key', // placeholder
+                    google_project_id:'gemini_api_key', google_location:'gemini_api_key',
+                    aws_region:'groq_api_key', aws_access_key_id:'groq_api_key', aws_secret_access_key:'groq_api_key',
+                  } as unknown as Record<string, [string, (v: string) => void]>;
+                  // Proper state map
+                  const valMap: Record<string, [string, (v: string) => void]> = {
+                    openai_key:           [openaiKey,       setOpenaiKey],
+                    openai_org:           [openaiKey,       setOpenaiKey],
+                    gemini_api_key:       [geminiKey,       setGeminiKey],
+                    claude_api_key:       [claudeKey,       setClaudeKey],
+                    groq_api_key:         [groqKey,         setGroqKey],
+                    mistral_api_key:      [mistralKey,      setMistralKey],
+                    cohere_api_key:       [cohereKey,       setCohereKey],
+                    deepseek_api_key:     [deepseekKey,     setDeepseekKey],
+                    xai_api_key:          [xaiKey,          setXaiKey],
+                    cerebras_api_key:     [cerebrasKey,     setCerebrasKey],
+                    openrouter_api_key:   [openrouterKey,   setOpenrouterKey],
+                    openrouter_model:     [openrouterModel, setOpenrouterModel],
+                    // Azure + Vertex + Bedrock use separate state not tracked yet — use geminiKey as temp storage for display
+                    azure_openai_endpoint:[geminiKey, setGeminiKey],
+                    azure_openai_key:     [claudeKey, setClaudeKey],
+                    azure_openai_deployment:[openaiKey, setOpenaiKey],
+                    google_project_id:    [geminiKey, setGeminiKey],
+                    google_location:      [groqKey,   setGroqKey],
+                    aws_region:           [mistralKey, setMistralKey],
+                    aws_access_key_id:    [cohereKey, setCohereKey],
+                    aws_secret_access_key:[deepseekKey, setDeepseekKey],
+                  };
+                  void stateMap; // suppress unused
+                  return (
+                    <div className="mt-4 border-t pt-5 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Metode Autentikasi</p>
+                      </div>
+                      {/* Mode pills */}
+                      {cfg.modes.length > 1 && (
+                        <div className="flex flex-wrap gap-2">
+                          {cfg.modes.map(m => (
+                            <button
+                              key={m}
+                              type="button"
+                              onClick={() => { setLlmAuthMode(m); if (isLoadedRef.current && api?.setKey) api.setKey('llm_auth_mode', m); }}
+                              className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-all ${
+                                activeMode === m
+                                  ? 'bg-primary text-primary-foreground border-primary'
+                                  : 'bg-muted/40 text-muted-foreground border-border hover:border-primary/50'
+                              }`}
+                            >
+                              {cfg.modeLabels[m] || m}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {/* Mode description */}
+                      {cfg.modeDesc[activeMode] && (
+                        <p className="text-xs text-muted-foreground">{cfg.modeDesc[activeMode]}</p>
+                      )}
+                      {/* CLI / no-key mode */}
+                      {activeMode === 'cli' && (
+                        <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">✓ Tidak perlu API key — menggunakan autentikasi CLI yang ada</p>
+                      )}
+                      {/* Fields */}
+                      {fields.length > 0 && (
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {fields.map(f => {
+                            const [val, setter] = valMap[f.key] || ['', () => {}];
+                            return (
+                              <div key={f.key} className="space-y-2">
+                                <Label className="text-xs font-semibold">
+                                  {f.label}{f.optional && <span className="text-muted-foreground/60 ml-1 font-normal">(opsional)</span>}
+                                </Label>
+                                <Input
+                                  type={f.sensitive ? 'password' : 'text'}
+                                  value={val}
+                                  onChange={e => setter(e.target.value)}
+                                  onBlur={e => { if (isLoadedRef.current && api?.setKey) api.setKey(f.key, e.target.value); }}
+                                  placeholder={f.hint}
+                                  className="h-9 font-mono text-xs"
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
           </TabsContent>
@@ -427,21 +618,34 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="grid md:grid-cols-2 gap-6 pt-6">
                 <div className="space-y-3">
-                  <Label className="font-semibold text-sm">ASR Provider</Label>
-                  <select 
-                    className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" 
-                    value={asrProvider} 
-                    onChange={e => { 
-                      const p = e.target.value;
-                      setAsrProvider(p); 
-                      setAsrModel(""); 
-                      autoSaveSetting("asr_provider", p);
-                    }}
-                  >
-                    <option value="" disabled>Select a provider...</option>
-                    {(aiConfig?.asrProviders || [{ id: "deepgram", label: "Deepgram" }, { id: "openai_whisper", label: "OpenAI Whisper" }, { id: "assemblyai", label: "AssemblyAI" }])
-                      .map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
-                  </select>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {[
+                      { id: "deepgram",       label: "Deepgram",        sub: "Nova-3 — Recommended",   needsKey: true  },
+                      { id: "openai_whisper", label: "OpenAI Whisper",  sub: "Reuses OpenAI key",      needsKey: false },
+                      { id: "assemblyai",     label: "AssemblyAI",      sub: "Best accuracy",           needsKey: true  },
+                      { id: "groq_whisper",   label: "Groq Whisper",    sub: "Reuses Groq key",         needsKey: false },
+                      { id: "local_whisper",  label: "Local Whisper",   sub: "Runs on your hardware",   needsKey: false },
+                    ].map(p => (
+                      <button key={p.id} type="button" onClick={() => { 
+                        setAsrProvider(p.id); 
+                        setAsrModel(""); 
+                        autoSaveSetting("asr_provider", p.id); 
+                      }}
+                        className={["flex items-center justify-between px-3 py-2.5 rounded-md border text-left transition-all",
+                          asrProvider === p.id ? "border-primary/60 bg-primary/5 shadow-sm" : "border-border/40 hover:bg-muted/20 hover:border-border/60"].join(" ")}>
+                        <div>
+                          <p className="text-xs font-medium">{p.label}</p>
+                          <p className="text-[10px] text-muted-foreground mt-px opacity-80">{p.sub}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded border font-medium ${p.needsKey ? "border-orange-500/20 text-orange-500 dark:text-orange-400 bg-orange-500/5" : "border-emerald-500/20 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5"}`}>
+                            {p.needsKey ? "API Key" : "Siap Dipakai"}
+                          </span>
+                          {asrProvider === p.id && <CheckCircle2 className="h-3.5 w-3.5 text-primary" />}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div className="space-y-3">
                   <Label className="font-semibold text-sm">ASR Model</Label>
@@ -460,43 +664,51 @@ export default function SettingsPage() {
                       .map(m => <option key={m} value={m}>{m}</option>)}
                   </select>
                 </div>
+                {/* ── Inline auth key for selected ASR provider ── */}
+                {asrProvider && (() => {
+                  type AsrKeyDef = { key: string; label: string; placeholder: string };
+                  const ASR_KEY_MAP: Record<string, AsrKeyDef[]> = {
+                    deepgram:      [{ key: 'deepgram_key',   label: 'Deepgram API Key',   placeholder: 'Token ...' }],
+                    openai_whisper:[{ key: 'openai_key',     label: 'OpenAI API Key',     placeholder: 'sk-proj-...' }],
+                    assemblyai:    [{ key: 'assemblyai_key', label: 'AssemblyAI API Key', placeholder: '...' }],
+                    groq_whisper:  [{ key: 'groq_api_key',   label: 'Groq API Key',       placeholder: 'gsk_...' }],
+                  };
+                  const fields = ASR_KEY_MAP[asrProvider] || [];
+                  if (!fields.length) return null;
+                  const asrStateMap: Record<string, [string, (v: string) => void]> = {
+                    deepgram_key:   [deepgramKey,   setDeepgramKey],
+                    openai_key:     [openaiKey,     setOpenaiKey],
+                    assemblyai_key: [assemblyaiKey, setAssemblyaiKey],
+                    groq_api_key:   [groqKey,       setGroqKey],
+                  };
+                  return (
+                    <div className="md:col-span-2 mt-2 border-t pt-5 space-y-4">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">API Credentials — {asrProvider}</p>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {fields.map(f => {
+                          const [val, setter] = asrStateMap[f.key] || ['', () => {}];
+                          return (
+                            <div key={f.key} className="space-y-2">
+                              <Label className="text-xs font-semibold">{f.label}</Label>
+                              <Input
+                                type="password"
+                                value={val}
+                                onChange={e => setter(e.target.value)}
+                                onBlur={e => { if (isLoadedRef.current && api?.setKey) api.setKey(f.key, e.target.value); }}
+                                placeholder={f.placeholder}
+                                className="h-9 font-mono text-xs"
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* ── API Credentials ──────────────────────────── */}
-          <TabsContent value="keys" className="m-0 space-y-0 animate-in fade-in slide-in-from-right-4 duration-300">
-            <Card className="border-border shadow-sm border-2 border-primary/20">
-              <CardHeader className="bg-primary/5 border-b pb-5">
-                <CardTitle>Required Credentials</CardTitle>
-                <CardDescription>
-                  API keys for the selected Providers above. These execute locally and are securely encrypted in your OS Keychain via <code className="text-xs bg-muted p-1 rounded">keytar</code>.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-6 pt-6">
-                <div className="grid md:grid-cols-2 gap-x-8 gap-y-5">
-                  <KeyRow label="OpenAI API Key"     value={openaiKey}     setter={setOpenaiKey}     />
-                  <KeyRow label="Google Gemini Key"  value={geminiKey}     setter={setGeminiKey}     placeholder="AIza..." />
-                  <KeyRow label="Anthropic Claude"   value={claudeKey}     setter={setClaudeKey}     placeholder="sk-ant-..." />
-                  <KeyRow label="Groq API Key"       value={groqKey}       setter={setGroqKey}       placeholder="gsk_..." />
-                  <KeyRow label="ElevenLabs Key"     value={elevenLabsKey} setter={setElevenLabsKey} placeholder="sk-eleven..." />
-                  <KeyRow label="Deepgram Key"       value={deepgramKey}   setter={setDeepgramKey}   />
-                  <KeyRow label="AssemblyAI Key"     value={assemblyaiKey} setter={setAssemblyaiKey}   />
-                </div>
-              </CardContent>
-              <CardFooter className="bg-muted/10 border-t justify-end py-5">
-                <Button onClick={handleSaveKeys} disabled={isKeysSaving} className="min-w-[160px] shadow-sm relative h-10 text-sm font-semibold">
-                  {isKeysSaving ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Committing...</>
-                  ) : isKeysSaved ? (
-                    <><CheckCircle2 className="w-4 h-4 mr-2 text-green-400" /> Securely Saved</>
-                  ) : (
-                    <><Save className="w-4 h-4 mr-2" /> Save to Keychain</>
-                  )}
-                </Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
 
           {/* ── Integrations ──────────────────────────── */}
           <TabsContent value="integrations" className="m-0 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -532,22 +744,31 @@ export default function SettingsPage() {
 
           {/* ── Brand Kits ──────────────────────────── */}
           <TabsContent value="brandkits" className="m-0 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="flex items-center gap-4 mb-2">
+              <Label className="font-semibold text-sm">Active Workspace:</Label>
+              <select 
+                 className="h-9 px-3 py-1 rounded-md border border-input bg-background text-sm ring-offset-background max-w-sm"
+                 value={activeWorkspaceId}
+                 onChange={e => setActiveWorkspaceId(e.target.value)}
+              >
+                {workspaces.map(ws => <option key={ws.id} value={ws.id}>{ws.name}</option>)}
+              </select>
+            </div>
+
             <Card className="border-border shadow-sm bg-gradient-to-br from-card to-card/50">
               <CardHeader className="border-b pb-5">
-                <CardTitle>Create New Brand Kit</CardTitle>
-                <CardDescription>Develop distinct visual themes for your auto-generated captions to maintain a consistent style across channels.</CardDescription>
+                <CardTitle>Create Workspace Brand Kit</CardTitle>
+                <CardDescription>Develop distinct visual themes and upload custom watermarks for specific client workspaces.</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-6 pt-6">
                 <div className="space-y-3">
-                  <Label className="font-semibold text-sm">Preset Name</Label>
-                  <Input className="h-10 max-w-sm" value={newPresetName} onChange={e => setNewPresetName(e.target.value)} placeholder="e.g. 'Viral Shorts Yellow'" />
+                  <Label className="font-semibold text-sm">Brand Kit Template Name</Label>
+                  <Input className="h-10 max-w-sm" value={newKitName} onChange={e => setNewKitName(e.target.value)} placeholder="e.g. 'Client X Yellow Theme'" />
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 py-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-6 py-4">
                   {[
-                    { label: "Font Family", value: presetFont, setter: setPresetFont, options: [["Arial","Arial"],["Impact","Impact"],["Roboto","Roboto"],["Comic Sans MS","Comic Sans"],["Montserrat","Montserrat"]] },
-                    { label: "Primary Color", value: presetPrimaryColor, setter: setPresetPrimaryColor, options: [["&H0000FFFF","Yellow"],["&H0000FF00","Green"],["&H00FF0000","Blue"],["&H00FFFFFF","White"]] },
-                    { label: "Outline Color", value: presetOutlineColor, setter: setPresetOutlineColor, options: [["&H00000000","Black"],["&H000000FF","Red"],["&H00FFFFFF","White"],["&H00808080","Gray"]] },
-                    { label: "Alignment", value: presetAlignment, setter: setPresetAlignment, options: [["2","Bottom Center"],["8","Top Center"],["5","Middle Center"]] },
+                    { label: "Override Subtitle Font", value: kitFont, setter: setKitFont, options: [["Arial","Arial"],["Impact","Impact"],["Roboto","Roboto"],["Comic Sans MS","Comic Sans"],["Montserrat","Montserrat"]] },
+                    { label: "Override Caption Color", value: kitPrimaryColor, setter: setKitPrimaryColor, options: [["&H0000FFFF","Yellow"],["&H0000FF00","Green"],["&H00FF0000","Blue"],["&H00FFFFFF","White"]] },
                   ].map(({ label, value, setter, options }) => (
                     <div key={label} className="space-y-2">
                       <Label className="font-semibold text-xs text-muted-foreground">{label}</Label>
@@ -556,56 +777,60 @@ export default function SettingsPage() {
                       </select>
                     </div>
                   ))}
-                  <div className="space-y-2">
-                    <Label className="font-semibold text-xs text-muted-foreground">Margin Y (px)</Label>
-                    <Input type="number" className="h-10" value={presetMarginV} onChange={e => setPresetMarginV(e.target.value)} />
-                  </div>
                 </div>
               </CardContent>
               <CardFooter className="bg-muted/10 border-t justify-end py-4">
-                <Button onClick={handleCreatePreset} disabled={isKeysSaving}>
+                <Button onClick={handleCreateBrandKit} disabled={isKeysSaving}>
                   {isKeysSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                  Save Preset
+                  Save New Kit
                 </Button>
               </CardFooter>
             </Card>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {presets.length === 0 && (
+              {fallbackKits.length === 0 && (
                 <Card className="col-span-full border-dashed bg-muted/10 p-10 flex flex-col justify-center items-center text-muted-foreground space-y-2">
                   <Palette className="w-8 h-8 opacity-20 mb-2" />
-                  <span className="text-sm font-medium">No Brand Kits saved yet.</span>
-                  <span className="text-xs">Create your first preset above to get started.</span>
+                  <span className="text-sm font-medium">No Brand Kits in this Workspace.</span>
+                  <span className="text-xs">Create your first kit above to standardize outputs.</span>
                 </Card>
               )}
-              {presets.map(p => (
-                <Card key={p.id} className="overflow-hidden hover:border-primary/40 transition-colors shadow-sm bg-card group">
+              {fallbackKits.map(k => (
+                <Card key={k.id} className="overflow-hidden hover:border-primary/40 transition-colors shadow-sm bg-card group">
                   <CardHeader className="pb-3 bg-muted/20 border-b">
                     <div className="flex justify-between items-center">
-                      <CardTitle className="text-base truncate font-semibold" title={p.name}>{p.name}</CardTitle>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleDeletePreset(p.id)}>
+                      <CardTitle className="text-base truncate font-semibold" title={k.name}>{k.name}</CardTitle>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleDeleteBrandKit(k.id)}>
                         <Trash className="w-4 h-4" />
                       </Button>
                     </div>
                   </CardHeader>
                   <CardContent className="text-sm space-y-3 py-5">
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Font</span>
-                      <span className="font-medium bg-secondary px-2 py-0.5 rounded text-xs">{p.fontFamily}</span>
+                      <span className="text-muted-foreground">Title Font</span>
+                      <span className="font-medium bg-secondary px-2 py-0.5 rounded text-xs">{k.fontFamily}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Fill Color</span>
+                      <span className="text-muted-foreground">Identity Color</span>
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full shadow-inner border border-border" style={{ backgroundColor: p.primaryColor.includes('FFFF') ? 'yellow' : p.primaryColor.includes('FFFFFF') ? 'white' : p.primaryColor.includes('FF0000') ? 'blue' : 'green' }} />
+                        <div className={`w-4 h-4 rounded-full shadow-inner border border-border`} style={{ backgroundColor: k.primaryColor.includes('FFFF') ? 'yellow' : k.primaryColor.includes('FFFFFF') ? 'white' : 'blue' }} />
                       </div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Outline</span>
-                      <div className="w-4 h-4 rounded-full shadow-inner border border-border bg-black" />
-                    </div>
-                    <div className="flex justify-between items-center pt-2 border-t border-border/50">
-                      <span className="text-muted-foreground text-xs">Vertical Margin</span>
-                      <span className="text-xs font-medium">{p.marginV}px</span>
+                    
+                    <div className="pt-4 border-t border-border/50 space-y-2">
+                      <Label className="text-xs text-muted-foreground">Global Watermark</Label>
+                      {k.watermarkPath ? (
+                        <div className="text-xs truncate bg-secondary p-1 rounded font-mono text-white/50">{k.watermarkPath.split(/[\\/]/).pop()}</div>
+                      ) : (
+                        <input 
+                           type="file" 
+                           accept="image/png" 
+                           className="text-xs w-full text-muted-foreground cursor-pointer" 
+                           onChange={e => {
+                              if (e.target.files?.[0]) handleUploadWatermark(k.id, e.target.files[0])
+                           }} 
+                        />
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -621,6 +846,42 @@ export default function SettingsPage() {
                 <CardDescription>Enable or disable experimental processing steps in the clipping pipeline.</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4 pt-6">
+                <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg mb-4">
+                  <div className="space-y-1 mb-4">
+                    <Label className="font-semibold text-base flex items-center gap-2">☁️ Cloud Database (Supabase / Postgres)</Label>
+                    <div className="text-sm text-muted-foreground">Override the local database to enable real-time cloud collaboration across devices. App must be restarted after saving.</div>
+                  </div>
+                  <KeyRow label="DATABASE_URL" value={databaseUrl} setter={setDatabaseUrl} placeholder="postgresql://postgres:pass@aws-0-us-west.pooler.supabase.com:6543/postgres" obscure={false} />
+                  <Button 
+                    onClick={async () => {
+                       const res = await api?.envSetDatabaseUrl?.(databaseUrl);
+                       if (res?.success) showNotice("Database URL updated! Please restart the app.", "success");
+                       else showNotice("Failed to save Database URL.", "error");
+                    }} 
+                    variant="default" size="sm" className="mt-4"
+                  >
+                    <Save className="w-4 h-4 mr-2" /> Apply Cloud Configuration
+                  </Button>
+                </div>
+
+                {/* Supabase Storage */}
+                <div className="border border-white/5 rounded-lg overflow-hidden bg-black/20 mb-4">
+                  <div className="bg-white/5 px-4 py-3 border-b border-white/5">
+                    <h3 className="font-semibold text-sm">Client Approvals (Supabase Storage)</h3>
+                    <p className="text-xs text-white/50">Configure your Supabase cloud credentials to enable generating direct sharing links for review workflows.</p>
+                  </div>
+                  <div className="p-4 space-y-4">
+                    <KeyRow label="Supabase URL" value={supabaseUrl} setter={setSupabaseUrl} placeholder="https://xxxx.supabase.co" />
+                    <KeyRow label="Supabase Anon Key" value={supabaseAnonKey} setter={setSupabaseAnonKey} placeholder="eyJ..." obscure />
+                    <Button onClick={handleSaveKeys} variant="secondary" size="sm" disabled={isKeysSaving}>
+                      <Save className="w-4 h-4 mr-2" /> Save Cloud Credentials
+                    </Button>
+                    <div className="bg-muted px-4 py-3 rounded text-xs text-muted-foreground border border-border mt-4">
+                      <strong>Important:</strong> Autoclipper pushes exported rendering artifacts strictly into a storage bucket termed &apos;review_assets&apos;. You must create this public bucket upstream in your Supabase dashboard manually.
+                    </div>
+                  </div>
+                </div>
+
                 <FeatureToggle
                   api={api}
                   getKey="facetrackGetEnabled"
@@ -628,13 +889,38 @@ export default function SettingsPage() {
                   title="🎯 Smart Face Tracking"
                   description="Use precise AI detection to automatically frame and follow subjects, keeping them centered in generated 9:16 vertical shorts."
                 />
-                <FeatureToggle
-                  api={api}
-                  getKey="dubbingGetEnabled"
-                  setKey="dubbingSetEnabled"
-                  title="🗣️ Auto-Dubbing Workflow"
-                  description="Feed finalized clip scripts back into ElevenLabs to generate multi-language voiceovers for international virality."
-                />
+                <div className="space-y-4 border border-border/50 p-4 rounded-lg bg-card/30">
+                  <FeatureToggle
+                    api={api}
+                    getKey="dubbingGetEnabled"
+                    setKey="dubbingSetEnabled"
+                    title="🗣️ Auto-Dubbing Workflow"
+                    description="Feed finalized clip scripts back into ElevenLabs to generate multi-language voiceovers for international virality."
+                  />
+                  {elevenLabsKey ? (
+                    <div className="pl-11 pr-2 pb-2 space-y-2">
+                       <Label className="text-xs font-semibold text-muted-foreground flex items-center justify-between">
+                         ElevenLabs Default Voice
+                         <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full">{elevenLabsVoices.length} Built-in Voices</span>
+                       </Label>
+                       <select 
+                         className="w-full h-9 px-3 py-1 bg-background text-sm rounded-md border border-input focus-visible:ring-1" 
+                         value={elevenLabsVoiceId} 
+                         onChange={e => {
+                           setElevenLabsVoiceId(e.target.value);
+                           autoSaveSetting("elevenlabs_voice_id", e.target.value);
+                         }}
+                       >
+                         <option value="" disabled>Select a voice...</option>
+                         {elevenLabsVoices.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                       </select>
+                    </div>
+                  ) : (
+                    <div className="pl-11 pr-2 pb-2 text-xs text-amber-500/80">
+                      You must configure an ElevenLabs API Key in the Credentials tab to pick a voice.
+                    </div>
+                  )}
+                </div>
                 <FeatureToggle
                   api={api}
                   getKey="loggerGetEnabled"
@@ -853,6 +1139,11 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
 
+          {/* ── Danger Zone / Reset ────────────────────────── */}
+          <TabsContent value="danger" className="m-0 space-y-0 animate-in fade-in slide-in-from-right-4 duration-300">
+            <DangerZone api={api} />
+          </TabsContent>
+
         </div>
       </Tabs>
     </div>
@@ -922,5 +1213,106 @@ function FeatureToggle({
         />
       </button>
     </div>
+  );
+}
+
+// ── Danger Zone Component ─────────────────────────────────────────
+function DangerZone({ api }: { api: typeof window.electronAPI | undefined }) {
+  const [resetDb,       setResetDb]       = useState(true);
+  const [resetKeys,     setResetKeys]     = useState(true);
+  const [resetSettings, setResetSettings] = useState(true);
+  const [confirmed,     setConfirmed]     = useState(false);
+  const [resetting,     setResetting]     = useState(false);
+  const [msg,           setMsg]           = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  const handleReset = async () => {
+    if (!confirmed) return;
+    setResetting(true);
+    setMsg(null);
+    try {
+      const res = await (api as unknown as { appReset?: (o: object) => Promise<{ success: boolean; error?: string }> })?.appReset?.({
+        resetDb, resetKeys, resetSettings,
+      });
+      if (res?.success) {
+        setMsg({ text: 'Reset berhasil — aplikasi akan restart...', type: 'success' });
+      } else {
+        setMsg({ text: `Gagal: ${res?.error || 'Unknown error'}`, type: 'error' });
+        setResetting(false);
+      }
+    } catch (err: unknown) {
+      setMsg({ text: `Error: ${(err as Error).message}`, type: 'error' });
+      setResetting(false);
+    }
+  };
+
+  return (
+    <Card className="border-destructive/30">
+      <CardHeader className="bg-destructive/5 border-b border-destructive/20">
+        <CardTitle className="flex items-center gap-2 text-destructive">
+          <AlertTriangle className="h-5 w-5" /> Reset Aplikasi
+        </CardTitle>
+        <CardDescription>
+          Tindakan ini akan menghapus data sesuai pilihan dan <strong>tidak dapat dibatalkan</strong>. Aplikasi akan restart secara otomatis.
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="pt-6 space-y-5">
+        {/* Options */}
+        <div className="space-y-3">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Pilih yang akan direset</p>
+          {[
+            { key: 'db',       label: 'Database lokal (dev.db)',            desc: 'Hapus semua project, clip, job, dan data aplikasi', checked: resetDb,       set: setResetDb },
+            { key: 'keys',     label: 'API Keys & Credentials',             desc: 'Hapus semua API key dari keychain sistem',          checked: resetKeys,     set: setResetKeys },
+            { key: 'settings', label: 'Pengaturan & Konfigurasi Aplikasi',  desc: 'Hapus config.json, autopilot, logger, dll.',        checked: resetSettings, set: setResetSettings },
+          ].map(opt => (
+            <label key={opt.key} className="flex items-start gap-3 p-3 rounded border border-border hover:bg-muted/30 cursor-pointer transition-colors">
+              <input
+                type="checkbox" checked={opt.checked}
+                onChange={e => opt.set(e.target.checked)}
+                className="mt-0.5 accent-destructive"
+              />
+              <div>
+                <p className="text-sm font-medium">{opt.label}</p>
+                <p className="text-xs text-muted-foreground">{opt.desc}</p>
+              </div>
+            </label>
+          ))}
+        </div>
+
+        {/* Confirmation */}
+        <div className="p-3 rounded border border-destructive/30 bg-destructive/5">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox" checked={confirmed}
+              onChange={e => setConfirmed(e.target.checked)}
+              className="accent-destructive"
+            />
+            <span className="text-sm text-destructive font-medium">
+              Saya mengerti bahwa tindakan ini tidak dapat dibatalkan
+            </span>
+          </label>
+        </div>
+
+        {msg && (
+          <div className={`px-3 py-2 rounded text-xs font-medium ${msg.type === 'error' ? 'bg-destructive/10 text-destructive' : 'bg-green-500/10 text-green-500'}`}>
+            {msg.text}
+          </div>
+        )}
+      </CardContent>
+
+      <CardFooter className="border-t border-destructive/20 bg-destructive/5 justify-end">
+        <Button
+          variant="destructive"
+          disabled={!confirmed || resetting || !(resetDb || resetKeys || resetSettings)}
+          onClick={handleReset}
+          className="min-w-36"
+        >
+          {resetting
+            ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Mereset...</>
+            : <><Trash className="h-4 w-4 mr-2" />Reset & Restart</>
+          }
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }

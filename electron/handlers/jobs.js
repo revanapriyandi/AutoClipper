@@ -49,6 +49,36 @@ function broadcast(channel, data) {
 }
 
 let isProcessingQueue = false;
+let schemaReady = false;    // true once tables confirmed to exist
+let repairAttempted = false; // prevent repair spam on repeated failures
+
+/**
+ * Push the Prisma schema to ensure tables exist.
+ * Uses execSync with shell:true to support .cmd files on Windows.
+ */
+async function repairSchema() {
+  const { execSync } = require('child_process');
+  const path = require('path');
+  const projectRoot = path.join(__dirname, '..', '..');
+  const dbPath = require('../prisma').dbPath ||
+    path.join(projectRoot, 'prisma', 'dev.db');
+  const dbUrl = 'file:' + dbPath.replace(/\\/g, '/');
+  global.splashStatus?.('Mengerjakan skema database...');
+  console.log('[JobQueue] Repairing schema — running prisma db push...');
+  try {
+    execSync('npx prisma db push', {
+      cwd: projectRoot,
+      env: { ...process.env, DATABASE_URL: dbUrl },
+      stdio: 'pipe',
+      shell: true,
+    });
+    console.log('[JobQueue] Schema repaired successfully.');
+    global.splashStatus?.('Skema database siap!');
+    schemaReady = true;
+  } catch (err) {
+    console.error('[JobQueue] Schema repair failed:', err.message);
+  }
+}
 
 async function processNextJob() {
   if (isProcessingQueue) return;
@@ -56,23 +86,41 @@ async function processNextJob() {
 
   try {
     const now = new Date();
-    const job = await prisma.job.findFirst({
-      where: {
-        OR: [
-          { status: 'QUEUED' },
-          { status: 'RETRY_PENDING', nextRetryAt: { lte: now } },
-        ],
-        AND: [
-          {
-            OR: [
-              { scheduledAt: null },
-              { scheduledAt: { lte: now } },
-            ],
-          },
-        ],
-      },
-      orderBy: { createdAt: 'asc' },
-    });
+    let job;
+    try {
+      job = await prisma.job.findFirst({
+        where: {
+          OR: [
+            { status: 'QUEUED' },
+            { status: 'RETRY_PENDING', nextRetryAt: { lte: now } },
+          ],
+          AND: [
+            {
+              OR: [
+                { scheduledAt: null },
+                { scheduledAt: { lte: now } },
+              ],
+            },
+          ],
+        },
+        orderBy: { createdAt: 'asc' },
+      });
+      schemaReady = true; // query succeeded — tables exist
+    } catch (dbErr) {
+      const msg = dbErr.message || '';
+      if (msg.includes('does not exist') || msg.includes('no such table')) {
+        isProcessingQueue = false;
+        if (!repairAttempted) {
+          // Attempt schema repair exactly once per process lifetime
+          repairAttempted = true;
+          await repairSchema();
+        }
+        // Either way, silently stop this tick — next interval will retry
+        return;
+      }
+      throw dbErr; // re-throw unrelated DB errors
+    }
+
 
     if (!job) { isProcessingQueue = false; return; }
 
@@ -95,7 +143,8 @@ async function processNextJob() {
         // Derive outputPath if not in payload
         if (!payload.outputPath) {
           const clipsDir = await getDir('clips');
-          const baseName = path.basename(payload.sourcePath || 'clip').replace(/\.[^.]+$/, '');
+          const src = payload.sourcePath || payload.inputPath || 'clip';
+          const baseName = path.basename(src).replace(/\.[^.]+$/, '') || 'clip';
           payload.outputPath = path.join(clipsDir, `${baseName}_${job.id}.mp4`);
         }
 
@@ -126,6 +175,118 @@ async function processNextJob() {
         writeLog('info', 'jobs', `Posted to ${platform}`);
         broadcast('job:progress', { jobId: job.id, percent: 100, label: 'Upload complete' });
 
+      } else if (job.type === 'RENDER_MULTILINGUAL') {
+        broadcast('job:progress', { jobId: job.id, percent: 5, label: 'Starting multilingual batch render...' });
+        
+        const { targetLanguages, enableDubbing, basePayload } = payload;
+        if (!targetLanguages || targetLanguages.length === 0) throw new Error("No target languages specified");
+
+        // Require backend services
+        const { runTranslation } = require('./translation');
+        const { synthesizeAudio } = require('./dubbing');
+
+        let percentPerLang = 90 / targetLanguages.length;
+        let currentPct = 5;
+
+        for (let i = 0; i < targetLanguages.length; i++) {
+            const lang = targetLanguages[i];
+            
+            try {
+              // 1. Translate
+              broadcast('job:progress', { jobId: job.id, percent: currentPct, label: `[${lang}] Translating subtitles...` });
+              const translatedSegments = await runTranslation(basePayload.segments, lang);
+              
+              currentPct += (percentPerLang * 0.4);
+
+              // 2. Synthesize Audio 
+              let dubbedAudioPath = null;
+              if (enableDubbing) {
+                 broadcast('job:progress', { jobId: job.id, percent: currentPct, label: `[${lang}] Generating AI Voice...` });
+                 // Combine translated text for TTS
+                 const fullTranslatedText = translatedSegments.map(s => s.text).join(' ');
+                 dubbedAudioPath = await synthesizeAudio(fullTranslatedText, null, null);
+              }
+
+              currentPct += (percentPerLang * 0.4);
+
+              // 3. Enqueue Standard RENDER Job for this region
+              broadcast('job:progress', { jobId: job.id, percent: currentPct, label: `[${lang}] Queuing Render Job...` });
+              
+              const localizedPayload = {
+                 ...basePayload,
+                 segments: translatedSegments,
+              };
+
+              // If dubbing enabled, replace background music or setup audio track
+              if (dubbedAudioPath) {
+                 // The frontend sets bgMusicPath for background music. 
+                 // We will set dubbedAudioPath as another property, but standard render.js doesn't support multiple dynamic tracks yet.
+                 // We'll replace bgMusicPath with the dubbed track for now, OR we can let the user know we override it.
+                 // Ideally, we'd add 'dubbedAudioPath' to basePayload and update render.js to mix it. 
+                 // Since render.js doesn't natively mix a separate "dubbed" track without bgMusic overriding, we assign it as bgMusicPath.
+                 localizedPayload.bgMusicPath = dubbedAudioPath;
+                 localizedPayload.audioDucking = false; // Disable ducking so voice takes over
+                 localizedPayload.enhanceAudio = false; 
+              }
+
+              // Adjust output path to include language code
+              const clipsDir = await getDir('clips');
+              const src = basePayload.sourcePath || basePayload.inputPath || 'clip';
+              const baseName = path.basename(src).replace(/\.[^.]+$/, '') || 'clip';
+              localizedPayload.outputPath = path.join(clipsDir, `${baseName}_${lang.replace(/\s+/g, '')}_${Date.now()}.mp4`);
+
+              await prisma.job.create({
+                data: {
+                  type: 'RENDER',
+                  payloadJson: JSON.stringify(localizedPayload),
+                  status: 'QUEUED',
+                }
+              });
+
+              currentPct += (percentPerLang * 0.2);
+
+            } catch (errLang) {
+              console.error(`[JobQueue] Failed to process language ${lang}:`, errLang);
+              // We won't throw so that it doesn't fail the entire batch, just skip.
+              broadcast('job:progress', { jobId: job.id, percent: currentPct, label: `[${lang}] Error: ${errLang.message}` });
+            }
+        }
+
+        broadcast('job:progress', { jobId: job.id, percent: 100, label: 'Batch queued' });
+      } else if (job.type === 'RENDER_AB_TEST') {
+        broadcast('job:progress', { jobId: job.id, percent: 5, label: 'Starting A/B test batch render...' });
+        const { basePayload, hookVariants } = payload;
+        
+        if (!hookVariants || hookVariants.length === 0) throw new Error("No hook variants specified");
+
+        let percentPerVar = 90 / hookVariants.length;
+        let currentPct = 5;
+
+        for (let i = 0; i < hookVariants.length; i++) {
+            const hook = hookVariants[i];
+            broadcast('job:progress', { jobId: job.id, percent: currentPct, label: `Queuing Hook Variant ${i + 1}...` });
+            
+            const localizedPayload = {
+               ...basePayload,
+               hookText: hook
+            };
+
+            const clipsDir = await getDir('clips');
+            const src = basePayload.sourcePath || basePayload.inputPath || 'clip';
+            const baseName = path.basename(src).replace(/\.[^.]+$/, '') || 'clip';
+            localizedPayload.outputPath = path.join(clipsDir, `${baseName}_var${i + 1}_${Date.now()}.mp4`);
+
+            await prisma.job.create({
+              data: {
+                type: 'RENDER',
+                payloadJson: JSON.stringify(localizedPayload),
+                status: 'QUEUED',
+              }
+            });
+
+            currentPct += percentPerVar;
+        }
+        broadcast('job:progress', { jobId: job.id, percent: 100, label: 'A/B Batch queued' });
       } else {
         throw new Error('Unknown job type: ' + job.type);
       }
@@ -165,7 +326,8 @@ async function processNextJob() {
       }
     }
   } catch (systemError) {
-    console.error('[JobQueue] System error:', systemError.message);
+    console.error('[JobQueue] System error:', systemError?.message ?? String(systemError));
+    if (systemError?.stack) console.error('[JobQueue] Stack:', systemError.stack);
   }
 
   isProcessingQueue = false;

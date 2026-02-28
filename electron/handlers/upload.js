@@ -17,6 +17,7 @@ const { getValidToken } = require('./auth');
 async function uploadToYouTube({ videoPath, title, description, tags = [] }) {
   const token = await getValidToken('youtube');
   if (!token) throw new Error('YouTube: Not authenticated. Connect in Settings.');
+  if (!fs.existsSync(videoPath)) throw new Error(`YouTube: Video file not found at ${videoPath}`);
 
   const videoBuffer = fs.readFileSync(videoPath);
   const fileSize = fs.statSync(videoPath).size;
@@ -81,6 +82,7 @@ async function uploadToYouTube({ videoPath, title, description, tags = [] }) {
 async function uploadToTikTok({ videoPath, title }) {
   const token = await getValidToken('tiktok');
   if (!token) throw new Error('TikTok: Not authenticated. Connect in Settings.');
+  if (!fs.existsSync(videoPath)) throw new Error(`TikTok: Video file not found at ${videoPath}`);
 
   const videoBuffer = fs.readFileSync(videoPath);
   const fileSize = fs.statSync(videoPath).size;
@@ -116,6 +118,7 @@ async function uploadToTikTok({ videoPath, title }) {
 async function uploadToFacebook({ videoPath, title, pageId }) {
   const token = await getValidToken('facebook');
   if (!token) throw new Error('Facebook: Not authenticated. Connect in Settings.');
+  if (!fs.existsSync(videoPath)) throw new Error(`Facebook: Video file not found at ${videoPath}`);
 
   const targetId = pageId || 'me';
   const videoBuffer = fs.readFileSync(videoPath);

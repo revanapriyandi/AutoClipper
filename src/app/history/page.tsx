@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { FolderOpen, Film, Clock, Search, Download, DollarSign, Filter } from "lucide-react";
+import { FolderOpen, Film, Clock, Search, Download, DollarSign, Filter, MessageSquare, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface HistoryClip {
@@ -45,6 +45,7 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [uploadingClipId, setUploadingClipId] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -104,6 +105,22 @@ export default function HistoryPage() {
     const durationSec = (c.endMs - c.startMs) / 1000;
     return acc + (durationSec / 60) * 0.0043 + 0.001;
   }, 0);
+
+  const handleCreateReviewLink = async (clipId: string, projectId: string, localFilePath: string) => {
+    if (!window.electronAPI?.supabaseCreateReviewLink) return;
+    setUploadingClipId(clipId);
+    try {
+      const res = await window.electronAPI.supabaseCreateReviewLink({ clipId, projectId, localFilePath });
+      if (res.success) {
+        alert("Review link created successfully! Check the Approvals page.");
+      } else {
+        alert("Failed to create review link: " + res.error);
+      }
+    } catch (e: unknown) {
+      alert("Error: " + (e as Error).message);
+    }
+    setUploadingClipId(null);
+  };
 
   return (
     <div className="grid gap-6 pb-10">
@@ -233,13 +250,23 @@ export default function HistoryPage() {
                       </Button>
                     </Link>
                     {renderedAsset && (
-                      <Button
-                        variant="ghost" size="icon" className="h-6 w-6"
-                        title="Show in Folder"
-                        onClick={() => window.electronAPI?.showItemInFolder(renderedAsset.storagePath)}
-                      >
-                        <Film className="h-3 w-3" />
-                      </Button>
+                      <>
+                        <Button
+                          variant="ghost" size="icon" className="h-6 w-6"
+                          title="Show in Folder"
+                          onClick={() => window.electronAPI?.showItemInFolder(renderedAsset.storagePath)}
+                        >
+                          <Film className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost" size="icon" className="h-6 w-6 text-indigo-400 hover:text-indigo-300"
+                          title="Generate Client Review Link"
+                          onClick={() => handleCreateReviewLink(c.id, c.projectId, renderedAsset.storagePath)}
+                          disabled={uploadingClipId === c.id}
+                        >
+                          {uploadingClipId === c.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3" />}
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>

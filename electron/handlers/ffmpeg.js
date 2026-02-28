@@ -22,6 +22,49 @@ ipcMain.handle('ffmpeg:checkInstallation', async () => {
     }
 });
 
+function getBestH264Encoder() {
+    // ffmpeg.getAvailableEncoders only checks the binary's compiled features, 
+    // not actual hardware support. This causes crash 4294967295 on non-NVIDIA GPUs.
+    // Defaulting to libx264 for maximum compatibility across all user machines.
+    return Promise.resolve('libx264');
+}
+
+// ── Generate Waveform image data ─────────────────────────────────────────────
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
+ipcMain.handle('ffmpeg:getWaveform', async (_, { sourcePath, width = 800, height = 150 }) => {
+    try {
+        return await new Promise((resolve, reject) => {
+            if (!fs.existsSync(sourcePath)) return reject(new Error('Source file not found'));
+            
+            const outPath = path.join(os.tmpdir(), `waveform_${Date.now()}.png`);
+            ffmpeg(sourcePath)
+                .complexFilter([
+                    `[0:a]showwavespic=s=${width}x${height}:colors=white[out]`
+                ])
+                .outputOptions(['-map [out]', '-frames:v 1'])
+                .save(outPath)
+                .on('end', () => {
+                    try {
+                        if (!fs.existsSync(outPath)) throw new Error('Waveform generation failed (no output file)');
+                        const data = fs.readFileSync(outPath).toString('base64');
+                        fs.unlinkSync(outPath);
+                        resolve({ success: true, dataUrl: `data:image/png;base64,${data}` });
+                    } catch (e) {
+                        reject(e);
+                    }
+                })
+                .on('error', (err) => reject(new Error(`FFmpeg error: ${err.message}`)));
+        });
+    } catch (e) {
+        console.error('[Waveform]', e.message);
+        return { success: false, error: e.message };
+    }
+});
+
 module.exports = {
-    ffmpeg
+    ffmpeg,
+    getBestH264Encoder
 };

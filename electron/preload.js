@@ -5,13 +5,38 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setKey:              (account, password) => ipcRenderer.invoke('keytar:set',  { account, password }),
   getKey:              (account)           => ipcRenderer.invoke('keytar:get',  { account }),
   deleteKey:           (account)           => ipcRenderer.invoke('keytar:delete', { account }),
+  
+  // ── Environment ─────────────────────────────────────────────────────────────
+  envSetDatabaseUrl:   (url)               => ipcRenderer.invoke('env:setDatabaseUrl', url),
+  envGetDatabaseUrl:   ()                  => ipcRenderer.invoke('env:getDatabaseUrl'),
 
-  // ── DB (Prisma) ─────────────────────────────────────────────────────────────
-  dbCreateProject:     (opts)      => ipcRenderer.invoke('db:createProject', opts),
+  // ── Database ────────────────────────────────────────────────────────────────
+  // ── Database ────────────────────────────────────────────────────────────────
+  dbCreateProject:     (title, sourcePath) => ipcRenderer.invoke('db:createProject', { title, sourcePath }),
   dbGetProjects:       ()          => ipcRenderer.invoke('db:getProjects'),
   dbGetProject:        (id)        => ipcRenderer.invoke('db:getProject', id),
   dbGetClipHistory:    ()          => ipcRenderer.invoke('db:getClipHistory'),
-  dbGetScheduledJobs:  ()          => ipcRenderer.invoke('db:getScheduledJobs'),
+  dbDeleteProject:     (id)        => ipcRenderer.invoke('db:deleteProject', id),
+  dbSaveProjectClips:  (data)      => ipcRenderer.invoke('db:saveProjectClips', data),
+  dbGetProjectClips:   (projectId) => ipcRenderer.invoke('db:getProjectClips', projectId),
+  dbUpdateClipChunks:  (data)      => ipcRenderer.invoke('db:updateClipChunks', data),
+  dbAddLog:            (data)      => ipcRenderer.invoke('db:addLog', data),
+  dbGetLogs:           (opts)      => ipcRenderer.invoke('db:getLogs', opts),
+  
+  // ── Video Downloader ────────────────────────────────────────────────────────
+  downloadVideoUrl:    (url)       => ipcRenderer.invoke('app:download-url', url),
+  onDownloadProgress:  (callback)  => {
+    // Remove existing listeners to prevent duplicates
+    ipcRenderer.removeAllListeners('download:progress');
+    ipcRenderer.on('download:progress', (event, percent) => callback(percent));
+  },
+  
+  // Workspaces & Brand Kits
+  dbGetWorkspaces:     ()          => ipcRenderer.invoke('db:getWorkspaces'),
+  dbCreateBrandKit:    (data)      => ipcRenderer.invoke('db:createBrandKit', data),
+  dbUpdateBrandKit:    (data)      => ipcRenderer.invoke('db:updateBrandKit', data),
+  dbDeleteBrandKit:    (id)        => ipcRenderer.invoke('db:deleteBrandKit', id),
+  brandUploadAsset:    (data)      => ipcRenderer.invoke('brand:uploadAsset', data),
 
   // ── Autopilot ───────────────────────────────────────────────────────────────
   autopilotGetConfig:  ()          => ipcRenderer.invoke('autopilot:getConfig'),
@@ -42,8 +67,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // ── AI ──────────────────────────────────────────────────────────────────────
   aiGetConfig:         ()                         => ipcRenderer.invoke('ai:getConfig'),
-  aiTranscribe:        (videoPath, deepgramKey)   => ipcRenderer.invoke('ai:transcribe', { videoPath, deepgramKey }),
-  aiScore:             (promptText, provider)     => ipcRenderer.invoke('ai:score', { promptText, provider }),
+  aiExtractAudio:      (sourcePath, projectId)    => ipcRenderer.invoke('ai:extractAudio', sourcePath, projectId),
+  thumbnailGenerateAI: (opts)                     => ipcRenderer.invoke('thumbnail:generateAI', opts),
+  aiTranscribe:        (videoPath, deepgramKey, projectId) => ipcRenderer.invoke('ai:transcribe', videoPath, deepgramKey, projectId),
+  aiScore:             (opts)     => ipcRenderer.invoke('ai:score', opts),
+  aiTranslate:         (opts)                     => ipcRenderer.invoke('ai:translate', opts),
+  aiGenerateImage:     (opts)                     => ipcRenderer.invoke('ai:generateImage', opts),
 
   // ── Rendering ───────────────────────────────────────────────────────────────
   renderClip:          (options) => ipcRenderer.invoke('render:clip', options),
@@ -58,6 +87,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // ── Caption ─────────────────────────────────────────────────────────────────
   captionGenerate:     (opts)    => ipcRenderer.invoke('caption:generate', opts),
+
+  // ── Supabase (Client Approval) ──────────────────────────────────────────────
+  supabaseCreateReviewLink: (opts) => ipcRenderer.invoke('supabase:createReviewLink', opts),
+  supabaseGetReviewLinks:   (opts) => ipcRenderer.invoke('supabase:getReviewLinks', opts),
+  supabaseDeleteReviewLink: (opts) => ipcRenderer.invoke('supabase:deleteReviewLink', opts),
+  supabaseUpdateReviewStatus: (opts) => ipcRenderer.invoke('supabase:updateReviewStatus', opts),
 
   // ── Logging ─────────────────────────────────────────────────────────────────
   loggerSetEnabled:    (en)      => ipcRenderer.invoke('logger:setEnabled', en),
@@ -92,6 +127,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // ── FFmpeg ────────────────────────────────────────────────────────────────────
   ffmpegCheckInstallation: ()    => ipcRenderer.invoke('ffmpeg:checkInstallation'),
+  getWaveform:           (sourcePath, width, height) => ipcRenderer.invoke('ffmpeg:getWaveform', { sourcePath, width, height }),
 
   // ── Jobs (Phase 1 — Queue Dashboard) ─────────────────────────────────────────
   enqueueJob:          (type, payload) => ipcRenderer.invoke('job:enqueue', { type, payload }),
@@ -178,4 +214,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('menu:openSettings', handler);
     return () => ipcRenderer.removeListener('menu:openSettings', handler);
   },
+
+  // ── App Reset ───────────────────────────────────────────────────────────────
+  appReset: (options) => ipcRenderer.invoke('app:reset', options),
+
+  // ── AI Alternative Auth ──────────────────────────────────────────────────────
+  detectGeminiCli:    ()        => ipcRenderer.invoke('app:detect-gemini-cli'),
+  checkGcloudAdc:     ()        => ipcRenderer.invoke('app:check-gcloud-adc'),
+  googleAiOAuthLogin: (opts)    => ipcRenderer.invoke('app:google-ai-oauth-login', opts),
+  checkAwsCreds:      ()        => ipcRenderer.invoke('app:check-aws-creds'),
+  testConnection:     (opts)    => ipcRenderer.invoke('app:test-connection', opts),
 });

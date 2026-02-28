@@ -128,52 +128,57 @@ ipcMain.handle('dubbing:translate', async (_, { text, targetLanguage }) => {
 
 // ── TTS Synthesis via ElevenLabs ─────────────────────────────────────────────
 
+async function synthesizeAudio(text, voiceId, outputPath) {
+  if (!text) throw new Error('text is required');
+
+  const apiKey = await getSetting('elevenlabs_api_key');
+  if (!apiKey) throw new Error('ElevenLabs API key not configured. Add it in Settings.');
+
+  const selectedVoiceId = voiceId || '21m00Tcm4TlvDq8ikWAM'; // Default: Rachel
+
+  const res = await fetch(`${ELEVENLABS_API}/text-to-speech/${selectedVoiceId}`, {
+    method: 'POST',
+    headers: {
+      'xi-api-key': apiKey,
+      'Content-Type': 'application/json',
+      'Accept': 'audio/mpeg',
+    },
+    body: JSON.stringify({
+      text,
+      model_id: 'eleven_multilingual_v2',
+      voice_settings: {
+        stability: 0.5,
+        similarity_boost: 0.75,
+        style: 0.3,
+        use_speaker_boost: true,
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`ElevenLabs TTS error ${res.status}: ${errText.slice(0, 200)}`);
+  }
+
+  const audioBuffer = Buffer.from(await res.arrayBuffer());
+
+  let finalOutputPath = outputPath;
+  if (!finalOutputPath) {
+    const clipsDir = await getDir('clips');
+    finalOutputPath = path.join(clipsDir, `dubbing_${Date.now()}.mp3`);
+  }
+
+  const dir = path.dirname(finalOutputPath);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(finalOutputPath, audioBuffer);
+
+  return finalOutputPath;
+}
+
 ipcMain.handle('dubbing:synthesize', async (_, { text, voiceId, outputPath }) => {
   try {
-    if (!text) throw new Error('text is required');
-
-    const apiKey = await getSetting('elevenlabs_api_key');
-    if (!apiKey) throw new Error('ElevenLabs API key not configured. Add it in Settings.');
-
-    const selectedVoiceId = voiceId || '21m00Tcm4TlvDq8ikWAM'; // Default: Rachel
-
-    const res = await fetch(`${ELEVENLABS_API}/text-to-speech/${selectedVoiceId}`, {
-      method: 'POST',
-      headers: {
-        'xi-api-key': apiKey,
-        'Content-Type': 'application/json',
-        'Accept': 'audio/mpeg',
-      },
-      body: JSON.stringify({
-        text,
-        model_id: 'eleven_multilingual_v2',
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.3,
-          use_speaker_boost: true,
-        },
-      }),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`ElevenLabs TTS error ${res.status}: ${errText.slice(0, 200)}`);
-    }
-
-    const audioBuffer = Buffer.from(await res.arrayBuffer());
-
-    let finalOutputPath = outputPath;
-    if (!finalOutputPath) {
-      const clipsDir = await getDir('clips');
-      finalOutputPath = path.join(clipsDir, `dubbing_${Date.now()}.mp3`);
-    }
-
-    const dir = path.dirname(finalOutputPath);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(finalOutputPath, audioBuffer);
-
-    return { success: true, audioPath: finalOutputPath };
+    const finalPath = await synthesizeAudio(text, voiceId, outputPath);
+    return { success: true, audioPath: finalPath };
   } catch (e) {
     console.error('[Dubbing] synthesize error:', e.message);
     return { success: false, error: e.message };
@@ -234,4 +239,4 @@ ipcMain.handle('dubbing:mergeAudio', async (_, { videoPath, audioPath, outputPat
 // Preload enabled state
 isDubbingEnabled();
 
-module.exports = { isDubbingEnabled, dubbingEnabled };
+module.exports = { isDubbingEnabled, dubbingEnabled, synthesizeAudio };

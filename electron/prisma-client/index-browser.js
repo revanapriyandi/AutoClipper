@@ -117,6 +117,25 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.WorkspaceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+};
+
+exports.Prisma.BrandKitScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  name: 'name',
+  fontFamily: 'fontFamily',
+  primaryColor: 'primaryColor',
+  watermarkPath: 'watermarkPath',
+  logoPath: 'logoPath',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.ProjectScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -124,6 +143,8 @@ exports.Prisma.ProjectScalarFieldEnum = {
   durationMs: 'durationMs',
   status: 'status',
   tags: 'tags',
+  workspaceId: 'workspaceId',
+  brandKitId: 'brandKitId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -239,6 +260,18 @@ exports.Prisma.AutopilotHistoryScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.ReviewLinkScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  clipId: 'clipId',
+  cloudUrl: 'cloudUrl',
+  status: 'status',
+  comments: 'comments',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -251,6 +284,8 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
+  Workspace: 'Workspace',
+  BrandKit: 'BrandKit',
   Project: 'Project',
   ClipProfile: 'ClipProfile',
   Transcript: 'Transcript',
@@ -262,7 +297,8 @@ exports.Prisma.ModelName = {
   Analytics: 'Analytics',
   Settings: 'Settings',
   AutopilotConfig: 'AutopilotConfig',
-  AutopilotHistory: 'AutopilotHistory'
+  AutopilotHistory: 'AutopilotHistory',
+  ReviewLink: 'ReviewLink'
 };
 
 /**
