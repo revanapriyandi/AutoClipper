@@ -246,7 +246,9 @@ ipcMain.handle('ai:transcribe', async (_, sourcePath, userDeepgramKey, projectId
       }
 
       // No usable subs found — extract audio fresh via ffmpeg
-      const finalAudioPath = path.join(os.tmpdir(), `autoclipper_audio_${Date.now()}.mp3`);
+      let finalAudioPath = path.join(os.tmpdir(), `autoclipper_audio_${Date.now()}.mp3`);
+      finalAudioPath = finalAudioPath.replace(/\\/g, '/'); // Fix FFmpeg invalid argument escaping on Windows
+      
       console.log(`[ASR] Extracting audio from video to: ${finalAudioPath}`);
       await new Promise((resolve, reject) => {
         ffmpeg(sourcePath)
@@ -254,6 +256,7 @@ ipcMain.handle('ai:transcribe', async (_, sourcePath, userDeepgramKey, projectId
           .audioCodec('libmp3lame')
           .audioFrequency(16000)
           .audioChannels(1)
+          .outputOptions('-y') // Overwrite if exists
           .save(finalAudioPath)
           .on('end', () => { console.log(`[ASR] Audio extracted OK`); resolve(); })
           .on('error', (err) => { console.error(`[ASR] ffmpeg error: ${err.message}`); reject(err); });

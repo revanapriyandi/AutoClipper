@@ -422,6 +422,9 @@ ipcMain.handle('render:clip', async (_, options) => {
       options.outputPath = path.join(clipsDir, `${baseName}_${jobId}.mp4`);
     }
 
+    // FFmpeg on Windows struggles with backslashes in certain output mappings
+    options.outputPath = options.outputPath.replace(/\\/g, '/');
+
     const outputPath = await runVideoRender(options, jobId);
     return { success: true, outputPath, jobId };
   } catch (e) {
@@ -444,6 +447,10 @@ ipcMain.handle('render:batch', async (_, jobs) => {
         const baseName = path.basename(options.sourcePath || 'clip', path.extname(options.sourcePath || '.mp4'));
         options.outputPath = path.join(clipsDir, `${baseName}_${jobId}.mp4`);
       }
+
+      // FFmpeg on Windows struggles with backslashes in certain output mappings
+      options.outputPath = options.outputPath.replace(/\\/g, '/');
+
       const outputPath = await runVideoRender(options, jobId);
       results.push({ success: true, jobId, outputPath });
     } catch (e) {
