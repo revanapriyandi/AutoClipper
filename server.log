@@ -1,0 +1,229 @@
+
+> autoclipper@1.0.0 dev
+> node dev-runner.js
+
+[AutoClipper] Starting Next.js Dev Server...
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 2.6s
+ ○ Compiling /editor ...
+ ✓ Compiled /editor in 8.3s (1145 modules)
+ GET /editor 200 in 8990ms
+ ✓ Compiled in 831ms (563 modules)
+ ✓ Compiled in 750ms (563 modules)
+ ○ Compiling /editor ...
+ ✓ Compiled /editor in 562ms (573 modules)
+ GET /editor 200 in 886ms
+ ○ Compiling /onboarding ...
+ ✓ Compiled /onboarding in 878ms (1155 modules)
+ GET /editor 200 in 88ms
+ ○ Compiling / ...
+ ✓ Compiled / in 556ms (1177 modules)
+ GET / 200 in 77ms
+ GET /editor?source=dummy.mp4&startMs=0&endMs=60000 200 in 53ms
+ ✓ Compiled in 8.9s (1121 modules)
+ ✓ Compiled in 1304ms (1121 modules)
+ ✓ Compiled in 1847ms (1121 modules)
+ ✓ Compiled / in 296ms (564 modules)
+ ⨯ Error: Cannot find module './948.js'
+Require stack:
+- /app/.next/server/webpack-runtime.js
+- /app/.next/server/app/page.js
+- /app/node_modules/next/dist/server/require.js
+- /app/node_modules/next/dist/server/load-components.js
+- /app/node_modules/next/dist/build/utils.js
+- /app/node_modules/next/dist/server/dev/hot-middleware.js
+- /app/node_modules/next/dist/server/dev/hot-reloader-webpack.js
+- /app/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /app/node_modules/next/dist/server/lib/router-server.js
+- /app/node_modules/next/dist/server/lib/start-server.js
+    at Function.<anonymous> (node:internal/modules/cjs/loader:1383:15)
+    at /app/node_modules/next/dist/server/require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+    at Function._load (node:internal/modules/cjs/loader:1192:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1463:12)
+    at mod.require (/app/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:147:16)
+    at __webpack_require__.f.require (/app/.next/server/webpack-runtime.js:203:28)
+    at /app/.next/server/webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (/app/.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (/app/.next/server/webpack-runtime.js:162:22)
+    at /app/.next/server/app/page.js:1:16245
+    at Object.<anonymous> (/app/.next/server/app/page.js:1:16298)
+    at Module._compile (node:internal/modules/cjs/loader:1706:14)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1463:12)
+    at mod.require (/app/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:147:16)
+    at requirePage (/app/node_modules/next/dist/server/require.js:109:84)
+    at /app/node_modules/next/dist/server/load-components.js:103:84
+    at async loadComponentsImpl (/app/node_modules/next/dist/server/load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (/app/node_modules/next/dist/server/next-server.js:714:36)
+    at async DevServer.findPageComponents (/app/node_modules/next/dist/server/dev/next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (/app/node_modules/next/dist/server/base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (/app/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/app/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/app/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/app/node_modules/next/dist/server/base-server.js:818:17)
+    at async /app/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/app/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/app/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/app/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/app/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/app/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/app/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/app/.next/server/webpack-runtime.js',
+    '/app/.next/server/app/page.js',
+    '/app/node_modules/next/dist/server/require.js',
+    '/app/node_modules/next/dist/server/load-components.js',
+    '/app/node_modules/next/dist/build/utils.js',
+    '/app/node_modules/next/dist/server/dev/hot-middleware.js',
+    '/app/node_modules/next/dist/server/dev/hot-reloader-webpack.js',
+    '/app/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js',
+    '/app/node_modules/next/dist/server/lib/router-server.js',
+    '/app/node_modules/next/dist/server/lib/start-server.js'
+  ],
+  page: '/'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 2.5s (1345 modules)
+ GET / 500 in 3140ms
+ GET /editor?source=dummy.mp4&startMs=0&endMs=60000 200 in 251ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1038ms (1348 modules)
+ GET /_next/static/css/app/layout.css?v=1772283018270 404 in 1202ms
+ GET /_next/static/chunks/main-app.js?v=1772283018270 404 in 1208ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 1210ms
+ GET /_next/static/chunks/app/editor/page.js 404 in 1209ms
+ GET /_next/static/chunks/app/layout.js 404 in 1209ms
+ GET /editor?source=dummy.mp4&startMs=0&endMs=60000 200 in 94ms
+ GET /_next/static/css/app/layout.css?v=1772283063593 404 in 46ms
+ GET /_next/static/chunks/main-app.js?v=1772283063593 404 in 98ms
+ GET /_next/static/chunks/app/editor/page.js 404 in 96ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 98ms
+ GET /_next/static/chunks/app/layout.js 404 in 95ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/app/.next/server/vendor-chunks/get-nonce.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/get-nonce' in /app/.next/server for build dependencies doesn't lead to expected result '/app/.next/server/vendor-chunks/get-nonce.js', but to 'Error: Can't resolve './vendor-chunks/get-nonce' in '/app/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/get-nonce (expected /app/.next/server/vendor-chunks/get-nonce.js)
+<w>  at file dependencies /app/.next/server/webpack-runtime.js
+<w>  at file /app/.next/server/webpack-runtime.js
+<w>  at file dependencies /app/.next/server/app/_not-found/page.js
+<w>  at file /app/.next/server/app/_not-found/page.js
+<w>  at file dependencies /app/node_modules/next/dist/server/require.js
+<w>  at file /app/node_modules/next/dist/server/require.js
+<w>  at file dependencies /app/node_modules/next/dist/server/load-components.js
+<w>  at file /app/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /app/node_modules/next/dist/build/utils.js
+<w>  at file /app/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+ GET /editor?source=dummy.mp4&startMs=0&endMs=60000 200 in 51ms
+ GET /_next/static/css/app/layout.css?v=1772283107324 404 in 46ms
+ GET /_next/static/chunks/main-app.js?v=1772283107324 404 in 106ms
+ GET /_next/static/chunks/app/editor/page.js 404 in 98ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 101ms
+ GET /_next/static/chunks/app/layout.js 404 in 97ms
+ ✓ Compiled in 1851ms (1347 modules)
+ GET /editor?source=dummy.mp4&startMs=0&endMs=60000 200 in 229ms
+ ✓ Compiled /_not-found in 370ms (1336 modules)
+ GET /_next/static/css/app/layout.css?v=1772283185412 404 in 491ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 477ms
+ GET /_next/static/chunks/main-app.js?v=1772283185412 404 in 481ms
+ GET /editor?source=dummy.mp4&startMs=0&endMs=60000 200 in 74ms
+ GET /_next/static/css/app/layout.css?v=1772283238337 404 in 34ms
+ GET /_next/static/chunks/main-app.js?v=1772283238337 404 in 71ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 108ms
+ GET /editor?source=dummy.mp4&startMs=0&endMs=60000 200 in 35ms
+ GET /_next/static/css/app/layout.css?v=1772283238615 404 in 36ms
+ GET /_next/static/chunks/main-app.js?v=1772283238615 404 in 65ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 65ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/app/.next/server/vendor-chunks/get-nonce.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/get-nonce' in /app/.next/server for build dependencies doesn't lead to expected result '/app/.next/server/vendor-chunks/get-nonce.js', but to 'Error: Can't resolve './vendor-chunks/get-nonce' in '/app/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/get-nonce (expected /app/.next/server/vendor-chunks/get-nonce.js)
+<w>  at file dependencies /app/.next/server/webpack-runtime.js
+<w>  at file /app/.next/server/webpack-runtime.js
+<w>  at file dependencies /app/.next/server/app/editor/page.js
+<w>  at file /app/.next/server/app/editor/page.js
+<w>  at file dependencies /app/node_modules/next/dist/server/require.js
+<w>  at file /app/node_modules/next/dist/server/require.js
+<w>  at file dependencies /app/node_modules/next/dist/server/load-components.js
+<w>  at file /app/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /app/node_modules/next/dist/build/utils.js
+<w>  at file /app/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/clsx' in /app/.next/server for build dependencies doesn't lead to expected result '/app/.next/server/vendor-chunks/clsx.js', but to 'Error: Can't resolve './vendor-chunks/clsx' in '/app/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/clsx (expected /app/.next/server/vendor-chunks/clsx.js)
+<w>  at file dependencies /app/.next/server/webpack-runtime.js
+<w>  at file /app/.next/server/webpack-runtime.js
+<w>  at file dependencies /app/.next/server/app/editor/page.js
+<w>  at file /app/.next/server/app/editor/page.js
+<w>  at file dependencies /app/node_modules/next/dist/server/require.js
+<w>  at file /app/node_modules/next/dist/server/require.js
+<w>  at file dependencies /app/node_modules/next/dist/server/load-components.js
+<w>  at file /app/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /app/node_modules/next/dist/build/utils.js
+<w>  at file /app/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+ GET /editor?source=dummy.mp4&startMs=0&endMs=60000 200 in 62ms
+ GET /_next/static/css/app/layout.css?v=1772283314211 404 in 36ms
+ GET /_next/static/chunks/main-app.js?v=1772283314211 404 in 116ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 112ms
+ ✓ Compiled / in 318ms (605 modules)
+ GET / 200 in 460ms
+ GET /_next/static/css/app/layout.css?v=1772283361777 404 in 42ms
+ GET /_next/static/chunks/app/page.js 404 in 59ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 60ms
+ GET /_next/static/chunks/main-app.js?v=1772283361777 404 in 63ms
+ GET /editor?source=dummy.mp4&startMs=0&endMs=60000 200 in 42ms
+ GET /_next/static/css/app/layout.css?v=1772283367063 404 in 32ms
+ GET /_next/static/chunks/main-app.js?v=1772283367063 404 in 51ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 50ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, lstat '/app/.next/server/vendor-chunks/get-nonce.js'
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/get-nonce' in /app/.next/server for build dependencies doesn't lead to expected result '/app/.next/server/vendor-chunks/get-nonce.js', but to 'Error: Can't resolve './vendor-chunks/get-nonce' in '/app/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/get-nonce (expected /app/.next/server/vendor-chunks/get-nonce.js)
+<w>  at file dependencies /app/.next/server/webpack-runtime.js
+<w>  at file /app/.next/server/webpack-runtime.js
+<w>  at file dependencies /app/.next/server/app/_not-found/page.js
+<w>  at file /app/.next/server/app/_not-found/page.js
+<w>  at file dependencies /app/node_modules/next/dist/server/require.js
+<w>  at file /app/node_modules/next/dist/server/require.js
+<w>  at file dependencies /app/node_modules/next/dist/server/load-components.js
+<w>  at file /app/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /app/node_modules/next/dist/build/utils.js
+<w>  at file /app/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Resolving './vendor-chunks/clsx' in /app/.next/server for build dependencies doesn't lead to expected result '/app/.next/server/vendor-chunks/clsx.js', but to 'Error: Can't resolve './vendor-chunks/clsx' in '/app/.next/server'' instead. Resolving dependencies are ignored for this path.
+<w>  at resolve commonjs file ./vendor-chunks/clsx (expected /app/.next/server/vendor-chunks/clsx.js)
+<w>  at file dependencies /app/.next/server/webpack-runtime.js
+<w>  at file /app/.next/server/webpack-runtime.js
+<w>  at file dependencies /app/.next/server/app/_not-found/page.js
+<w>  at file /app/.next/server/app/_not-found/page.js
+<w>  at file dependencies /app/node_modules/next/dist/server/require.js
+<w>  at file /app/node_modules/next/dist/server/require.js
+<w>  at file dependencies /app/node_modules/next/dist/server/load-components.js
+<w>  at file /app/node_modules/next/dist/server/load-components.js
+<w>  at file dependencies /app/node_modules/next/dist/build/utils.js
+<w>  at file /app/node_modules/next/dist/build/utils.js
+<w>  at file dependencies /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at file /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
+<w>  at resolve commonjs /app/node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js
