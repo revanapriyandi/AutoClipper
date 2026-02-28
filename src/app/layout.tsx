@@ -39,3 +39,4 @@ export default function RootLayout({
     </html>
   );
 }
+// Trigger HMR 1

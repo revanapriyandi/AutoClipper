@@ -378,6 +378,12 @@ ${hookText ? `Dialogue: 1,0:00:00.00,0:00:03.00,Hook,,0,0,0,,${hookText}\n` : ''
       command.complexFilter(filterChain);
       command.outputOptions([...videoOutputOptions, `-map ${vOut}`, `-map ${aOut}`, '-c:a aac', '-b:a 128k']);
 
+      // Ensure output directory exists right before saving
+      const outDir = path.dirname(outputPath);
+      if (!fs.existsSync(outDir)) {
+          fs.mkdirSync(outDir, { recursive: true });
+      }
+
       command
         .on('progress', (progress) => {
           const pct = Math.min(99, progress.percent || 0);
