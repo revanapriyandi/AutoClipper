@@ -92,8 +92,20 @@ export function ThumbnailModal({ open, onOpenChange, sourcePath, startMs, endMs,
                <div key={i} className="flex flex-col gap-2 relative group">
                   <div className="aspect-[9/16] bg-black rounded-lg overflow-hidden border border-white/10 relative">
                      {v.dataUrl ? (
-                         /* eslint-disable-next-line @next/next/no-img-element */
-                         <img src={v.dataUrl} alt={v.label} className="w-full h-full object-cover" />
+                         <>
+                           {/* eslint-disable-next-line @next/next/no-img-element */}
+                           <img src={v.dataUrl} alt={v.label || "thumbnail"} className="w-full h-full object-cover" />
+                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-lg">
+                             <Button size="sm" className="bg-primary text-primary-foreground shadow-lg hover:scale-105 transition-transform" onClick={() => {
+                               const a = document.createElement('a');
+                               a.href = v.dataUrl;
+                               a.download = `autoclipper_thumb_${i+1}.jpg`;
+                               a.click();
+                             }}>
+                               Download
+                             </Button>
+                           </div>
+                         </>
                      ) : (
                          <div className="w-full h-full flex items-center justify-center text-xs text-white/30 text-center p-4">Text composite failed</div>
                      )}

@@ -37,6 +37,14 @@ interface LogEntry {
   message: string;
 }
 
+interface AutopilotHistoryRecord {
+  id: string;
+  title: string;
+  url: string;
+  createdAt: string;
+  projectId: string;
+}
+
 export default function AutopilotPage() {
   const [config, setConfig] = useState<AutopilotConfig>({
     isActive: false,
@@ -51,6 +59,7 @@ export default function AutopilotPage() {
   });
   const [stats, setStats] = useState<AutopilotStats>({ totalDownloads: 0, totalClips: 0, totalPosted: 0 });
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [historyRecords, setHistoryRecords] = useState<AutopilotHistoryRecord[]>([]);
   const [running, setRunning] = useState(false);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ text: string; type: "success" | "error" | "info" } | null>(null);
@@ -84,15 +93,17 @@ export default function AutopilotPage() {
         });
       }
 
-      // Load stats from history
+      // Load stats & history
       try {
-        const histRes = await (api as unknown as { dbGetProjects?: () => Promise<{ success: boolean; projects?: { id: string; createdAt: string }[] }> })?.dbGetProjects?.();
-        if (histRes?.success && histRes.projects) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const histRes = await (api as any)?.autopilotGetHistory?.();
+        if (histRes?.success && histRes.history) {
+          setHistoryRecords(histRes.history);
           setStats({
-            totalDownloads: histRes.projects.length,
-            totalClips: 0,
+            totalDownloads: histRes.history.length,
+            totalClips: 0, // Mocked for now
             totalPosted: 0,
-            lastRun: histRes.projects[0]?.createdAt,
+            lastRun: histRes.history[0]?.createdAt,
           });
         }
       } catch {}
@@ -102,6 +113,21 @@ export default function AutopilotPage() {
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const refreshHistory = async () => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const histRes = await (api as any)?.autopilotGetHistory?.();
+      if (histRes?.success && histRes.history) {
+        setHistoryRecords(histRes.history);
+        setStats(prev => ({
+          ...prev,
+          totalDownloads: histRes.history.length,
+          lastRun: histRes.history[0]?.createdAt,
+        }));
+      }
+    } catch {}
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -145,8 +171,8 @@ export default function AutopilotPage() {
 
     if (res?.success) {
       addLog(`✅ Success! Project "${res.videoTitle}" created.`, "success");
-      setStats(prev => ({ ...prev, totalDownloads: prev.totalDownloads + 1 }));
       setMsg({ text: `✅ Project "${res.videoTitle}" dibuat!`, type: "success" });
+      refreshHistory();
     } else {
       addLog(`❌ Failed: ${res?.error || "Unknown error"}`, "error");
       setMsg({ text: `❌ ${res?.error || "Gagal"}`, type: "error" });
@@ -351,16 +377,48 @@ export default function AutopilotPage() {
       </div>
 
       {/* Stats Chart Placeholder */}
-      <Card className="border-dashed bg-muted/10">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base"><BarChart3 className="h-4 w-4" /> Download History</CardTitle>
-          <CardDescription>Riwayat download otomatis akan muncul di sini setelah bot berjalan.</CardDescription>
-        </CardHeader>
-        <CardContent className="flex items-center justify-center h-32 text-muted-foreground/40">
-          <div className="text-center">
-            <FolderOpen className="h-10 w-10 mx-auto mb-2 opacity-30" />
-            <p className="text-sm">Run autopilot to see download history</p>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-base"><BarChart3 className="h-4 w-4" /> Download History</CardTitle>
+            <Button variant="ghost" size="sm" onClick={refreshHistory}><RefreshCw className="h-4 w-4 mr-2" /> Refresh</Button>
           </div>
+          <CardDescription>Riwayat video yang telah diunduh oleh autopilot.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {historyRecords.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 border border-dashed rounded-lg bg-muted/10 text-muted-foreground/40">
+              <FolderOpen className="h-10 w-10 mx-auto mb-2 opacity-30" />
+              <p className="text-sm">Run autopilot to see download history</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left border-collapse">
+                <thead className="text-xs text-muted-foreground bg-muted/20 uppercase border-b">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Date</th>
+                    <th className="px-4 py-3 font-medium">Video Title</th>
+                    <th className="px-4 py-3 font-medium">Source URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historyRecords.map((record) => (
+                    <tr key={record.id} className="border-b transition-colors hover:bg-muted/10">
+                      <td className="px-4 py-3 align-top whitespace-nowrap text-muted-foreground text-xs">
+                        {new Date(record.createdAt).toLocaleString("id-ID")}
+                      </td>
+                      <td className="px-4 py-3 font-medium max-w-[300px] truncate" title={record.title}>
+                        {record.title}
+                      </td>
+                      <td className="px-4 py-3 max-w-[200px] truncate text-primary hover:underline">
+                        <a href={record.url} target="_blank" rel="noreferrer" title={record.url}>{record.url}</a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
