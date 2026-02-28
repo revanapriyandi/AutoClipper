@@ -1,0 +1,14 @@
+node_modules/
+dist/
+dist-electron/
+release/
+docs/
+.git/
+.env
+.vercel/
+electron/
+prisma/dev.db
+*.exe
+*.dmg
+*.zip
+*.tar.gz
