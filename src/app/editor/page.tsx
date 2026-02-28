@@ -59,6 +59,7 @@ function EditorInner() {
   const [activePanel, setActivePanel] = useState<'text' | 'audio' | 'color' | 'effects' | 'transitions' | 'keyframes' | 'image' | null>('color');
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   const [draggingHandle, setDraggingHandle] = useState<'in' | 'out' | null>(null);
+  const [draggingTrack, setDraggingTrack] = useState<{ id: string; type: 'text' | 'broll'; handle: 'in' | 'out' } | null>(null);
 
   // Undo/Redo history
   const historyRef = useRef<EditState[]>([]);
@@ -213,26 +214,47 @@ function EditorInner() {
   // ── Timeline drag ─────────────────────────────────────────────────────────
 
   const handleTimelineDrag = useCallback((e: React.MouseEvent | React.PointerEvent) => {
-    const tl = timelineRef.current; if (!tl || !draggingHandle) return;
+    const tl = timelineRef.current; if (!tl) return;
+    if (!draggingHandle && !draggingTrack) return;
     e.preventDefault();
     const rect = tl.getBoundingClientRect();
     const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const rawMs = initStart + ratio * (initEnd - initStart);
     setEditRaw(prev => {
-      if (draggingHandle === 'in') {
-        return { ...prev, startMs: Math.min(rawMs, prev.endMs - 500) };
-      } else {
-        return { ...prev, endMs: Math.max(rawMs, prev.startMs + 500) };
+      if (draggingHandle) {
+        if (draggingHandle === 'in') {
+          return { ...prev, startMs: Math.min(rawMs, prev.endMs - 500) };
+        } else {
+          return { ...prev, endMs: Math.max(rawMs, prev.startMs + 500) };
+        }
+      } else if (draggingTrack) {
+        const type = draggingTrack.type;
+        const id = draggingTrack.id;
+        const list = type === 'text' ? prev.textLayers : prev.brollLayers;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const newList = list.map((l: any) => {
+           if (l.id === id) {
+              if (draggingTrack.handle === 'in') {
+                 return { ...l, startMs: Math.min(rawMs - prev.startMs, l.endMs - 500) };
+              } else {
+                 return { ...l, endMs: Math.max(rawMs - prev.startMs, l.startMs + 500) };
+              }
+           }
+           return l;
+        });
+        return { ...prev, [type === 'text' ? 'textLayers' : 'brollLayers']: newList };
       }
+      return prev;
     });
-  }, [draggingHandle, initStart, initEnd]);
+  }, [draggingHandle, draggingTrack, initStart, initEnd]);
 
   const stopDrag = useCallback(() => {
-    if (draggingHandle) {
+    if (draggingHandle || draggingTrack) {
       setEdit(prev => ({ ...prev })); // commit to history
       setDraggingHandle(null);
+      setDraggingTrack(null);
     }
-  }, [draggingHandle, setEdit]);
+  }, [draggingHandle, draggingTrack, setEdit]);
 
 
   const previewFilter = (() => {
@@ -708,100 +730,133 @@ function EditorInner() {
           </div>
 
           {/* TIMELINE */}
-          <div className="bg-[#161616] border-t border-white/10 px-4 pt-3 pb-4 shrink-0">
-            <div className="text-xs text-white/30 mb-2 flex items-center gap-2">
-              <Scissors className="h-3 w-3" /> Timeline — drag handles to trim
+          <div className="bg-[#161616] border-t border-white/10 px-4 pt-3 pb-4 shrink-0 overflow-y-auto max-h-64">
+            <div className="text-xs text-white/30 mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                 <Scissors className="h-3 w-3" /> Timeline — Multi-track Editor
+              </div>
+              <div className="flex justify-between text-[10px] text-white/20 w-32">
+                <span>{msToTime(initStart)}</span>
+                <span>{msToTime(initEnd)}</span>
+              </div>
             </div>
 
-            {/* Main video clip bar */}
-            <div
-              ref={timelineRef}
-              className="relative h-10 bg-white/5 rounded-lg cursor-pointer overflow-visible"
-              onPointerMove={handleTimelineDrag}
-              onPointerUp={stopDrag}
-              onPointerLeave={stopDrag}
-              onClick={e => {
-                if (draggingHandle) return;
-                const rect = timelineRef.current!.getBoundingClientRect();
-                const ratio = (e.clientX - rect.left) / rect.width;
-                seekTo(ratio * (edit.endMs - edit.startMs));
-              }}
-            >
-              {/* Clip region */}
-              <div
-                className="absolute top-0 h-full bg-primary/30 border border-primary/50 rounded-lg"
-                style={{
-                  left:  `${((edit.startMs - initStart) / (initEnd - initStart)) * 100}%`,
-                  right: `${((initEnd - edit.endMs)    / (initEnd - initStart)) * 100}%`,
-                }}
-              />
+            <div className="flex flex-col gap-1 relative">
+               {/* Global Playhead */}
+               <div
+                  className="absolute top-0 bottom-0 w-px bg-red-500 z-50 pointer-events-none"
+                  style={{ left: `${(currentTime / Math.max(1, edit.endMs - edit.startMs)) * 100}%`, boxShadow: '0 0 4px red' }}
+               >
+                  <div className="absolute top-0 -translate-x-1/2 -mt-2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[6px] border-l-transparent border-r-transparent border-t-red-500" />
+               </div>
 
-              {/* IN handle */}
-              <div
-                className="absolute top-0 -translate-x-1/2 h-full w-3 bg-primary cursor-ew-resize rounded-l-lg flex items-center justify-center z-10"
-                style={{ left: `${((edit.startMs - initStart) / (initEnd - initStart)) * 100}%` }}
-                onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); setDraggingHandle('in'); }}
-              >
-                <div className="w-0.5 h-4 bg-white/70 rounded" />
-              </div>
+               {/* Video Track */}
+               <div className="flex items-center gap-2">
+                 <div className="w-16 shrink-0 text-[10px] font-mono text-white/40 flex items-center gap-1.5 justify-end px-2"><Clapperboard className="w-3 h-3"/> Video</div>
+                 <div
+                   ref={timelineRef}
+                   className="relative h-12 bg-white/5 rounded-lg cursor-pointer flex-1 overflow-visible"
+                   onPointerMove={handleTimelineDrag}
+                   onPointerUp={stopDrag}
+                   onPointerLeave={stopDrag}
+                   onClick={e => {
+                     if (draggingHandle) return;
+                     const rect = timelineRef.current!.getBoundingClientRect();
+                     const ratio = (e.clientX - rect.left) / rect.width;
+                     seekTo(ratio * (edit.endMs - edit.startMs));
+                   }}
+                 >
+                   <div
+                     className="absolute top-0 h-full bg-blue-600/30 border border-blue-500/50 rounded-lg"
+                     style={{
+                       left:  `${((edit.startMs - initStart) / (initEnd - initStart)) * 100}%`,
+                       right: `${((initEnd - edit.endMs)    / (initEnd - initStart)) * 100}%`,
+                     }}
+                   />
+                   <div
+                     className="absolute top-0 -translate-x-1/2 h-full w-3 bg-blue-500 cursor-ew-resize rounded-l-lg flex items-center justify-center z-10"
+                     style={{ left: `${((edit.startMs - initStart) / (initEnd - initStart)) * 100}%` }}
+                     onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); setDraggingHandle('in'); }}
+                   >
+                     <div className="w-0.5 h-4 bg-white/70 rounded" />
+                   </div>
+                   <div
+                     className="absolute top-0 translate-x-1/2 h-full w-3 bg-blue-500 cursor-ew-resize rounded-r-lg flex items-center justify-center z-10"
+                     style={{ right: `${((initEnd - edit.endMs) / (initEnd - initStart)) * 100}%` }}
+                     onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); setDraggingHandle('out'); }}
+                   >
+                     <div className="w-0.5 h-4 bg-white/70 rounded" />
+                   </div>
+                   {waveformUrl && (
+                     <div
+                       className="absolute inset-x-0 bottom-0 h-full opacity-30 pointer-events-none"
+                       style={{ backgroundImage: `url(${waveformUrl})`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', mixBlendMode: 'screen' }}
+                     />
+                   )}
+                 </div>
+               </div>
 
-              {/* OUT handle */}
-              <div
-                className="absolute top-0 translate-x-1/2 h-full w-3 bg-primary cursor-ew-resize rounded-r-lg flex items-center justify-center z-10"
-                style={{ right: `${((initEnd - edit.endMs) / (initEnd - initStart)) * 100}%` }}
-                onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); setDraggingHandle('out'); }}
-              >
-                <div className="w-0.5 h-4 bg-white/70 rounded" />
-              </div>
+               {/* B-Roll Track */}
+               {edit.brollLayers.length > 0 && (
+                  <div className="flex items-center gap-2">
+                     <div className="w-16 shrink-0 text-[10px] font-mono text-white/40 flex items-center gap-1.5 justify-end px-2"><ImageIcon className="w-3 h-3"/> B-Roll</div>
+                     <div className="relative h-8 bg-black/20 rounded-lg flex-1 border border-white/5"
+                          onPointerMove={handleTimelineDrag}
+                          onPointerUp={stopDrag}
+                          onPointerLeave={stopDrag}
+                     >
+                        {edit.brollLayers.map(b => (
+                           <div key={b.id} className="absolute top-0 h-full bg-purple-500/40 border border-purple-500/60 rounded flex items-center px-1 text-[9px] truncate"
+                                style={{
+                                   left: `${(b.startMs / Math.max(1, edit.endMs - edit.startMs)) * 100}%`,
+                                   width: `${((b.endMs - b.startMs) / Math.max(1, edit.endMs - edit.startMs)) * 100}%`
+                                }}>
+                                <div className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-white/50" onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); setDraggingTrack({ id: b.id, type: 'broll', handle: 'in' }); }} />
+                                <span className="pointer-events-none px-1 truncate">{b.path.split(/[\\/]/).pop()}</span>
+                                <div className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-white/50" onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); setDraggingTrack({ id: b.id, type: 'broll', handle: 'out' }); }} />
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+               )}
 
-              {/* Waveform Background Overlay */}
-              {waveformUrl && (
-                <div
-                  className="absolute inset-x-0 bottom-0 h-10 opacity-30 pointer-events-none"
-                  style={{
-                     backgroundImage: `url(${waveformUrl})`,
-                     backgroundSize: '100% 100%',
-                     backgroundRepeat: 'no-repeat',
-                     mixBlendMode: 'screen'
-                  }}
-                />
-              )}
+               {/* Text Track */}
+               {edit.textLayers.length > 0 && (
+                  <div className="flex items-center gap-2">
+                     <div className="w-16 shrink-0 text-[10px] font-mono text-white/40 flex items-center gap-1.5 justify-end px-2"><Type className="w-3 h-3"/> Text</div>
+                     <div className="relative h-8 bg-black/20 rounded-lg flex-1 border border-white/5"
+                          onPointerMove={handleTimelineDrag}
+                          onPointerUp={stopDrag}
+                          onPointerLeave={stopDrag}
+                     >
+                        {edit.textLayers.map(l => (
+                           <div key={l.id} className="absolute top-0 h-full bg-amber-500/40 border border-amber-500/60 rounded flex items-center px-1 text-[9px] truncate"
+                                style={{
+                                   left: `${(l.startMs / Math.max(1, edit.endMs - edit.startMs)) * 100}%`,
+                                   width: `${((l.endMs - l.startMs) / Math.max(1, edit.endMs - edit.startMs)) * 100}%`
+                                }}>
+                                <div className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-white/50" onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); setDraggingTrack({ id: l.id, type: 'text', handle: 'in' }); }} />
+                                <span className="pointer-events-none px-1 truncate">{l.text}</span>
+                                <div className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-white/50" onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); setDraggingTrack({ id: l.id, type: 'text', handle: 'out' }); }} />
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+               )}
 
-              {/* Playhead */}
-              <div
-                className="absolute top-0 h-full w-0.5 bg-red-500 z-20 pointer-events-none"
-                style={{ left: `${(currentTime / Math.max(1, edit.endMs - edit.startMs)) * 100}%`, boxShadow: '0 0 4px red' }}
-              />
-
-              {/* Text layer markers */}
-              {edit.textLayers.map(l => (
-                <div
-                  key={l.id}
-                  className="absolute top-1/2 -translate-y-1/2 h-2 rounded bg-yellow-400/70"
-                  style={{
-                    left:  `${(l.startMs / Math.max(1, edit.endMs - edit.startMs)) * 100}%`,
-                    width: `${((l.endMs - l.startMs) / Math.max(1, edit.endMs - edit.startMs)) * 100}%`,
-                  }}
-                />
-              ))}
+               {/* Audio Track Indication */}
+               {edit.audioTrack && (
+                 <div className="flex items-center gap-2">
+                    <div className="w-16 shrink-0 text-[10px] font-mono text-white/40 flex items-center gap-1.5 justify-end px-2"><Music className="w-3 h-3"/> Audio</div>
+                    <div className="relative h-8 bg-black/20 rounded-lg flex-1 border border-white/5 flex items-center">
+                       <div className="absolute inset-0 bg-emerald-500/20 border border-emerald-500/40 rounded" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, var(--primary) 4px, var(--primary) 8px)' }}></div>
+                       <div className="px-2 text-[10px] text-emerald-400 font-mono truncate z-10 flex items-center gap-1.5 w-full">
+                         <span className="truncate">{edit.audioTrack.path.split(/[\\/]/).pop()}</span>
+                       </div>
+                    </div>
+                 </div>
+               )}
             </div>
-
-            {/* Duration labels */}
-            <div className="flex justify-between text-[10px] text-white/20 mt-1">
-              <span>{msToTime(initStart)}</span>
-              <span>{msToTime(initEnd)}</span>
-            </div>
-
-            {/* Audio Track Indication */}
-            {edit.audioTrack && (
-              <div className="relative h-6 mt-2 bg-primary/10 rounded overflow-hidden border border-primary/20 flex items-center shrink-0">
-                <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, var(--primary) 4px, var(--primary) 8px)' }}></div>
-                <div className="px-2 text-[10px] text-primary/80 font-mono truncate z-10 flex items-center gap-1.5 w-full">
-                  <Music className="w-3 h-3 shrink-0" />
-                  <span className="truncate">{edit.audioTrack.path.split(/[\\/]/).pop()}</span>
-                </div>
-              </div>
-            )}
           </div>
         </main>
 

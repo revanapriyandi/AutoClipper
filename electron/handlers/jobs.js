@@ -140,6 +140,40 @@ async function processNextJob() {
       if (job.type === 'RENDER') {
         broadcast('job:progress', { jobId: job.id, percent: 0, label: 'Starting render...' });
 
+        if (payload.isAutopilot && (!payload.brollLayers || payload.brollLayers.length === 0)) {
+           try {
+              broadcast('job:progress', { jobId: job.id, percent: 10, label: 'Fetching Auto B-Roll...' });
+              const transcriptText = (payload.segments || []).map(s => s.text).join(' ');
+              const durationMs = payload.endMs - payload.startMs;
+
+              const aiModule = require('./ai');
+              const brollModule = require('./broll');
+              if (aiModule.suggestBRollInternal && brollModule.searchPexelsInternal) {
+                 const brollSuggestionRes = await aiModule.suggestBRollInternal(transcriptText, durationMs);
+                 if (brollSuggestionRes?.success && brollSuggestionRes.result?.broll) {
+                    const brollList = [];
+                    for (const b of brollSuggestionRes.result.broll) {
+                       const searchRes = await brollModule.searchPexelsInternal(b.keyword, 'portrait', 1);
+                       if (searchRes?.success && searchRes.videos?.length > 0) {
+                          const dlRes = await brollModule.downloadPexelsInternal(searchRes.videos[0].id, searchRes.videos[0].downloadUrl);
+                          if (dlRes?.success) {
+                             brollList.push({
+                                id: Date.now() + Math.random().toString(),
+                                path: dlRes.localPath,
+                                startMs: b.startMs,
+                                endMs: b.endMs,
+                             });
+                          }
+                       }
+                    }
+                    payload.brollLayers = brollList;
+                 }
+              }
+           } catch (e) {
+              console.error("[Job Queue] Failed to apply auto b-roll: ", e);
+           }
+        }
+
         // Derive outputPath if not in payload
         if (!payload.outputPath) {
           const clipsDir = await getDir('clips');

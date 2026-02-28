@@ -60,6 +60,45 @@ ipcMain.handle('broll:search', async (_, { keywords, orientation = 'portrait', p
   }
 });
 
+async function searchPexelsInternal(keywords, orientation = 'portrait', perPage = 5) {
+  try {
+    const pexelsKey = await keytar.getPassword(SERVICE_NAME, 'pexels_api_key');
+    if (!pexelsKey) return { success: false, error: 'no key' };
+
+    const query = Array.isArray(keywords) ? keywords.slice(0, 3).join(' ') : keywords;
+    const url = `${PEXELS_API_URL}?query=${encodeURIComponent(query)}&orientation=${orientation}&per_page=${perPage}&size=small`;
+
+    const res = await fetch(url, { headers: { 'Authorization': pexelsKey } });
+    if (!res.ok) throw new Error(`API error`);
+    const data = await res.json();
+    const videos = (data.videos || []).map(v => {
+      const file = v.video_files?.find(f => f.quality === 'sd') || v.video_files?.find(f => f.quality === 'hd') || v.video_files?.[0];
+      return { id: v.id, url: v.url, downloadUrl: file?.link };
+    }).filter(v => v.downloadUrl);
+
+    return { success: true, videos };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+}
+
+async function downloadPexelsInternal(videoId, downloadUrl) {
+  try {
+    const cacheDir = await getDir('brollCache');
+    const cacheFile = path.join(cacheDir, `broll_${videoId}.mp4`);
+    if (fs.existsSync(cacheFile)) return { success: true, localPath: cacheFile };
+    const res = await fetch(downloadUrl);
+    if (!res.ok) throw new Error(`Download failed`);
+    const buffer = Buffer.from(await res.arrayBuffer());
+    fs.writeFileSync(cacheFile, buffer);
+    return { success: true, localPath: cacheFile };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+}
+
+module.exports = { searchPexelsInternal, downloadPexelsInternal };
+
 // ── Download a Pexels video to local cache ───────────────────────
 ipcMain.handle('broll:download', async (_, { videoId, downloadUrl }) => {
   try {
