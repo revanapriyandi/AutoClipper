@@ -457,7 +457,7 @@ async function transcribeWithProvider(asrProvider, asrModel, audioBuffer) {
 // ============================================================
 // IPC: ai:score — with per-provider retry + provider fallback chain
 // ============================================================
-const SYSTEM_PROMPT = 'You are an expert AI video editor for TikTok/Shorts/Reels. Return ONLY valid JSON.';
+const SYSTEM_PROMPT = 'You are an expert AI video editor for TikTok/Shorts/Reels. You understand pacing, engagement, and viral mechanics. Your task is to identify highly engaging clips that contain a strong Hook, a Build-up, and a Climax or Call to Action. For each clip, provide a detailed explanation of WHY it is viral. Return ONLY valid JSON matching the requested schema.';
 
 /**
  * Extract an array of jpeg base64 frames from a video clip
@@ -727,6 +727,47 @@ Return exactly this JSON format:
     return { success: false, error: error.message };
   }
 });
+
+async function suggestBRollInternal(transcript, durationMs) {
+  try {
+    const preferredProvider = await getSetting('ai_scoring_provider', config.DEFAULT_LLM_PROVIDER);
+    const model = await getSetting('ai_scoring_model', config.DEFAULT_LLM_MODEL);
+
+    const promptText = `Analyze the following video transcript which is ${durationMs}ms long.
+Identify at most 3 key moments (between 2 to 4 seconds long) that would benefit from visual B-roll overlay to keep the viewer engaged.
+For each moment, provide a short specific keyword to search on Pexels (e.g., 'trading chart', 'happy people', 'coffee cup').
+Make sure the moments don't overlap, and avoid the very beginning (0-2s) where the hook happens.
+
+Transcript:
+${JSON.stringify(transcript)}
+
+Return exactly this JSON format:
+{
+  "broll": [
+    { "keyword": "...", "startMs": 10000, "endMs": 13000 }
+  ]
+}`;
+
+    const chain = buildLLMChain(preferredProvider);
+    let lastError;
+
+    for (const provider of chain) {
+      try {
+        const result = await scoreWithProvider(provider, model, promptText);
+        return { success: true, result, usedProvider: provider };
+      } catch (err) {
+        if (err.message.startsWith('no-key:')) continue;
+        lastError = err;
+      }
+    }
+    throw lastError || new Error('All LLM providers failed. Check API keys.');
+  } catch (error) {
+    console.error('[AI] B-Roll suggestion failed:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+module.exports = { suggestBRollInternal };
 
 // ============================================================
 // IPC: ai:generateImage — Generate an image (DALL-E 3 default)

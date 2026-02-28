@@ -75,16 +75,30 @@ ${hookText ? `Dialogue: 1,0:00:00.00,0:00:03.00,Hook,,0,0,0,,${hookText}\n` : ''
     const relStart = Math.max(0, seg.start - startSec);
     const relEnd   = Math.max(0, seg.end   - startSec);
     if (relEnd <= 0) continue;
-    let textLine = '';
+
     if (seg.words && seg.words.length > 0) {
-      for (const w of seg.words) {
-        const durCs = Math.round((w.end - w.start) * 100);
-        textLine += `{\\k${durCs}}${w.text} `;
+      for (let i = 0; i < seg.words.length; i++) {
+        const w = seg.words[i];
+        const wStart = Math.max(0, w.start - startSec);
+        const wEnd = Math.max(0, w.end - startSec);
+        const durMs = Math.round((w.end - w.start) * 1000);
+
+        let textLine = '';
+        for (let j = 0; j < seg.words.length; j++) {
+           if (j === i) {
+              textLine += `{\\c&H00FFFF&\\fscx120\\fscy120\\t(0,${durMs/2},\\fscx100\\fscy100)}${seg.words[j].text} `;
+           } else if (j < i) {
+              textLine += `{\\c${primaryColor}\\fscx100\\fscy100}${seg.words[j].text} `;
+           } else {
+              textLine += `{\\c&HFFFFFF&\\fscx100\\fscy100}${seg.words[j].text} `;
+           }
+        }
+        assContent += `Dialogue: 0,${formatAssTime(wStart)},${formatAssTime(wEnd)},Default,,0,0,0,,${textLine.trim()}\n`;
       }
     } else {
-      textLine = seg.text;
+      const popAnim = `{\\fscx80\\fscy80\\t(0,150,\\fscx110\\fscy110)\\t(150,300,\\fscx100\\fscy100)}`;
+      assContent += `Dialogue: 0,${formatAssTime(relStart)},${formatAssTime(relEnd)},Default,,0,0,0,,${popAnim}${seg.text.trim()}\n`;
     }
-    assContent += `Dialogue: 0,${formatAssTime(relStart)},${formatAssTime(relEnd)},Default,,0,0,0,,${textLine.trim()}\n`;
   }
   fs.writeFileSync(assPath, assContent, 'utf8');
 
@@ -200,6 +214,17 @@ ${hookText ? `Dialogue: 1,0:00:00.00,0:00:03.00,Hook,,0,0,0,,${hookText}\n` : ''
     for (const eq of zExprs.reverse()) finalZ = eq + finalZ;
 
     // We can do simple centering for Pan for now (ih/2 - ih/zoom/2)
+    const px = '(iw-iw/zoom)/2';
+    const py = '(ih-ih/zoom)/2';
+
+    filterChain.push(`${vOut}zoompan=z='${finalZ}':x='${px}':y='${py}':d=${durationSec*fps}:s=1080x1920:fps=${fps}[vzoom]`);
+    vOut = '[vzoom]';
+  } else if ((options.format === '9:16' || !options.format) && options.autoZoom !== false) {
+    // Dynamic Auto-Zoom (CapCut style subtle zoom)
+    // If no specific keyframes, apply a very subtle slow zoom to keep the viewer engaged
+    const fps = 30;
+    // Zoom from 1.0 to 1.05 over the entire clip duration
+    const finalZ = `min(zoom+0.0015,1.1)`;
     const px = '(iw-iw/zoom)/2';
     const py = '(ih-ih/zoom)/2';
 
